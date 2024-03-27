@@ -1,0 +1,25 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+dons_page:
+    path: /dons
+    controller: App\Controller\DonsController::index
+# config/routes.yaml
+don_delete:
+    path: /dons/{id}/delete
+    controller: App\Controller\DonsController::delete
+    methods: [POST] # Vous pouvez également inclure DELETE si vous voulez supporter les deux méthodes
+
+# config/routes.yaml
+
+edit_don:
+    path: '/edit/{id}'
+    controller: 'App\Controller\DonsController::editDon'
+
+demander_dons:
+    path: '/demander_dons'
+    controller: 'App\Controller\DemandeDonsController::demanderDons'
+
+
+   
+

@@ -1,0 +1,30 @@
+{# templates/dons/edit_modal.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Faire un don{% endblock %}
+
+{% block body %}
+
+
+<div class="modal" id="modifierDonModal{{ don.idDons }}" tabindex="-1" role="dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Modifier les données du don</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

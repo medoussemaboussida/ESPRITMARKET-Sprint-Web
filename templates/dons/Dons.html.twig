@@ -1,0 +1,285 @@
+
+
+{# templates/dons/Dons.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Faire un don{% endblock %}
+
+{% block body %}
+	<title>Dons</title>
+
+
+<body>
+	
+	<!--PreLoader-->
+    <div class="loader">
+        <div class="loader-inner">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <!--PreLoader Ends-->
+	
+	<!-- header -->
+	<div class="top-header-area" id="sticker">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12 col-sm-12 text-center">
+					<div class="main-menu-wrap">
+						<!-- logo -->
+						<div class="site-logo">
+							<a href="index.html">
+								<img src="assets/img/logo.png" alt="">
+							</a>
+						</div>
+						<!-- logo -->
+
+						<!-- menu start -->
+						<nav class="main-menu">
+							<ul>
+								<li ><a href="#">Home</a>
+									<ul class="sub-menu">
+										<li><a href="index.html">Static Home</a></li>
+										<li><a href="index_2.html">Slider Home</a></li>
+									</ul>
+								</li>
+								<li><a href="about.html">About</a></li>
+								<li class="current-list-item"><a href="#">Dons</a>
+									<ul class="sub-menu">
+                  <li><a href="{{ path('dons_page') }}">Faire un don</a></li>
+										<li><a href="{{ path('demander_dons')}}">Demander dons</a></li>
+										
+									</ul>
+								</li>
+								<li><a href="news.html">News</a>
+									<ul class="sub-menu">
+										<li><a href="news.html">News</a></li>
+										<li><a href="single-news.html">Single News</a></li>
+									</ul>
+								</li>
+								<li><a href="contact.html">Contact</a></li>
+								<li><a href="shop.html">Shop</a>
+									<ul class="sub-menu">
+										<li><a href="shop.html">Shop</a></li>
+										<li><a href="checkout.html">Check Out</a></li>
+										<li><a href="single-product.html">Single Product</a></li>
+										<li><a href="cart.html">Cart</a></li>
+									</ul>
+								</li>
+								<li>
+									<div class="header-icons">
+										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+									</div>
+								</li>
+							</ul>
+						</nav>
+						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+						<div class="mobile-menu"></div>
+						<!-- menu end -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end header -->
+	
+	<!-- search area -->
+	<div class="search-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<span class="close-btn"><i class="fas fa-window-close"></i></span>
+					<div class="search-bar">
+						<div class="search-bar-tablecell">
+							<h3>Search For:</h3>
+							<input type="text" placeholder="Keywords">
+							<button type="submit">Search <i class="fas fa-search"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <!-- breadcrumb-section -->
+	<div class="breadcrumb-section breadcrumb-bg">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="breadcrumb-text">
+						<p>Dons</p>
+						<h1>Faire un don</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    
+
+    <div class="left"><h2>
+				Vos points			</h2> </div>
+
+<div class="right">
+        <img src="https://smartrevision.net/wp-content/uploads/2023/01/Optimized-coinz-150x150.jpeg" width="40" height="40">
+        <div class="points-inner">
+            <span style="font-size: 20px;">Vous avez</span>
+            <label style="font-size: 20px; font-weight: bold;">{{ nbPointsUtilisateur }} Points</label>
+    </div>
+</div>       
+    
+	<!-- end breadcrumb section -->
+	<!-- end search area -->
+
+
+<div class="row justify-content-center"> 
+				<div class="col-lg-4 col-md-6 text-center">
+					<div class="single-product-item">
+			<h1 style="font-size: 20px; ">Faire un don</h1>
+
+
+                        {# Afficher le formulaire #}
+                            {{ form_start(form) }}
+                               {{ form_row(form.nbpoints) }}
+								<p><input type="submit" value="Submit"></p>
+                                 {{ form_end(form) }}
+					</div>
+				</div> 
+                </div>                  
+
+    
+    <h1>Liste des dons</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre de points</th>
+            <th>Date d'ajout</th>
+            <th>État du don</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set totalPoints = 0 %}
+        {% for don in dons %}
+            <tr>
+                <td >{{ don.nbPoints }}</td>
+                <td>{{ don.dateAjout | date('Y-m-d H:i:s') }}</td>
+                <td>{{ don.etatStatutDons }}</td>
+                <td>
+                    <!-- Icône pour modifier -->
+<a href="{{ path('edit_don', {'id': don.idDons}) }}"><i class="fas fa-edit"></i></a>
+
+                    
+                    <!-- Icône pour supprimer -->
+                    <a href="{{ path('don_delete', {'id': don.idDons}) }}" onclick="event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce don ?')) { document.getElementById('delete-form-{{ don.idDons }}').submit(); }">
+                        <i class="fas fa-trash"></i>
+                    </a>
+
+                    <form id="delete-form-{{ don.idDons }}" action="{{ path('don_delete', {'id': don.idDons}) }}" method="POST" style="display: none;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ don.idDons) }}">
+                    </form>
+                </td>
+            </tr>
+            {% set totalPoints = totalPoints + don.nbPoints %}
+        {% endfor %}
+        <tr>
+            <td colspan="4" class="text-right">Total des points donnés : {{ totalPoints }}</td>
+        </tr>
+    </tbody>
+</table>
+    <div class="footer-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box about-widget">
+						<h2 class="widget-title">About us</h2>
+						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box get-in-touch">
+						<h2 class="widget-title">Get in Touch</h2>
+						<ul>
+							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
+							<li>support@fruitkha.com</li>
+							<li>+00 111 222 3333</li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box pages">
+						<h2 class="widget-title">Dons</h2>
+						<ul>
+							<li><a href="index.html">Home</a></li>
+                  <li><a href="{{ path('dons_page') }}">Faire un don</a></li>
+							<li><a href="services.html">Shop</a></li>
+							<li><a href="news.html">News</a></li>
+							<li><a href="contact.html">Contact</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box subscribe">
+						<h2 class="widget-title">Subscribe</h2>
+						<p>Subscribe to our mailing list to get the latest updates.</p>
+						<form action="index.html">
+							<input type="email" placeholder="Email">
+							<button type="submit"><i class="fas fa-paper-plane"></i></button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end footer -->
+	
+	<!-- copyright -->
+	<div class="copyright">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-12">
+					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.<br>
+						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
+					</p>
+				</div>
+				<div class="col-lg-6 text-right col-md-12">
+					<div class="social-icons">
+						<ul>
+							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end copyright -->
+	
+	<!-- jquery -->
+	<script src="assets/js/jquery-1.11.3.min.js"></script>
+	<!-- bootstrap -->
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+	<!-- count down -->
+	<script src="assets/js/jquery.countdown.js"></script>
+	<!-- isotope -->
+	<script src="assets/js/jquery.isotope-3.0.6.min.js"></script>
+	<!-- waypoints -->
+	<script src="assets/js/waypoints.js"></script>
+	<!-- owl carousel -->
+	<script src="assets/js/owl.carousel.min.js"></script>
+	<!-- magnific popup -->
+	<script src="assets/js/jquery.magnific-popup.min.js"></script>
+	<!-- mean menu -->
+	<script src="assets/js/jquery.meanmenu.min.js"></script>
+	<!-- sticker js -->
+	<script src="assets/js/sticker.js"></script>
+	<!-- main js -->
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+{% endblock %}
