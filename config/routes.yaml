@@ -1,3 +1,7 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+
+afficher_produit_panier:
+    path: /afficher-panier/{idUser}
+    controller: App\Controller\ProduitcartController::afficherPanier
