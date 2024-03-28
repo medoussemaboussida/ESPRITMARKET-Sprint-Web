@@ -120,18 +120,138 @@
     
 
 
+	<!-- contact form -->
+	<div class="contact-from-section mt-150 mb-150">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 mb-5 mb-lg-0">
+					<div class="form-title">
    <h1>Poster une demande de don</h1>
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur, ratione! Laboriosam est, assumenda. Perferendis, quo alias quaerat aliquid. Corporis ipsum minus voluptate? Dolore, esse natus!</p>
+					</div>
+				 	<div id="form_status"></div>
+					<div class="contact-form">
 <form action="{{ path('demander_dons') }}" method="post">
-    
-    <div>
-        <label for="contenu">Contenu:</label>
-        <textarea id="contenu" name="contenu" required></textarea>
-        <!-- Zone de texte pour saisir le contenu de la demande -->
+							
+							<p><textarea  id="contenu" name="contenu" required cols="30" rows="10" placeholder="Contenu"></textarea></p>
+							<p><input type="submit" value="Submit"></p>
+						</form>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<h2>Liste des demandes de dons</h2>
+
+<!-- Liste des demandes de dons -->
+<div class="latest-news mt-150 mb-150">
+    <div class="container">
+        <div class="row">
+            {% for key, demande in demandes %}
+            <div class="col-lg-4 col-md-6">
+                <div class="single-latest-news">
+                    <a href=""><div class=""></div></a>
+                    <div class="news-text-box">
+                        <h3><a href="single-news.html">{{ demande.getContenu() }}</a></h3>
+                        <p class="blog-meta">
+                            <span class="author"><i class="fas fa-user"></i> {{ demande.getNomuser() }} {{ demande.getPrenomuser() }}</span>
+                            <span class="date"><i class="fas fa-calendar"></i>{{ demande.getDatePublication()|date('Y-m-d H:i:s') }}</span>
+                        </p>
+                        <p class="excerpt">Points gagnés: {{ demande.getNbpoints() }}</p>
+
+                        <!-- Lien pour transférer des points -->
+                        <a href="#" class="read-more-btn" data-demande-id="{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
+
+                        <!-- Formulaire de transfert de points (masqué par défaut) -->
+                        <div id="myModal{{ demande.idDemande }}" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <h2>Transférer des points</h2>
+                                <form id="transferForm{{ demande.idDemande }}">
+                                    <label for="donPoints">Nombre de points à transférer :</label>
+                                    <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
+                                    <button type="button" id="submitForm{{ demande.idDemande }}">Transférer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-   
-    <button type="submit">Poster</button>
-    <!-- Bouton pour soumettre le formulaire -->
-</form>
+</div>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- JavaScript pour gérer l'affichage du modal -->
+    <script>
+        $(document).ready(function() {
+            // Gérer le clic sur le lien "Transférer des points"
+            $('.read-more-btn').click(function(e) {
+                e.preventDefault(); // Empêcher le comportement par défaut du lien
+                var idDemande = $(this).data('demande-id');
+                $('#myModal' + idDemande).show();
+            });
+
+            // Gérer la soumission du formulaire de transfert de points
+            $('[id^="submitForm"]').click(function(e) {
+                e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+                var idDemande = $(this).attr('id').replace('submitForm', '');
+                var userId = $('#userId').val();
+                var donPoints = $('#donPoints' + idDemande).val();
+
+                $.ajax({
+                    url: '/transfer_points', // Remplacez par l'URL de votre route Symfony
+                    method: 'POST',
+                    data: {
+                        userId: userId,
+                        donPoints: donPoints,
+                        idDemande: idDemande
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Points transférés avec succès.');
+                            $('#pointsDemande' + idDemande).text(response.newPoints);
+                            $('#myModal' + idDemande).hide(); // Masquer la fenêtre modale
+                        } else {
+                            alert('Erreur: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Erreur: ' + error);
+                    }
+                });
+            });
+
+            // Gérer le clic sur le bouton de fermeture du modal
+            $('.close').click(function() {
+                $(this).closest('.modal').hide();
+            });
+
+            // Gérer le clic en dehors du contenu du modal pour le fermer
+            $(window).click(function(event) {
+                if ($(event.target).hasClass('modal')) {
+                    $(event.target).hide();
+                }
+            });
+        });
+    </script>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
     <div class="footer-area">
 		<div class="container">
@@ -203,6 +323,7 @@
 		</div>
 	</div>
 	<!-- end copyright -->
+
 	
 	<!-- jquery -->
 	<script src="assets/js/jquery-1.11.3.min.js"></script>
@@ -224,6 +345,7 @@
 	<script src="assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="assets/js/main.js"></script>
+
 
 </body>
 

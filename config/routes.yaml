@@ -21,5 +21,10 @@ demander_dons:
     controller: 'App\Controller\DemandeDonsController::demanderDons'
 
 
+transfer_points:
+    path: /transfer_points
+    controller: App\Controller\DemandeDonsController::transferPoints
+    methods: ['POST']
+
    
 

@@ -19,7 +19,7 @@ class Demandedons
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $iddemande;
+    private $idDemande;
 
     /**
      * @var string|null
@@ -114,15 +114,16 @@ class Demandedons
 
     public function getDatePublication(): ?\DateTimeInterface
     {
-        return $this->datePublication;
+        return $this->datepublication;
     }
-
+    
     public function setDatePublication(\DateTimeInterface $datePublication): self
     {
-        $this->datePublication = $datePublication;
-
+        $this->datepublication = $datePublication;
+    
         return $this;
     }
+    
 
     public function getNbpoints(): ?int
     {
