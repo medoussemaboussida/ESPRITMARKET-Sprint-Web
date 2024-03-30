@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Table(name: "produit", indexes: [
     new ORM\Index(name: "categorie_id", columns: ["categorie_id"])
@@ -17,12 +19,23 @@ class Produit
     private $idproduit;
 
     #[ORM\Column(name: "nomProduit", type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Veuillez entrer un nom de produit.")]
+    #[Assert\Length(
+        min: 5,
+        max: 20,
+        minMessage: "Le nom de produit doit comporter {{ limit }} caractères minimum.",
+        maxMessage: "Le nom de produit doit comporter {{ limit }} caractères maximum."
+    )]
     private $nomproduit;
 
     #[ORM\Column(name: "quantite", type: "integer", nullable: false)]
+    #[Assert\NotBlank(message:"Veuillez entrer une quantité.")]
+    #[Assert\GreaterThan(value: 0, message:"La quantité doit être supérieure à zéro.")]
     private $quantite;
 
     #[ORM\Column(name: "prix", type: "float", precision: 10, scale: 0, nullable: false)]
+    #[Assert\NotBlank(message:"Veuillez entrer le prix.")]
+    #[Assert\GreaterThan(value: 0, message:"La quantité doit être supérieure à zéro.")]
     private $prix;
 
     #[ORM\Column(name: "imageProduit", type: "string", length: 255, nullable: false)]

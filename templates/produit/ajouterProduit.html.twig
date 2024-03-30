@@ -195,12 +195,15 @@
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
               <span class="mdi mdi-menu"></span>
             </button>
-            <ul class="navbar-nav w-100">
-              <li class="nav-item w-100">
-                <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input type="text" class="form-control" placeholder="Search products">
-                </form>
-              </li>
+          <ul class="navbar-nav w-100">
+          <li class="nav-item w-100">
+           <form action="{{ path('app_produit_search') }}" method="get" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+            <input type="text" name="keyword" class="form-control" placeholder="Search products">
+            <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+                    <div id="search-results"></div>
+
+            </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
@@ -390,10 +393,12 @@
                     <p class="card-description"></p>
                    {% block body %}
                    
-                   {{ form_start(form, {'attr': {'class': 'forms-sample'}}) }}
+                  {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }}
                    <div class="form-group" >
                    {{ form_label(form.nomproduit, 'Nom de produit', {'attr': {'class': 'form-control-label'}}) }}
                    {{ form_widget(form.nomproduit, {'attr': {'class': 'form-control', 'placeholder': 'Nom de produit'}}) }}
+                   {{ form_errors(form.nomproduit) }}
+
                    </div>
                    <div class="form-group" >
                    {{ form_label(form.categorie, 'categorie', {'attr': {'class': 'form-control-label'}}) }}
@@ -402,14 +407,19 @@
                    <div class="form-group" >
                    {{ form_label(form.prix, 'Prix', {'attr': {'class': 'form-control-label'}}) }}
                    {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
+                   {{ form_errors(form.prix) }}
+
                    </div>
                    <div class="form-group" >
                    {{ form_label(form.quantite, 'Quantite', {'attr': {'class': 'form-control-label'}}) }}
                    {{ form_widget(form.quantite, {'attr': {'class': 'form-control', 'placeholder': 'Quantite'}}) }}
+                   {{ form_errors(form.quantite) }}
                    </div>
                    <div class="form-group">
                    {{ form_label(form.imageproduit, 'Image', {'attr': {'class': 'form-control-label'}}) }}
                    {{ form_widget(form.imageproduit, {'attr': {'class': 'form-control'}}) }}
+                   {{ form_errors(form.imageproduit) }}
+
                    </div>
                    <button type="submit" class="btn btn-primary">Ajouter</button>
                    {{ form_end(form) }}
@@ -417,11 +427,21 @@
                   </div>
                 </div>
               </div>
+                       <div class="col-lg-6 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Nombre de produits</h4>
+            <canvas id="pieChart" style="height:200px"></canvas>
+        </div>
+    </div>
+</div>
+</div>
+
                    <div class="row ">
               <div class="col-12 grid-margin">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">Liste des catégories</h4>
+                    <h4 class="card-title">Liste des produits</h4>
                     <div class="table-responsive">
                       <table class="table">
                         <thead>
@@ -477,7 +497,57 @@
                 </div>
               </div>
             </div>
-          </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    const data = {
+            labels: {{ categories|map(category => category[0].nomCategorie)|json_encode|raw }},
+      datasets: [{
+        label: 'nombre de produits :',
+        data: {{ categories|map(category => category.count)|json_encode|raw }},
+        backgroundColor: [
+          '#4e73df',
+          '#1cc88a',
+          '#36b9cc',
+          '#f6c23e',
+          '#e74a3b',
+          '#9b59b6',
+          '#fbc02d',
+          '#7266ba',
+          '#4882c2',
+          '#6d5e63'
+        ],
+        borderColor: [
+          '#4e73df',
+          '#1cc88a',
+          '#36b9cc',
+          '#f6c23e',
+          '#e74a3b',
+          '#9b59b6',
+          '#fbc02d',
+          '#7266ba',
+          '#4882c2',
+          '#6d5e63'
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    const config = {
+      type: 'pie',
+      data: data,
+      /*options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }*/
+    };
+
+    new Chart(ctx, config);
+  </script>
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">

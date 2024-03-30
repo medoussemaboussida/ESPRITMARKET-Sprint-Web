@@ -1,0 +1,10 @@
+knp_paginator:
+    page_range: 5                      # Nombre de pages affichées dans la barre de pagination
+    default_options:
+        page_name: page                # Nom du paramètre GET utilisé pour la pagination
+        sort_field_name: sort          # Nom du paramètre GET utilisé pour le tri
+        sort_direction_name: direction # Nom du paramètre GET utilisé pour la direction du tri
+        distinct: true                 # Définissez à true pour supprimer les doublons de résultats
+    template:
+        pagination: '@KnpPaginator/Pagination/sliding.html.twig'  # Modèle de pagination par défaut
+        sortable: '@KnpPaginator/Pagination/sortable_link.html.twig'  # Modèle de lien de tri par défaut

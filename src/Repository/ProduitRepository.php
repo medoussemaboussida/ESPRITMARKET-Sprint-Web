@@ -45,4 +45,34 @@ class ProduitRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+public function findByKeyword(string $keyword)
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.nomproduit LIKE :keyword')
+            ->setParameter('keyword', '%' . $keyword . '%')
+            ->getQuery()
+            ->getResult();
+    }
+    public function findByCategoryName(string $keyword): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.categorie', 'c') // Assurez-vous que "categorie" est le nom de la relation dans l'entité Produit
+            ->where('c.nomcategorie LIKE :keyword')
+            ->setParameter('keyword', '%'.$keyword.'%')
+            ->getQuery()
+            ->getResult();
+    }
+    public function getCategoryStatistics()
+    {
+        return $this->createQueryBuilder('p')
+            ->select('c.nomcategorie as category', 'COUNT(p.idproduit) as productCount')
+            ->join('p.categorie', 'c')
+            ->groupBy('c.idcategorie')
+            ->orderBy('productCount', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+
 }

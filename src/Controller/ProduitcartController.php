@@ -24,6 +24,9 @@ class ProduitcartController extends AbstractController
             'controller_name' => 'ProduitcartController',
         ]);
     }
+
+
+    //supprimer un produit de votre panier
     #[Route('/produitcart/supprimer/{id}', name: 'app_produitcart_supprimer')]
     public function supprimer($id,ProduitcartRepository $repository): Response
     {
@@ -34,6 +37,8 @@ class ProduitcartController extends AbstractController
         return $this->redirectToRoute('app_produit_front');
     }
     
+
+    //ajouter un produit a votre panier
     #[Route('/produitcart/{idProduit}/{idUser}', name: 'app_produit_cart')]
 
     public function ajouter(Request $request, $idProduit, $idUser): Response
@@ -57,6 +62,9 @@ class ProduitcartController extends AbstractController
         return $this->redirectToRoute('app_produit_front');
     }
 
+
+
+    //afficher la panier avec les produits choisis
     #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]
     public function afficherPanier($idUser): Response
     {

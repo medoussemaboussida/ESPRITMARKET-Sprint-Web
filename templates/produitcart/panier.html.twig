@@ -154,7 +154,6 @@
             <th class="product-image">Product Image</th>
             <th class="product-name">Name</th>
             <th class="product-price">Price</th>
-            <th class="product-quantity">Quantity</th>
 			<th class="product-action">Delete</th>
 
         </tr>
@@ -165,9 +164,6 @@
             <td class="product-image"><img src="{{ asset('images/' ~ produit.idproduit.imageproduit) }}" alt="" class="product-img"></td>
             <td class="product-name">{{ produit.idproduit.nomproduit }}</td>
             <td class="product-price">{{ produit.idproduit.prix }}DT</td>
-            <td class="product-quantity">
-                <input type="number" name="quantity_{{ produit.idproduit.quantite}}" value="1" min="1">
-            </td>
 			<td class="product-action">
     
 	             <a href="{{ path('app_produitcart_supprimer', {'id': produit.idpanierproduit }) }}" class="cart-btn" ><i class="fas fa-trash-alt" style="display: inline;"></i>Delete</a>
@@ -212,7 +208,7 @@
 						</table>
 						<div class="cart-buttons">
 							<a  href="{{ path('app_commande_add', {'idp':panier.idpanier}) }}" class="boxed-btn black">Passer Commande</a>
-							<a href="cart.html" class="boxed-btn">Update Cart</a>
+							<a href="{{ path('app_commande_delete', {'idp':panier.idpanier}) }}" class="boxed-btn">Annuler</a>
 						</div>
 					</div>
 

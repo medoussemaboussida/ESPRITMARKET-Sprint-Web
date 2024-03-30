@@ -152,10 +152,9 @@
                 <div class="col-md-12">
                     <div class="product-filters">
                         <ul>
-                            <li class="active" data-filter="*">All</li>
-                            <li data-filter=".strawberry">Strawberry</li>
-                            <li data-filter=".berry">Berry</li>
-                            <li data-filter=".lemon">Lemon</li>
+                            <li class="" data-filter="*"><a href="{{ path('app_produit_front')}}">All</li>
+							 {% for categorie in categories %}
+                      <li><a href="{{ path('app_categorie_front', {'id': categorie.idcategorie}) }}">{{ categorie.nomcategorie }}</a></li>                {% endfor %}
                         </ul>
                     </div>
                 </div>
@@ -180,6 +179,24 @@
     {% endfor %}
 </div>
 
+
+
+	<div class="row">
+    <div class="col-lg-12 text-center">
+        <div class="pagination-wrap">
+            <ul>
+                <li><a href="#" class="prev">Prev</a></li>
+                <li><a href="#" class="page-link active">1</a></li>
+                <li><a href="#" class="page-link">2</a></li>
+                <li><a href="#" class="page-link">3</a></li>
+                <li><a href="#" class="next">Next</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+	<!-- end products -->
+
 <style>
 /* CSS pour disposer les produits en ligne */
 .product-box {
@@ -187,26 +204,6 @@
 }
 
 </style>
-
-			<div class="row">
-				<div class="col-lg-12 text-center">
-					<div class="pagination-wrap">
-						<ul>
-							<li><a href="#" >Prev</a></li>
-							<li><a class="active" href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">Next</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- end products -->
-
-
 	<!-- logo carousel -->
 	<div class="logo-carousel-section">
 		<div class="container">

@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 class ProduitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -23,6 +25,15 @@ class ProduitType extends AbstractType
             ->add('imageproduit', FileType::class, [
                 'label' => 'Image',
                 'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'accept' => '.png,.jpg,.jpeg', // Limiter les extensions de fichier dans le navigateur
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please upload an image file.',
+                    ]),
+                ],
             ])
             ->add('categorie', EntityType::class, [
                 'class' => Categorie::class,
