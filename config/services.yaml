@@ -6,6 +6,7 @@
 parameters:
  images_directory: '%kernel.project_dir%/public/images'
 services:
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -19,6 +20,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
 
     
         

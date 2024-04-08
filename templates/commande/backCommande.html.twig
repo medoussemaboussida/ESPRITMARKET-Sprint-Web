@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ESPRITMARKET Admin</title>
+    <title>Gestion des commandes</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="/back/assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/css/vendor.bundle.base.css">
@@ -400,6 +400,8 @@
                             </th>
                             <th> Client </th>
                             <th> Date de validation </th>
+                            <th> Action </th>
+
                           </tr>
                         </thead>
        <tbody>
@@ -414,6 +416,11 @@
     </td>
     <td>{{ commandes.idpanier.iduser.nomuser }}</td>
     <td>{{ commandes.datecommande | date('Y-m-d H:i:s')}}</td>
+    <td>
+        <form action="{{ path('app_commande_supprimer', {'id': commandes.idcommande}) }}" style="display: inline;"> 
+     <button type="submit" class="btn btn-primary">Delete</button>
+     </form>
+    </td>
       </tr>
          {% endfor %}
       </tbody>

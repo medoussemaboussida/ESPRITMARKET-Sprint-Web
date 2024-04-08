@@ -7,6 +7,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class CategorieType extends AbstractType
 {
@@ -17,6 +19,15 @@ class CategorieType extends AbstractType
             ->add('imagecategorie', FileType::class, [
                 'label' => 'Image',
                 'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'accept' => '.png,.jpg,.jpeg', // Limiter les extensions de fichier dans le navigateur
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please upload an image file.',
+                    ]),
+                ],
             ]);
         
     }

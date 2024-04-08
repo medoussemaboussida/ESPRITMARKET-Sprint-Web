@@ -3,6 +3,7 @@
 namespace App\Controller;
 use App\Entity\Panier;
 use App\Entity\Commande;
+use App\Entity\Produitcart;
 use App\Repository\PanierRepository;
 use App\Repository\CommandeRepository;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -47,8 +48,15 @@ class CommandeController extends AbstractController
     {
       
         $panier = $this->getDoctrine()->getRepository(Panier::class)->find($idp);
-        $dateCommande = new DateTimeImmutable();
+        $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $idp]);
 
+        if (empty($produitCart)) {
+            // Si la table produitcart est vide, rediriger l'utilisateur ou afficher un message d'erreur
+            $this->addFlash('error', 'Votre panier est vide. Veuillez ajouter des produits avant de passer la commande.');
+            return $this->redirectToRoute('app_produit_front');
+        }
+        else {
+        $dateCommande = new DateTimeImmutable();
         // Créer une nouvelle instance de Produitcart
         $commande = new Commande();
 
@@ -63,23 +71,31 @@ class CommandeController extends AbstractController
         $entityManager->persist($commande);
         $entityManager->flush();
         $this->addFlash('success', 'Votre commande a bien été passée.');
-        $emailUtilisateur = $panier->getIduser()->getEmailuser();
+        //$emailUtilisateur = $panier->getIduser()->getEmailuser();
 
         return $this->redirectToRoute('app_produit_front');
-
+    }
     }
 
-
+    //annuler commande depuis front
     #[Route('/commande/delete/{idp}', name: 'app_commande_delete')]
     public function delete(Request $request,$idp): Response
     {
         // Récupérer toutes les commandes liées au panier avec l'ID donné
     $commandes = $this->getDoctrine()->getRepository(Commande::class)->findBy(['idpanier' => $idp]);
-    
+    $dateActuelle = new DateTimeImmutable();
+
     // Supprimer chaque commande individuellement
     $entityManager = $this->getDoctrine()->getManager();
     foreach ($commandes as $commande) {
+        $commandeDateFormatted = $commande->getDatecommande()->format('Y-m-d');
+        // Convertir la date actuelle en une chaîne de caractères au format 'Y-m-d'
+        $dateActuelleFormatted = $dateActuelle->format('Y-m-d');
+
+        if ($commandeDateFormatted === $dateActuelleFormatted)
+        {
         $entityManager->remove($commande);
+        }
     }
     $entityManager->flush();
 
@@ -88,6 +104,18 @@ class CommandeController extends AbstractController
     return $this->redirectToRoute('app_produit_front');
     }
     
+
+    //supprimer une commande depuis back
+#[Route('/commande/supprimer/{id}', name: 'app_commande_supprimer')]
+public function supprimer($id, CommandeRepository $repository): Response
+{
+    $list = $repository->find($id);
+    $em = $this->getDoctrine()->getManager();
+    $em->remove($list);
+    $em->flush();
+    return $this->redirectToRoute('app_commande_back');
+}
+
     }
 
 

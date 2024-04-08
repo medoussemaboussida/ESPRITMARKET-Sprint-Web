@@ -7,7 +7,7 @@
 	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
 
 	<!-- title -->
-	<title>Shop</title>
+	<title>Produits</title>
 
 	<!-- favicon -->
 	<link rel="shortcut icon" type="image/png" href="/front/assets/img/favicon.png">
@@ -32,6 +32,7 @@
 	<link rel="stylesheet" href="/front/assets/css/responsive.css">
 
 </head>
+
 <body>
 	
 	<!--PreLoader-->
@@ -51,46 +52,38 @@
 						<!-- logo -->
 						<div class="site-logo">
 							<a href="index.html">
-								<img src="/front/assets/img/logo.png" alt="">
+								<img src="/front/assets/img/logo.png" alt="" class="logo-img">
 							</a>
 						</div>
+						<style>
+							.logo-img {
+								max-width: 250px; /* ajustez la valeur en fonction de la taille maximale souhaitée */
+                               height: auto;
+							   margin-top: -12px;
+							}
+						</style>
 						<!-- logo -->
-
+                        
 						<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
-								<li class="current-list-item"><a href="#">Home</a>
+								<li><a href="{{path('app_produit')}}">Home</a></li>
+								<li><a href="">Dons</a></li>
+
+								<li><a href="">Evénements</a>
 									<ul class="sub-menu">
-										<li><a href="index.html">Static Home</a></li>
-										<li><a href="index_2.html">Slider Home</a></li>
+										<li><a href="">Evénements</a></li>
+										<li><a href="">Réclamation</a></li>
 									</ul>
 								</li>
-								<li><a href="about.html">About</a></li>
-								<li><a href="#">Pages</a>
+								<li><a href="">Publications</a></li>
+
+								<li><a href="">Offres</a></li>
+
+								<li  class="current-list-item"><a href="{{ path('app_produit_front')}}">Produits</a>
 									<ul class="sub-menu">
-										<li><a href="404.html">404 page</a></li>
-										<li><a href="about.html">About</a></li>
-										<li><a href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}">Cart</a></li>
-										<li><a href="checkout.html">Check Out</a></li>
-										<li><a href="contact.html">Contact</a></li>
-										<li><a href="news.html">News</a></li>
-										<li><a href="shop.html">Shop</a></li>
-									</ul>
-								</li>
-								<li><a href="news.html">News</a>
-									<ul class="sub-menu">
-										<li><a href="news.html">News</a></li>
-										<li><a href="single-news.html">Single News</a></li>
-									</ul>
-								</li>
-								<li><a href="contact.html">Contact</a></li>
-								
-								<li><a href="{{ path('app_produit_front')}}">Shop</a>
-									<ul class="sub-menu">
-										<li><a href="shop.html">Shop</a></li>
-										<li><a href="checkout.html">Check Out</a></li>
-										<li><a href="single-product.html">Single Product</a></li>
-										<li><a href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}">Cart</a></li>
+										<li><a href="checkout.html">Historique des commandes</a></li>
+										<li ><a href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}">Panier</a></li>
 									</ul>
 								</li>
 								<li>
@@ -152,13 +145,19 @@
                 <div class="col-md-12">
                     <div class="product-filters">
                         <ul>
-                            <li class="" data-filter="*"><a href="{{ path('app_produit_front')}}">All</li>
+                            <li class="bordered-btn" data-filter="*"><a href="{{ path('app_produit_front')}}">All</li>
 							 {% for categorie in categories %}
-                      <li><a href="{{ path('app_categorie_front', {'id': categorie.idcategorie}) }}">{{ categorie.nomcategorie }}</a></li>                {% endfor %}
+                      <li class="hero-btns"><a href="{{ path('app_categorie_front', {'id': categorie.idcategorie}) }}">{{ categorie.nomcategorie }}</a></li>                {% endfor %}
                         </ul>
                     </div>
                 </div>
             </div>
+{% for flash_message in app.flashes('error') %}
+    <div class="alert alert-danger" role="alert">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+
 {% for message in app.flashes('success') %}
     <div class="alert alert-success">
         {{ message }}
@@ -166,21 +165,25 @@
 {% endfor %}
 		<div  id="product-lists" class="row product-lists">
     {% for produit in produits %}
+	
         <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-box text-center">
             <div class="single-product-item">
                 <div class="product-image">
                 <img src="{{ asset('images/' ~ produit.imageproduit) }}" alt=""></a>
                 </div>
                 <h3>{{ produit.nomproduit }}</h3>
-                <p class="product-price"><span>Stock :{{ produit.quantite }}</span> {{ produit.prix }}DT </p>
+                <p class="product-price"><span>Stock :{{ produit.quantite }}</span> {{ produit.prix |number_format(3, '.', ' ')}}DT </p>
             <a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
             </div>
         </div>
     {% endfor %}
 </div>
 
+<style>
 
-
+</style>
+<script>
+</script>
 	<div class="row">
     <div class="col-lg-12 text-center">
         <div class="pagination-wrap">

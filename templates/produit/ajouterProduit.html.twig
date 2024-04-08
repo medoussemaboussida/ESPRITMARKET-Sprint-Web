@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ESPRITMARKET Admin</title>
+    <title>Gestion des produits</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="/back/assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/css/vendor.bundle.base.css">
@@ -20,7 +20,7 @@
     <!-- Layout styles -->
     <link rel="stylesheet" href="/back/assets/css/style.css">
     <!-- End layout styles -->
-    <link rel="shortcut icon" href="/back/assets/images/favicon.png" />
+    <link rel="shortcut icon" href="/back/assets/images/ourlogo.png" />
   </head>
   <body>
     <div class="container-scroller">
@@ -198,12 +198,35 @@
           <ul class="navbar-nav w-100">
           <li class="nav-item w-100">
            <form action="{{ path('app_produit_search') }}" method="get" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-            <input type="text" name="keyword" class="form-control" placeholder="Search products">
-            <button type="submit" class="btn btn-primary">Search</button>
+               <input type="text" name="search" id="search" class="form-control" placeholder="Search products">
+             <button type="submit" class="btn btn-primary">Search</button>
             </form>
                     <div id="search-results"></div>
 
             </li>
+            <script>
+$(document).ready(function() {
+    $('#search-form').submit(function(e) {
+        e.preventDefault(); // Empêche le formulaire d'être soumis normalement
+
+        // Récupérer la valeur du champ de saisie
+        var searchTerm = $('#search').val();
+
+        $.ajax({
+            type: 'GET',
+            url: '{{ path('app_produit_search') }}', // Endpoint de recherche AJAX
+            data: {
+                keyword: searchTerm
+            },
+            success: function(response) {
+                // Mettre à jour l'interface utilisateur avec les résultats de la recherche
+                $('#product-table-body').html(response);
+            }
+        });
+    });
+});
+</script>
+
             </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
@@ -427,8 +450,8 @@
                   </div>
                 </div>
               </div>
-                       <div class="col-lg-6 grid-margin stretch-card">
-    <div class="card">
+             <div class="col-lg-6 grid-margin stretch-card">
+             <div class="card">
         <div class="card-body">
             <h4 class="card-title">Nombre de produits</h4>
             <canvas id="pieChart" style="height:200px"></canvas>
@@ -441,8 +464,25 @@
               <div class="col-12 grid-margin">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">Liste des produits</h4>
+                    <h4 class="card-title text-center">Liste des produits</h4>
                     <div class="table-responsive">
+                    <div class="row">
+                    
+    <div class="col-lg-2 text-center">
+    
+        <div class="form-group">
+            <select class="btn btn-primary" id="sort-options">
+                 <option  class="btn btn-primary" value="">Trier par</option>
+                <option value="{{ path('app_prix_asc')}}" class="btn btn-primary">Prix croissant</option>
+                <option value="{{ path('app_prix_desc')}}" class="btn btn-primary">Prix décroissant</option>
+                <option value="{{ path('app_nomproduit_asc')}}" class="btn btn-primary">Nom croissant</option>
+                 <option value="{{ path('app_nomproduit_desc')}}" class="btn btn-primary">Nom décroissant</option>
+
+
+            </select>
+        </div>
+    </div>
+</div>
                       <table class="table">
                         <thead>
                           <tr>
@@ -454,13 +494,14 @@
                               </div>
                             </th>
                             <th> Nom produit </th>
+                            <th> Catégorie </th>
                             <th> Quantité </th>
                             <th> Prix (Dt) </th>
                             <th> Image Produit </th>
                             <th> Actions   </th>
                           </tr>
                         </thead>
-       <tbody>
+       <tbody id="product-table-body">
     {% for produit in produits %}
   <tr>
     <td>
@@ -471,8 +512,9 @@
       </div>
     </td>
     <td>{{ produit.nomproduit }}</td>
+    <td>{{ produit.categorie.nomcategorie }}</td>
     <td>{{ produit.quantite }}</td>
-    <td>{{ produit.prix }}</td>
+    <td>{{ produit.prix |number_format(3, '.', ' ') }}</td>
     <td>
       {% if produit.imageproduit %}
         <img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="Image" style="width: 200px; height: auto;">

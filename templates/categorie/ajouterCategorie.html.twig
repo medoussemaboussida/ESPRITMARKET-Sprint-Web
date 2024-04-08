@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ESPRITMARKET Admin</title>
+    <title>Gestion des catégories</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="/back/assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/css/vendor.bundle.base.css">
@@ -20,7 +20,7 @@
     <!-- Layout styles -->
     <link rel="stylesheet" href="/back/assets/css/style.css">
     <!-- End layout styles -->
-    <link rel="shortcut icon" href="/back/assets/images/favicon.png" />
+    <link rel="shortcut icon" href="/back/assets/images/ourlogo.png" />
   </head>
   <body>
     <div class="container-scroller">
@@ -390,14 +390,16 @@
                     <p class="card-description"></p>
                    {% block body %}
                    
-                   {{ form_start(form, {'attr': {'class': 'forms-sample'}}) }}
+                  {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }}
                    <div class="form-group" >
                    {{ form_label(form.nomcategorie, 'Nom de catégorie', {'attr': {'class': 'form-control-label'}}) }}
                    {{ form_widget(form.nomcategorie, {'attr': {'class': 'form-control', 'placeholder': 'Nom de catégorie'}}) }}
+                   {{ form_errors(form.nomcategorie) }}
                    </div>
                    <div class="form-group">
                    {{ form_label(form.imagecategorie, 'Image', {'attr': {'class': 'form-control-label'}}) }}
                    {{ form_widget(form.imagecategorie, {'attr': {'class': 'form-control'}}) }}
+                  {{ form_errors(form.imagecategorie) }}
                    </div>
                    <button type="submit" class="btn btn-primary">Ajouter</button>
                    {{ form_end(form) }}

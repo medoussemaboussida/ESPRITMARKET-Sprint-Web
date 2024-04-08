@@ -73,6 +73,17 @@ public function findByKeyword(string $keyword)
             ->getQuery()
             ->getResult();
     }
-    
+    public function searchByKeywordOrPriceOrQuantity($searchTerm)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.nomproduit LIKE :searchTerm')
+            ->orWhere('p.prix = :searchTerm2')
+            ->orWhere('p.quantite = :searchTerm3')
+            ->setParameter('searchTerm', '%'.$searchTerm.'%')
+            ->setParameter('searchTerm2', $searchTerm)
+            ->setParameter('searchTerm3', $searchTerm)
+            ->getQuery()
+            ->getResult();
+    }
 
 }

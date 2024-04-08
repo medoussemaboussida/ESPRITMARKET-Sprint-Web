@@ -30,13 +30,39 @@ class ProduitcartController extends AbstractController
     #[Route('/produitcart/supprimer/{id}', name: 'app_produitcart_supprimer')]
     public function supprimer($id,ProduitcartRepository $repository): Response
     {
-        $list = $repository->find($id);
+        $produits = $repository->findBy(['idproduit' => $id]);
+        $produit = $produits[array_rand($produits)];
+
         $em = $this->getDoctrine()->getManager();
-        $em->remove($list);
+        $em->remove($produit);
         $em->flush();
         return $this->redirectToRoute('app_produit_front');
     }
     
+
+    //ajouter meme produit +
+    #[Route('/produitcart/{id}/{idp}', name: 'app_produitcart_ajouter')]
+    public function ajouterP($id,$idp, ProduitcartRepository $repository, PanierRepository $panierRepository): Response
+    {
+        $panier = $panierRepository->find($idp);
+        $produit = $this->getDoctrine()->getRepository(Produit::class)->find($id);
+
+        $nouveauProduit = new Produitcart();
+
+        // Ajouter le produit au panier
+        $nouveauProduit->setIdproduit($produit);
+        $nouveauProduit ->setIdpanier($panier);
+
+
+    // Enregistrer le nouveau produit dans la base de données
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->persist($nouveauProduit);
+    $entityManager->flush();
+
+    // Rediriger l'utilisateur vers la page du panier
+    return $this->redirectToRoute('app_produit_front');
+    }
+
 
     //ajouter un produit a votre panier
     #[Route('/produitcart/{idProduit}/{idUser}', name: 'app_produit_cart')]
@@ -73,11 +99,38 @@ class ProduitcartController extends AbstractController
         $produitCartRepository = $this->getDoctrine()->getRepository(Produitcart::class);
         $produitsDansPanier = $produitCartRepository->findBy(['idpanier' => $panier]);
 
+        //calcul montant
+        $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
+        $totalPrix = 0;
+        // Parcourez chaque produit et ajoutez son prix au total
+        foreach ($produitCart as $produit) {
+            $totalPrix += $produit->getIdproduit()->getPrix(); 
+        }
+        
+        $quantite = [];
+        $produitsUniques = [];
 
+        // Parcourir chaque produit dans le panier
+        foreach ($produitCart as $produit) {
+        
+            // Vérifier si le produit existe déjà dans le tableau $quantite
+            if (array_key_exists($produit->getIdproduit()->getIdproduit(), $quantite)) {
+                // Si oui, augmenter la quantité
+                $quantite[$produit->getIdproduit()->getIdproduit()]++;
+            } else {
+                // Sinon, initialiser la quantité à 1 et ajouter le produit au tableau des produits uniques
+                $quantite[$produit->getIdproduit()->getIdproduit()] = 1;
+                $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
+            }
+        }
         // Afficher les détails du panier
         return $this->render('produitcart/panier.html.twig', [
+            'produitsUniques' => $produitsUniques,
             'produitsDansPanier' => $produitsDansPanier,
             'panier' => $panier,
+            'totalPrix' => $totalPrix,
+            'quantite' => $quantite, // Passer le tableau de quantité à la vue
+
         ]);
     }
 

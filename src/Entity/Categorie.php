@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CategorieRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: "categorie")]
 #[ORM\Entity(repositoryClass: CategorieRepository::class)]
@@ -15,7 +16,13 @@ class Categorie
     private $idcategorie;
 
     #[ORM\Column(name: "nomCategorie", type: "string", length: 255, nullable: false)]
-
+    #[Assert\NotBlank(message: "Veuillez entrer un nom de catégorie.")]
+    #[Assert\Length(
+        min: 5,
+        max: 20,
+        minMessage: "Le nom de categorie doit comporter {{ limit }} caractères minimum.",
+        maxMessage: "Le nom de categorie doit comporter {{ limit }} caractères maximum."
+    )]
     private $nomcategorie;
 
     #[ORM\Column(name: "imageCategorie", type: "string", length: 255, nullable: false)]
