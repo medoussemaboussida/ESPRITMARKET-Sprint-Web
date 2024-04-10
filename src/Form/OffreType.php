@@ -30,7 +30,7 @@ class OffreType extends AbstractType
                 'class' => Produit::class,
                 'choice_label' => 'nomProduit',
                 'multiple' => true, // Permet la sélection de plusieurs produits
-                'expanded' => false, // Affiche les produits comme cases à cocher
+                'expanded' => true, // Affiche les produits comme cases à cocher
                 'required' => false, // Le champ n'est pas obligatoire
                 // Vous pouvez ajouter d'autres options de personnalisation ici si nécessaire
             ]);

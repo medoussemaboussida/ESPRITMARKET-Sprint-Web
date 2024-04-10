@@ -56,26 +56,26 @@ class CodeController extends AbstractController
     {
         $entityManager = $this->getDoctrine()->getManager();
         $code = $entityManager->getRepository(Codepromo::class)->find($id);
-
+    
         // Vérifier si le code existe
         if (!$code) {
-            throw $this->createNotFoundException('Aucun code trouvée pour cet identifiant.');
+            throw $this->createNotFoundException('Aucun code trouvé pour cet identifiant.');
         }
-
-        $form = $this->createForm(Codepromo::class, $code);
+    
+        $form = $this->createForm(CodeType::class, $code); // Use CodeType form class here
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             // Mettre à jour le code dans la base de données
             $entityManager->flush();
-
+    
             // Ajouter un message flash pour indiquer la modification réussie
-            $this->addFlash('success', 'Code modifiée avec succès.');
-
+            $this->addFlash('success', 'Code modifié avec succès.');
+    
             // Rediriger vers la page d'affichage des codes
             return $this->redirectToRoute('afficher_codes');
         }
-
+    
         return $this->render('code/modifier.html.twig', [
             'form' => $form->createView(),
         ]);
