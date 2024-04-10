@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -44,6 +45,47 @@ class Participant
      * })
      */
     private $idEvenement;
+
+    public function getIdParticipant(): ?int
+    {
+        return $this->idParticipant;
+    }
+
+    public function getIdUser(): ?int
+    {
+        return $this->idUser;
+    }
+
+    public function setIdUser(int $idUser): static
+    {
+        $this->idUser = $idUser;
+
+        return $this;
+    }
+
+    public function getDatePart(): ?\DateTimeInterface
+    {
+        return $this->datePart;
+    }
+
+    public function setDatePart(\DateTimeInterface $datePart): static
+    {
+        $this->datePart = $datePart;
+
+        return $this;
+    }
+
+    public function getIdEvenement(): ?Evenement
+    {
+        return $this->idEvenement;
+    }
+
+    public function setIdEvenement(?Evenement $idEvenement): static
+    {
+        $this->idEvenement = $idEvenement;
+
+        return $this;
+    }
 
 
 }

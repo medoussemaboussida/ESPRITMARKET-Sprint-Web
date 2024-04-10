@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -53,6 +54,18 @@ private $dateAjout;
      */
     private $idUser;
 
+
+   /**
+ * @var \Evenement
+ *
+ * @ORM\ManyToOne(targetEntity="Evenement")
+ * @ORM\JoinColumns({
+ *   @ORM\JoinColumn(name="idEv", referencedColumnName="id_ev")
+ * })
+ */
+private $idEv;
+
+
     public function getIdDons(): ?int
     {
         return $this->iddons;
@@ -102,6 +115,17 @@ private $dateAjout;
     public function setIdUser(?Utilisateur $idUser): self
     {
         $this->idUser = $idUser;
+
+        return $this;
+    }
+    public function getIdEv(): ?Evenement
+    {
+        return $this->idEv;
+    }
+
+    public function setIdEv(?Evenement $idEv): self
+    {
+        $this->idEv = $idEv;
 
         return $this;
     }

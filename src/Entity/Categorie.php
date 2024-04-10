@@ -35,5 +35,34 @@ class Categorie
      */
     private $imagecategorie;
 
+    public function getIdcategorie(): ?int
+    {
+        return $this->idcategorie;
+    }
+
+    public function getNomcategorie(): ?string
+    {
+        return $this->nomcategorie;
+    }
+
+    public function setNomcategorie(string $nomcategorie): static
+    {
+        $this->nomcategorie = $nomcategorie;
+
+        return $this;
+    }
+
+    public function getImagecategorie(): ?string
+    {
+        return $this->imagecategorie;
+    }
+
+    public function setImagecategorie(string $imagecategorie): static
+    {
+        $this->imagecategorie = $imagecategorie;
+
+        return $this;
+    }
+
 
 }

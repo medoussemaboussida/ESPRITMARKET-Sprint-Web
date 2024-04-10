@@ -31,5 +31,22 @@ class Panier
      */
     private $iduser;
 
+    public function getIdpanier(): ?int
+    {
+        return $this->idpanier;
+    }
+
+    public function getIduser(): ?Utilisateur
+    {
+        return $this->iduser;
+    }
+
+    public function setIduser(?Utilisateur $iduser): static
+    {
+        $this->iduser = $iduser;
+
+        return $this;
+    }
+
 
 }

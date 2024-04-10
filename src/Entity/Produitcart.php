@@ -41,5 +41,34 @@ class Produitcart
      */
     private $idpanier;
 
+    public function getIdpanierproduit(): ?int
+    {
+        return $this->idpanierproduit;
+    }
+
+    public function getIdproduit(): ?Produit
+    {
+        return $this->idproduit;
+    }
+
+    public function setIdproduit(?Produit $idproduit): static
+    {
+        $this->idproduit = $idproduit;
+
+        return $this;
+    }
+
+    public function getIdpanier(): ?Panier
+    {
+        return $this->idpanier;
+    }
+
+    public function setIdpanier(?Panier $idpanier): static
+    {
+        $this->idpanier = $idpanier;
+
+        return $this;
+    }
+
 
 }

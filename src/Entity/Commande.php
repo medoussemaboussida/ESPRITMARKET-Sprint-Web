@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -37,6 +38,35 @@ class Commande
      * })
      */
     private $idpanier;
+
+    public function getIdcommande(): ?int
+    {
+        return $this->idcommande;
+    }
+
+    public function getDatecommande(): ?\DateTimeInterface
+    {
+        return $this->datecommande;
+    }
+
+    public function setDatecommande(\DateTimeInterface $datecommande): static
+    {
+        $this->datecommande = $datecommande;
+
+        return $this;
+    }
+
+    public function getIdpanier(): ?Panier
+    {
+        return $this->idpanier;
+    }
+
+    public function setIdpanier(?Panier $idpanier): static
+    {
+        $this->idpanier = $idpanier;
+
+        return $this;
+    }
 
 
 }

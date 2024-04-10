@@ -1,13 +1,40 @@
 
-
 {# templates/dons/Dons.html.twig #}
 
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
 
-{% block title %}Faire un don{% endblock %}
+	<!-- title -->
+	<title>Faire un don</title>
 
-{% block body %}
-	<title>Dons</title>
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/png" href="/front/assets/img/favicon.png">
+	<!-- google font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+	<!-- fontawesome -->
+	<link rel="stylesheet" href="/front/assets/css/all.min.css">
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="/front/assets/bootstrap/css/bootstrap.min.css">
+	<!-- owl carousel -->
+	<link rel="stylesheet" href="/front/assets/css/owl.carousel.css">
+	<!-- magnific popup -->
+	<link rel="stylesheet" href="/front/assets/css/magnific-popup.css">
+	<!-- animate css -->
+	<link rel="stylesheet" href="/front/assets/css/animate.css">
+	<!-- mean menu css -->
+	<link rel="stylesheet" href="/front/assets/css/meanmenu.min.css">
+	<!-- main style -->
+	<link rel="stylesheet" href="/front/assets/css/main.css">
+	<!-- responsive -->
+	<link rel="stylesheet" href="/front/assets/css/responsive.css">
+
+</head>
 
 
 <body>
@@ -46,8 +73,8 @@
 								<li><a href="about.html">About</a></li>
 								<li class="current-list-item"><a href="#">Dons</a>
 									<ul class="sub-menu">
-                  <li><a href="{{ path('dons_page') }}">Faire un don</a></li>
-										<li><a href="{{ path('demander_dons')}}">Demander dons</a></li>
+                                        <li><a href='/dons/{userId}'>Faire un don</a></li>
+										<li><a href='/demander_dons/{idUser}'>Demander dons</a></li>
 										
 									</ul>
 								</li>
@@ -132,20 +159,54 @@
 	<!-- end search area -->
 
 
-<div class="row justify-content-center"> 
-				<div class="col-lg-4 col-md-6 text-center">
-					<div class="single-product-item">
-			<h1 style="font-size: 20px; ">Faire un don</h1>
+ <div class="col-lg-4 col-md-6 text-center">
+        <div class="single-product-item">
+            <h1 style="font-size: 20px;">Faire un don</h1>
+
+            <form method="post">
+                {{ form_start(form) }}
+
+{{ form_widget(form.nbpoints) }}
+
+                {{ form_widget(form.idEv) }}
+
+                <button type="submit">Faire un don</button>
+
+                {{ form_end(form) }}
+            </form>
+        </div>
+    </div>
 
 
-                        {# Afficher le formulaire #}
-                            {{ form_start(form) }}
-                               {{ form_row(form.nbpoints) }}
-								<p><input type="submit" value="Submit"></p>
-                                 {{ form_end(form) }}
-					</div>
-				</div> 
-                </div>                  
+
+
+	<div class="latest-news mt-150 mb-150">
+    <div class="container">
+        <div class="row">
+		
+{% for evenement in evenementsDons %}
+            <div class="col-lg-4 col-md-6">
+                <div class="single-latest-news">
+                    <a href=""><div class=""></div></a>
+                    <div class="news-text-box">
+                        <h3><a href="single-news.html"> {{ evenement.nomEv }}</a></h3>
+                        <p class="blog-meta">
+                            <span class="date"><i class="fas fa-calendar"></i>{{ evenement.date()|date('Y-m-d H:i:s') }}</span>
+                        </p>
+                        <p class="excerpt">Points gagnés: {{ evenement.nbPoints }}</p>
+
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+
 
     
     <h1>Liste des dons</h1>
@@ -166,6 +227,8 @@
                 <td>{{ don.dateAjout | date('Y-m-d H:i:s') }}</td>
                 <td>{{ don.etatStatutDons }}</td>
                 <td>
+				        {% if don.getEtatstatutdons() != 'reçu' %}
+
                     <!-- Icône pour modifier -->
 <a href="{{ path('edit_don', {'id': don.idDons}) }}"><i class="fas fa-edit"></i></a>
 
@@ -180,6 +243,9 @@
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ don.idDons) }}">
                     </form>
                 </td>
+				{% else %}
+            <td></td> <!-- Ne rien afficher si l'état est "reçu" -->
+        {% endif %}
             </tr>
             {% set totalPoints = totalPoints + don.nbPoints %}
         {% endfor %}
@@ -212,7 +278,8 @@
 						<h2 class="widget-title">Dons</h2>
 						<ul>
 							<li><a href="index.html">Home</a></li>
-                  <li><a href="{{ path('dons_page') }}">Faire un don</a></li>
+                  <li><a href='/dons/{userId}'>Voir les dons de l'utilisateur 1</a>
+</li>
 							<li><a href="services.html">Shop</a></li>
 							<li><a href="news.html">News</a></li>
 							<li><a href="contact.html">Contact</a></li>
@@ -259,27 +326,26 @@
 	</div>
 	<!-- end copyright -->
 	
-	<!-- jquery -->
-	<script src="assets/js/jquery-1.11.3.min.js"></script>
+<!-- jquery -->
+	<script src="/front/assets/js/jquery-1.11.3.min.js"></script>
 	<!-- bootstrap -->
-	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/front/assets/bootstrap/js/bootstrap.min.js"></script>
 	<!-- count down -->
-	<script src="assets/js/jquery.countdown.js"></script>
+	<script src="/front/assets/js/jquery.countdown.js"></script>
 	<!-- isotope -->
-	<script src="assets/js/jquery.isotope-3.0.6.min.js"></script>
+	<script src="/front/assets/js/jquery.isotope-3.0.6.min.js"></script>
 	<!-- waypoints -->
-	<script src="assets/js/waypoints.js"></script>
+	<script src="/front/assets/js/waypoints.js"></script>
 	<!-- owl carousel -->
-	<script src="assets/js/owl.carousel.min.js"></script>
+	<script src="/front/assets/js/owl.carousel.min.js"></script>
 	<!-- magnific popup -->
-	<script src="assets/js/jquery.magnific-popup.min.js"></script>
+	<script src="/front/assets/js/jquery.magnific-popup.min.js"></script>
 	<!-- mean menu -->
-	<script src="assets/js/jquery.meanmenu.min.js"></script>
+	<script src="/front/assets/js/jquery.meanmenu.min.js"></script>
 	<!-- sticker js -->
-	<script src="assets/js/sticker.js"></script>
+	<script src="/front/assets/js/sticker.js"></script>
 	<!-- main js -->
-	<script src="assets/js/main.js"></script>
+	<script src="/front/assets/js/main.js"></script>
 
 </body>
 
-{% endblock %}

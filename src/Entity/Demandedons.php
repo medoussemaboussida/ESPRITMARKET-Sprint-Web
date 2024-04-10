@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -62,6 +63,17 @@ class Demandedons
      * @ORM\Column(name="prenomuser", type="string", length=255, nullable=true, options={"default"="NULL"})
      */
     private $prenomuser = 'NULL';
+
+/**
+ * @ORM\Column(type="integer", name="objectifPoints", nullable=true)
+ */
+private $objectifPoints;
+
+/**
+ * @ORM\Column(type="date", name="delai", nullable=true)
+ */
+private $delai;
+
 
     /**
      * @var \Dons
@@ -181,6 +193,32 @@ class Demandedons
     public function setIdUtilisateur(?Utilisateur $idUtilisateur): self
     {
         $this->idUtilisateur = $idUtilisateur;
+
+        return $this;
+    }
+
+    public function getObjectifPoints(): ?int
+    {
+        return $this->objectifPoints;
+    }
+
+    public function setObjectifPoints(?int $objectifPoints): self
+    {
+        $this->objectifPoints = $objectifPoints;
+
+        return $this;
+    }
+
+    // Getters et Setters pour $delai
+
+    public function getDelai(): ?\DateTimeInterface
+    {
+        return $this->delai;
+    }
+
+    public function setDelai(?\DateTimeInterface $delai): self
+    {
+        $this->delai = $delai;
 
         return $this;
     }

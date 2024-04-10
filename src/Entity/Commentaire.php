@@ -48,5 +48,46 @@ class Commentaire
      */
     private $idpublication;
 
+    public function getIdcommentaire(): ?int
+    {
+        return $this->idcommentaire;
+    }
+
+    public function getDescriptioncommentaire(): ?string
+    {
+        return $this->descriptioncommentaire;
+    }
+
+    public function setDescriptioncommentaire(string $descriptioncommentaire): static
+    {
+        $this->descriptioncommentaire = $descriptioncommentaire;
+
+        return $this;
+    }
+
+    public function getIduser(): ?Utilisateur
+    {
+        return $this->iduser;
+    }
+
+    public function setIduser(?Utilisateur $iduser): static
+    {
+        $this->iduser = $iduser;
+
+        return $this;
+    }
+
+    public function getIdpublication(): ?Publication
+    {
+        return $this->idpublication;
+    }
+
+    public function setIdpublication(?Publication $idpublication): static
+    {
+        $this->idpublication = $idpublication;
+
+        return $this;
+    }
+
 
 }

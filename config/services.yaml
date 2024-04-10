@@ -5,7 +5,21 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
 
+
+
 services:
+    App\Entity\Evenement:
+        autowire: true
+
+    App\Entity\Dons:
+        autowire: true
+        autoconfigure: true
+        
+      
+
+    App\Entity\Demandedons:
+        public: true
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

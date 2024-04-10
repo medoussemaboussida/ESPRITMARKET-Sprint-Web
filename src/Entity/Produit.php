@@ -59,5 +59,70 @@ class Produit
      */
     private $categorie;
 
+    public function getIdproduit(): ?int
+    {
+        return $this->idproduit;
+    }
+
+    public function getNomproduit(): ?string
+    {
+        return $this->nomproduit;
+    }
+
+    public function setNomproduit(string $nomproduit): static
+    {
+        $this->nomproduit = $nomproduit;
+
+        return $this;
+    }
+
+    public function getQuantite(): ?int
+    {
+        return $this->quantite;
+    }
+
+    public function setQuantite(int $quantite): static
+    {
+        $this->quantite = $quantite;
+
+        return $this;
+    }
+
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(float $prix): static
+    {
+        $this->prix = $prix;
+
+        return $this;
+    }
+
+    public function getImageproduit(): ?string
+    {
+        return $this->imageproduit;
+    }
+
+    public function setImageproduit(string $imageproduit): static
+    {
+        $this->imageproduit = $imageproduit;
+
+        return $this;
+    }
+
+    public function getCategorie(): ?Categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?Categorie $categorie): static
+    {
+        $this->categorie = $categorie;
+
+        return $this;
+    }
+
 
 }

@@ -41,5 +41,34 @@ class Offreproduit
      */
     private $idproduit;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getIdoffre(): ?Offre
+    {
+        return $this->idoffre;
+    }
+
+    public function setIdoffre(?Offre $idoffre): static
+    {
+        $this->idoffre = $idoffre;
+
+        return $this;
+    }
+
+    public function getIdproduit(): ?Produit
+    {
+        return $this->idproduit;
+    }
+
+    public function setIdproduit(?Produit $idproduit): static
+    {
+        $this->idproduit = $idproduit;
+
+        return $this;
+    }
+
 
 }

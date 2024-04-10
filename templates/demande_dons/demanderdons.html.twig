@@ -2,13 +2,40 @@
 
 
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
 
-{% extends 'base.html.twig' %}
+	<!-- title -->
+	<title>Demander dons</title>
 
-{% block title %}Demander dons{% endblock %}
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/png" href="/front/assets/img/favicon.png">
+	<!-- google font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+	<!-- fontawesome -->
+	<link rel="stylesheet" href="/front/assets/css/all.min.css">
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="/front/assets/bootstrap/css/bootstrap.min.css">
+	<!-- owl carousel -->
+	<link rel="stylesheet" href="/front/assets/css/owl.carousel.css">
+	<!-- magnific popup -->
+	<link rel="stylesheet" href="/front/assets/css/magnific-popup.css">
+	<!-- animate css -->
+	<link rel="stylesheet" href="/front/assets/css/animate.css">
+	<!-- mean menu css -->
+	<link rel="stylesheet" href="/front/assets/css/meanmenu.min.css">
+	<!-- main style -->
+	<link rel="stylesheet" href="/front/assets/css/main.css">
+	<!-- responsive -->
+	<link rel="stylesheet" href="/front/assets/css/responsive.css">
 
-{% block body %}
-	<title>Dons</title>
+</head>
 
 
 <body>
@@ -47,8 +74,8 @@
 								<li><a href="about.html">About</a></li>
 								<li class="current-list-item"><a href="#">Dons</a>
 									<ul class="sub-menu">
-                  <li><a href="{{ path('dons_page') }}">Faire un don</a></li>
-										<li><a href="{{ path('demander_dons')}}">Demander dons</a></li>
+<li><a href='/dons/{userId}'> Faire don </a></li>
+										<li><a href='/demander_dons/{idUser}'>Demander dons</a></li>
 										
 									</ul>
 								</li>
@@ -127,15 +154,15 @@
 				<div class="col-lg-8 mb-5 mb-lg-0">
 					<div class="form-title">
    <h1>Poster une demande de don</h1>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur, ratione! Laboriosam est, assumenda. Perferendis, quo alias quaerat aliquid. Corporis ipsum minus voluptate? Dolore, esse natus!</p>
 					</div>
 				 	<div id="form_status"></div>
 					<div class="contact-form">
-<form action="{{ path('demander_dons') }}" method="post">
-							
-							<p><textarea  id="contenu" name="contenu" required cols="30" rows="10" placeholder="Contenu"></textarea></p>
-							<p><input type="submit" value="Submit"></p>
-						</form>
+<form action='/demander_dons/{{ idUser }}' method="post">
+        <p><textarea id="contenu" name="contenu" required cols="30" rows="10" placeholder="Contenu"></textarea></p>
+        <p><input type="number" id="objectifPoints" name="objectifPoints" required placeholder="Objectif de points"></p>
+        <p><input type="date" id="delai" name="delai" required placeholder="Délai"></p>
+        <p><input type="submit" value="Submit"></p>
+    </form>
 					</div>
 				</div>
 				
@@ -148,6 +175,7 @@
 <div class="latest-news mt-150 mb-150">
     <div class="container">
         <div class="row">
+		
             {% for key, demande in demandes %}
             <div class="col-lg-4 col-md-6">
                 <div class="single-latest-news">
@@ -164,17 +192,21 @@
                         <a href="#" class="read-more-btn" data-demande-id="{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
 
                         <!-- Formulaire de transfert de points (masqué par défaut) -->
-                        <div id="myModal{{ demande.idDemande }}" class="modal" style="display: none;">
-                            <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <h2>Transférer des points</h2>
-                                <form id="transferForm{{ demande.idDemande }}">
-                                    <label for="donPoints">Nombre de points à transférer :</label>
-                                    <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
-                                    <button type="button" id="submitForm{{ demande.idDemande }}">Transférer</button>
-                                </form>
-                            </div>
-                        </div>
+                        <!-- Formulaire de transfert de points (masqué par défaut) -->
+<div id="myModal{{ demande.idDemande }}" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Transférer des points</h2>
+        <form id="transferForm{{ demande.idDemande }}">
+            <label for="donPoints">Nombre de points à transférer :</label>
+            <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
+            <!-- Ajout d'un élément pour afficher le message d'erreur -->
+            <div id="errorMessage{{ demande.idDemande }}" style="color: red;"></div>
+            <button type="button" id="submitForm{{ demande.idDemande }}">Transférer</button>
+        </form>
+    </div>
+</div>
+
                     </div>
                 </div>
             </div>
@@ -187,56 +219,63 @@
 
     <!-- JavaScript pour gérer l'affichage du modal -->
     <script>
-        $(document).ready(function() {
-            // Gérer le clic sur le lien "Transférer des points"
-            $('.read-more-btn').click(function(e) {
-                e.preventDefault(); // Empêcher le comportement par défaut du lien
-                var idDemande = $(this).data('demande-id');
-                $('#myModal' + idDemande).show();
-            });
+$(document).ready(function() {
+    // Gérer le clic sur le lien "Transférer des points"
+    $('.read-more-btn').click(function(e) {
+        e.preventDefault(); // Empêcher le comportement par défaut du lien
+        var idDemande = $(this).data('demande-id');
+        $('#myModal' + idDemande).show();
+    });
 
-            // Gérer la soumission du formulaire de transfert de points
-            $('[id^="submitForm"]').click(function(e) {
-                e.preventDefault(); // Empêcher le comportement par défaut du formulaire
-                var idDemande = $(this).attr('id').replace('submitForm', '');
-                var userId = $('#userId').val();
-                var donPoints = $('#donPoints' + idDemande).val();
+    // Gérer la soumission du formulaire de transfert de points
+    $('[id^="submitForm"]').click(function(e) {
+        e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+        var idDemande = $(this).attr('id').replace('submitForm', '');
+        var donPoints = $('#donPoints' + idDemande).val();
 
-                $.ajax({
-                    url: '/transfer_points', // Remplacez par l'URL de votre route Symfony
-                    method: 'POST',
-                    data: {
-                        userId: userId,
-                        donPoints: donPoints,
-                        idDemande: idDemande
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert('Points transférés avec succès.');
-                            $('#pointsDemande' + idDemande).text(response.newPoints);
-                            $('#myModal' + idDemande).hide(); // Masquer la fenêtre modale
-                        } else {
-                            alert('Erreur: ' + response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Erreur: ' + error);
-                    }
-                });
-            });
+        // Récupérer l'identifiant de l'utilisateur à partir de l'URL
+        var userId = window.location.pathname.split('/').pop(); // Récupérer le dernier segment de l'URL
 
-            // Gérer le clic sur le bouton de fermeture du modal
-            $('.close').click(function() {
-                $(this).closest('.modal').hide();
-            });
-
-            // Gérer le clic en dehors du contenu du modal pour le fermer
-            $(window).click(function(event) {
-                if ($(event.target).hasClass('modal')) {
-                    $(event.target).hide();
+        $.ajax({
+            url: '/transfer_points/' + userId, // Utiliser l'URL avec l'ID de l'utilisateur
+            method: 'POST',
+            data: {
+                donPoints: donPoints,
+                idDemande: idDemande
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Points transférés avec succès.');
+                    $('#pointsDemande' + idDemande).text(response.newPoints);
+                    $('#myModal' + idDemande).hide(); // Masquer la fenêtre modale
+                    // Rafraîchir la page après le transfert réussi
+                    window.location.reload();
+                } else {
+                    // Afficher le message d'erreur dans l'élément errorMessage
+                    $('#errorMessage' + idDemande).text(response);
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                // Afficher le message d'erreur dans l'élément errorMessage
+                $('#errorMessage' + idDemande).text('Erreur: ' + xhr.responseText); 
+            }
         });
+    });
+
+    // Gérer le clic sur le bouton de fermeture du modal
+    $('.close').click(function() {
+        $(this).closest('.modal').hide();
+    });
+
+    // Gérer le clic en dehors du contenu du modal pour le fermer
+    $(window).click(function(event) {
+        if ($(event.target).hasClass('modal')) {
+            $(event.target).hide();
+        }
+    });
+});
+
+        
     </script>
 
 
@@ -277,7 +316,7 @@
 						<h2 class="widget-title">Dons</h2>
 						<ul>
 							<li><a href="index.html">Home</a></li>
-                  <li><a href="{{ path('dons_page') }}">Faire un don</a></li>
+                  <li><a href='/dons/{userId}'>Faire un don</a></li>
 							<li><a href="services.html">Shop</a></li>
 							<li><a href="news.html">News</a></li>
 							<li><a href="contact.html">Contact</a></li>
@@ -325,28 +364,29 @@
 	<!-- end copyright -->
 
 	
-	<!-- jquery -->
-	<script src="assets/js/jquery-1.11.3.min.js"></script>
+	
+<!-- jquery -->
+	<script src="/front/assets/js/jquery-1.11.3.min.js"></script>
 	<!-- bootstrap -->
-	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/front/assets/bootstrap/js/bootstrap.min.js"></script>
 	<!-- count down -->
-	<script src="assets/js/jquery.countdown.js"></script>
+	<script src="/front/assets/js/jquery.countdown.js"></script>
 	<!-- isotope -->
-	<script src="assets/js/jquery.isotope-3.0.6.min.js"></script>
+	<script src="/front/assets/js/jquery.isotope-3.0.6.min.js"></script>
 	<!-- waypoints -->
-	<script src="assets/js/waypoints.js"></script>
+	<script src="/front/assets/js/waypoints.js"></script>
 	<!-- owl carousel -->
-	<script src="assets/js/owl.carousel.min.js"></script>
+	<script src="/front/assets/js/owl.carousel.min.js"></script>
 	<!-- magnific popup -->
-	<script src="assets/js/jquery.magnific-popup.min.js"></script>
+	<script src="/front/assets/js/jquery.magnific-popup.min.js"></script>
 	<!-- mean menu -->
-	<script src="assets/js/jquery.meanmenu.min.js"></script>
+	<script src="/front/assets/js/jquery.meanmenu.min.js"></script>
 	<!-- sticker js -->
-	<script src="assets/js/sticker.js"></script>
+	<script src="/front/assets/js/sticker.js"></script>
 	<!-- main js -->
-	<script src="assets/js/main.js"></script>
+	<script src="/front/assets/js/main.js"></script>
+	
 
 
 </body>
 
-{% endblock %}
