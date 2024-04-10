@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Entity\Produit;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 
 
 class OffreController extends AbstractController
@@ -199,4 +203,38 @@ class OffreController extends AbstractController
             'offre' => $offre,
         ]);
     }
+    #[Route('/afficher-calendrier', name: 'afficher_calendrier')]
+public function afficherCalendrier(): JsonResponse
+{
+    $entityManager = $this->getDoctrine()->getManager();
+    $offres = $entityManager->getRepository(Offre::class)->findAll();
+
+    $events = [];
+
+    foreach ($offres as $offre) {
+        $nomOffre = $offre->getNomoffre();
+        $dateDebut = $offre->getDatedebut();
+        $dateFin = $offre->getDatefin();
+
+        // Créez un intervalle d'une journée
+        $interval = new DateInterval('P1D');
+
+        // Déterminez le nombre de jours entre la date de début et la date de fin
+        $nombreJours = $dateFin->diff($dateDebut)->days;
+
+        // Créez un objet DateTime pour la date de début
+        $currentDate = clone $dateDebut;
+
+        // Parcourez chaque jour entre la date de début et la date de fin
+        for ($i = 0; $i <= $nombreJours; $i++) {
+            $events[] = [
+                'title' => $nomOffre,
+                'start' => $currentDate->format('Y-m-d')
+            ];
+            $currentDate->add($interval); // Ajoutez un jour à la date actuelle
+        }
+    }
+
+    return new JsonResponse($events);
+}
 }

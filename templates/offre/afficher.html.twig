@@ -362,9 +362,45 @@
             </button>
           </div>
         </nav>
-        <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">
+
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.0/main.min.js" integrity="sha256-DBxkGZLxKsLKhz054qUpBqtotG00r9AELGpSigJujLg=" crossorigin="anonymous"></script>
+       
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- Modal pour afficher le calendrier -->
+        <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="calendarModalLabel">Calendrier des offres</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="calendrier"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+       
+        <!-- Utilisez la variable JavaScript pour spécifier l'URL -->
+        <script>
+          $(document).ready(function() {
+              $('#calendarModal').on('shown.bs.modal', function () {
+                  // Chargez le calendrier dans le modal
+                  $('#calendrier').fullCalendar({
+                      // Configurations du calendrier ici...
+                      events: {
+                          url: afficherCalendrierUrl, // Utilisation de la variable JavaScript
+                          method: 'GET'
+                      }
+                  });
+              });
+          });
+        </script>
+
             
            <!-- partial -->
 <div class="main-panel">
@@ -386,7 +422,12 @@
                         <div class="col-md-6">
                             <h4 class="card-title">Liste des Offres</h4>
                         </div>
+                        <!-- afficherOffre.html.twig -->
                         <div class="col-md-6 text-right">
+
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#calendarModal">
+                          Afficher le calendrier
+                        </button>
                             <a href="{{ path('ajouter_offre') }}" class="btn btn-success">Ajouter Offre</a>
                         </div>
                     </div>

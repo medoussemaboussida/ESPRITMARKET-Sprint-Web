@@ -1,3 +1,6 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+afficher_calendrier:
+    path: '/afficher-calendrier'
+    controller: 'App\Controller\OffreController::afficherCalendrier'
