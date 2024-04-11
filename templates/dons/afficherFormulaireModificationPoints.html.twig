@@ -1,6 +1,3 @@
-{# templates/dons/backDons.html.twig #}
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -302,81 +299,20 @@
             </button>
           </div>
         </nav>
-        <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">              
-                   <div class="row ">
-              <div class="col-12 grid-margin">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Liste des Dons</h4>
-                    <div class="table-responsive">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </th>
-                              <tr>
-                                  <th>Nom de l'Utilisateur</th>
-                                  <th>Prénom de l'Utilisateur</th>
-                                  <th>Email de l'Utilisateur</th>
-                                  <th>Nombre de Points</th>
-                                  <th>Date d'Ajout</th>
-                                  <th>État du Don</th>
-                                  <th>Actions</th>
-                              </tr>
-                          
-                          </tr>
-                        </thead>
-                                             <tbody>
-                            {% for don in dons %}
-                            <tr>
-                                <td>{{ don.idUser.nomUser }}</td>
-                                <td>{{ don.idUser.prenomUser }}</td>
-                                <td>{{ don.idUser.emailUser }}</td>
-                                <td>{{ don.nbpoints }}</td>
-                                <td>{{ don.dateAjout|date('Y-m-d H:i:s') }}</td>
-                                <td>
-                                     <form action="{{ path('update_etat_dons', { 'id': don.idDons }) }}" method="post">
-    <select name="etatstatutdons" class="form-control" onchange="this.form.submit()">
-        <option value="reçu" {% if don.etatstatutdons == 'reçu' %} selected {% endif %}>reçu</option>
-        <option value="en attente" {% if don.etatstatutdons == 'en attente' %} selected {% endif %}>en attente</option>
-    </select>
-</form>
+    <div class="container">
+        <h1>Modifier les points de {{ don.idUser.nomUser }}</h1>
+<form action="{{ path('modifier_points_don', {'id': don.idDons}) }}" method="post">
+            {{ form_start(form) }}
+            <div class="form-group">
+    {{ form_label(form.nbpoints, 'Nouveau nombre de points :') }}
+    {{ form_widget(form.nbpoints, { 'attr': {'class': 'form-control'} }) }}
+</div>
 
-                                </td>
-                                 <td>
-        <!-- Bouton Supprimer -->
-<a href="{{ path('admin_dons_delete', {'id': don.idDons}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce don ?')">Supprimer
-            <i class="fas fa-trash"></i>
-        </a>
-    <a href="{{ path('modifier_points_don', {'id': don.idDons}) }}" class="btn btn-primary btn-sm">
-    <i class="fas fa-pencil-alt"></i> Modifier les points
-</a>
-
-    <!-- Bouton pour ouvrir le modal -->
-
-
-
-
-                            {% endfor %}
-                        </tbody>
-       
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:partials/_footer.html -->
-          <footer class="footer">
+            <button type="submit" class="btn btn-primary">Modifier</button>
+            {{ form_end(form) }}
+        </form>
+    </div>
+<footer class="footer">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
               <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
               <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>

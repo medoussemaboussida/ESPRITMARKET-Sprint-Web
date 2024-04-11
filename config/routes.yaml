@@ -61,3 +61,7 @@ admin_demandedons_delete:
     controller: App\Controller\DemandeDonsController::deleteDemande
     methods: ['GET']
 
+modifier_points_don:
+    path: '/modifier-points/{id}'
+    controller: 'App\Controller\DonsController::modifierPointsDon'
+    methods: ['GET', 'POST']

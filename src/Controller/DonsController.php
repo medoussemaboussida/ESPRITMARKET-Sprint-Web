@@ -18,6 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Repository\EvenementRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Form\ModifierPointsFormType;
+
 
 
 
@@ -323,4 +325,55 @@ public function updateEtatDons(Request $request, int $id): Response
     return $this->redirectToRoute('admin_dons');
 }
 
+
+/**
+ * @Route("/modifier-points/{id}", name="modifier_points_don", methods={"GET", "POST"})
+ */
+public function modifierPointsDon(Request $request, int $id): Response
+{
+    // Récupérer le don correspondant à l'identifiant
+    $don = $this->getDoctrine()->getRepository(Dons::class)->find($id);
+
+    // Vérifier si le don existe
+    if (!$don) {
+        throw $this->createNotFoundException('Le don avec l\'identifiant '.$id.' n\'existe pas.');
+    }
+
+    // Récupérer l'utilisateur associé au don
+    $utilisateur = $don->getIdUser();
+
+    // Récupérer le nombre de points avant la modification du don
+    $ancienPoints = $don->getNbpoints();
+
+    // Créer le formulaire avec le type de formulaire ModifierPointsFormType
+    $form = $this->createForm(ModifierPointsFormType::class, $don);
+
+    // Traiter la soumission du formulaire
+    $form->handleRequest($request);
+
+    // Vérifier si le formulaire est soumis et valide
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer le nouveau nombre de points saisi dans le formulaire
+        $nouveauPoints = $don->getNbpoints();
+
+        // Calculer les points mis à jour
+        $pointsMisAJour = $utilisateur->getNbPoints() + $ancienPoints - $nouveauPoints;
+
+        // Mettre à jour le nombre de points de l'utilisateur
+        $utilisateur->setNbPoints($pointsMisAJour);
+
+        // Enregistrer les modifications dans la base de données
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+
+        // Rafraîchir la page actuelle pour afficher les modifications
+        return $this->redirectToRoute('admin_dons');
+    }
+
+    // Afficher le formulaire dans le template
+    return $this->render('dons/afficherFormulaireModificationPoints.html.twig', [
+        'form' => $form->createView(),
+        'don' => $don, // Passer la variable "don" au template
+    ]);
+}
 }
