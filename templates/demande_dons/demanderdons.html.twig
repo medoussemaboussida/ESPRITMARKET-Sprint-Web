@@ -187,46 +187,66 @@
                             <span class="date"><i class="fas fa-calendar"></i>{{ demande.getDatePublication()|date('Y-m-d H:i:s') }}</span>
                         </p>
                         <p class="excerpt">Points gagnés: {{ demande.getNbpoints() }}</p>
+						 <p>Objectif Points : {{ demande.objectifPoints }}</p>
+ <p>Delai : {{ demande.delai|date('Y-m-d H:i:s') }}</p>
+          {% if demande.delai is not null %}
+    <!-- Obtenir la date et l'heure actuelles -->
+    {% set maintenant = date() %}
+    
+    <!-- Calculer le temps restant jusqu'à la date de délai -->
+    {% set diff = demande.delai.timestamp - maintenant.timestamp %}
+    {% set jours = diff / 86400 %} {# 86400 secondes par jour #}
+    {% set heures = (diff % 86400) / 3600 %} {# 3600 secondes par heure #}
+    {% set minutes = ((diff % 86400) % 3600) / 60 %} {# 60 secondes par minute #}
+    {% set secondes = ((diff % 86400) % 3600) % 60 %}
+    
+    Temps restant : {{ jours | round(0, 'floor') }} jours {{ heures | round(0, 'floor') }} heures {{ minutes | round(0, 'floor') }} minutes {{ secondes | round(0, 'floor') }} secondes
+{% else %}
+    <p>Le délai n'est pas défini pour cette demande.</p>
+{% endif %}
+<hr>
+
 
                         <!-- Lien pour transférer des points -->
-                        <a href="#" class="read-more-btn" data-demande-id="{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
+<a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
 
                         <!-- Formulaire de transfert de points (masqué par défaut) -->
                         <!-- Formulaire de transfert de points (masqué par défaut) -->
-<div id="myModal{{ demande.idDemande }}" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Transférer des points</h2>
-        <form id="transferForm{{ demande.idDemande }}">
-            <label for="donPoints">Nombre de points à transférer :</label>
-            <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
-            <!-- Ajout d'un élément pour afficher le message d'erreur -->
-            <div id="errorMessage{{ demande.idDemande }}" style="color: red;"></div>
-            <button type="button" id="submitForm{{ demande.idDemande }}">Transférer</button>
-        </form>
-    </div>
-</div>
-
-                    </div>
-                </div>
+<div class="modal fade" id="myModal{{ demande.idDemande }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h2 class="modal-title" id="myModalLabel">Transférer des points</h2>
             </div>
-            {% endfor %}
+            <div class="modal-body">
+                <form id="transferForm{{ demande.idDemande }}">
+                    <label for="donPoints">Nombre de points à transférer :</label>
+                    <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
+                    <div id="errorMessage{{ demande.idDemande }}" style="color: red;"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" id="submitForm{{ demande.idDemande }}" class="btn btn-primary">Transférer</button>
+            </div>
         </div>
     </div>
 </div>
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <!-- JavaScript pour gérer l'affichage du modal -->
-    <script>
-$(document).ready(function() {
-    // Gérer le clic sur le lien "Transférer des points"
-    $('.read-more-btn').click(function(e) {
-        e.preventDefault(); // Empêcher le comportement par défaut du lien
-        var idDemande = $(this).data('demande-id');
-        $('#myModal' + idDemande).show();
-    });
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('myModal{{ demande.idDemande }}'));
 
+        $('.read-more-btn').click(function(e) {
+            e.preventDefault();
+            myModal.show();
+        });
+         
+        $('#submitForm{{ demande.idDemande }}').click(function(e) {
+            e.preventDefault();
     // Gérer la soumission du formulaire de transfert de points
     $('[id^="submitForm"]').click(function(e) {
         e.preventDefault(); // Empêcher le comportement par défaut du formulaire
@@ -266,17 +286,23 @@ $(document).ready(function() {
     $('.close').click(function() {
         $(this).closest('.modal').hide();
     });
-
-    // Gérer le clic en dehors du contenu du modal pour le fermer
-    $(window).click(function(event) {
-        if ($(event.target).hasClass('modal')) {
-            $(event.target).hide();
-        }
+            myModal.hide();
+        });
     });
-});
+</script>
 
-        
-    </script>
+
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+    <!-- jQuery -->
+   <!-- JavaScript pour gérer les événements du modal -->
+
 
 
 
@@ -385,7 +411,10 @@ $(document).ready(function() {
 	<script src="/front/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="/front/assets/js/main.js"></script>
-	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 
 
 </body>

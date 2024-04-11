@@ -8,6 +8,10 @@ parameters:
 
 
 services:
+
+
+
+
     App\Entity\Evenement:
         autowire: true
 
@@ -15,7 +19,7 @@ services:
         autowire: true
         autoconfigure: true
         
-      
+   
 
     App\Entity\Demandedons:
         public: true

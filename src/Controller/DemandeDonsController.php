@@ -20,6 +20,7 @@ use App\Repository\DemandedonsRepository;
 
 class DemandeDonsController extends AbstractController
 {
+    
    /**
  * @Route("/demander_dons/{idUser}", name="demander_dons", methods={"GET", "POST"})
  */
@@ -58,12 +59,27 @@ public function demanderDons(Request $request, EntityManagerInterface $entityMan
         return $this->redirectToRoute('demander_dons', ['idUser' => $idUser]);
     }
 
-    $demandes = $this->getDoctrine()->getRepository(Demandedons::class)->findAll();
+// Calculer la différence entre la date actuelle et la date de délai pour chaque demande
+$demandes = $this->getDoctrine()->getRepository(Demandedons::class)->findAll();
+  // Initialiser le tableau des temps restants
+  $tempsRestants = [];
+
+  // Calculer la différence entre la date actuelle et la date de délai pour chaque demande
+  foreach ($demandes as $demande) {
+      $delai = $demande->getDelai();
+      if ($delai) {
+          $tempsRestants[$demande->getIdDemande()] = $delai->diff(new \DateTime());
+      } else {
+          $tempsRestants[$demande->getIdDemande()] = null;
+      }
+  }
 
     return $this->render('demande_dons/demanderdons.html.twig', [
         'utilisateur' => $utilisateur,
         'idUser' => $idUser,
         'demandes' => $demandes,
+        'tempsRestants' => $tempsRestants,
+
     ]);
 }
 
