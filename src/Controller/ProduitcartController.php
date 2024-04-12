@@ -25,23 +25,11 @@ class ProduitcartController extends AbstractController
         ]);
     }
 
-
-    //supprimer un produit de votre panier
-    #[Route('/produitcart/supprimer/{id}', name: 'app_produitcart_supprimer')]
-    public function supprimer($id,ProduitcartRepository $repository): Response
-    {
-        $produits = $repository->findBy(['idproduit' => $id]);
-        $produit = $produits[array_rand($produits)];
-
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($produit);
-        $em->flush();
-        return $this->redirectToRoute('app_produit_front');
-    }
-    
+  
+ 
 
     //ajouter meme produit +
-    #[Route('/produitcart/{id}/{idp}', name: 'app_produitcart_ajouter')]
+    #[Route('/produitcart/ajouterPlus/{id}/{idp}', name: 'app_produitcart_ajouter')]
     public function ajouterP($id,$idp, ProduitcartRepository $repository, PanierRepository $panierRepository): Response
     {
         $panier = $panierRepository->find($idp);
@@ -64,31 +52,43 @@ class ProduitcartController extends AbstractController
     }
 
 
-    //ajouter un produit a votre panier
-    #[Route('/produitcart/{idProduit}/{idUser}', name: 'app_produit_cart')]
+ 
+   //supprimer un produit de votre panier
+   #[Route('/produitcart/supprimer/{id}', name: 'app_produitcart_supprimer')]
+   public function supprimer($id,ProduitcartRepository $repository): Response
+   {
+       $produits = $repository->findBy(['idproduit' => $id]);
+       $produit = $produits[array_rand($produits)];
 
-    public function ajouter(Request $request, $idProduit, $idUser): Response
-    {
-        $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
-        $produit = $this->getDoctrine()->getRepository(Produit::class)->find($idProduit);
+       $em = $this->getDoctrine()->getManager();
+       $em->remove($produit);
+       $em->flush();
+       return $this->redirectToRoute('app_produit_front');
+   }
+   
+ //ajouter un produit a votre panier
+ #[Route('/produitcart/ajouter/{idProduit}/{idUser}', name: 'app_produit_cart')]
 
-       
-        // Créer une nouvelle instance de Produitcart
-        $produitCart = new Produitcart();
+ public function ajouter(Request $request, $idProduit, $idUser): Response
+ {
+     $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
+     $produit = $this->getDoctrine()->getRepository(Produit::class)->find($idProduit);
 
-        // Ajouter le produit au panier
-        $produitCart->setIdproduit($produit);
-        $produitCart->setIdpanier($panier);
+    
+     // Créer une nouvelle instance de Produitcart
+     $produitCart = new Produitcart();
 
-        // Enregistrer l'entité Produitcart
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($produitCart);
-        $entityManager->flush();
+     // Ajouter le produit au panier
+     $produitCart->setIdproduit($produit);
+     $produitCart->setIdpanier($panier);
 
-        return $this->redirectToRoute('app_produit_front');
-    }
+     // Enregistrer l'entité Produitcart
+     $entityManager = $this->getDoctrine()->getManager();
+     $entityManager->persist($produitCart);
+     $entityManager->flush();
 
-
+     return $this->redirectToRoute('app_produit_front');
+ }
 
     //afficher la panier avec les produits choisis
     #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]

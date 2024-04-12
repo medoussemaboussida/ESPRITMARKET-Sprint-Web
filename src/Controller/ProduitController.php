@@ -17,9 +17,20 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Utilisateur;
 use Knp\Component\Pager\PaginatorInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Symfony\Component\HttpFoundation\File\File;
+
 
 class ProduitController extends AbstractController
 {
+    private $paginator;
+
+    public function __construct(PaginatorInterface $paginator)
+    {
+        $this->paginator = $paginator;
+    }
+
     #[Route('/produit', name: 'app_produit')]
     public function index(): Response
     {
@@ -87,8 +98,14 @@ class ProduitController extends AbstractController
 }
     //affichage
     $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
+
  
-    
+ 
+    $pagination = $this->paginator->paginate(
+        $produits,
+        $request->query->getInt('page', 1),
+        4
+    );
     $categories = $this->getDoctrine()
     ->getRepository(Categorie::class)
     ->createQueryBuilder('c')
@@ -98,11 +115,12 @@ class ProduitController extends AbstractController
     ->orderBy('count', 'DESC')
     ->getQuery()
     ->getResult();
-
+    
     return $this->render('produit/ajouterProduit.html.twig', [
         'form' => $form->createView(),
-        'produits' => $produits,
+        'produits' => $pagination,
         'categories' => $categories,
+        'pagination' => $pagination,
 
     ]);
 }
@@ -187,69 +205,6 @@ $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeyword
 
     ]);
 }
-
-
-/*
-//chercher un produit selon categorie donnée dans search
-#[Route('/produit/searchcateg', name: 'app_produit_search')]
-public function searchcateg(Request $request, ProduitRepository $produitRepository): Response
-{
-    //ajout
-    $produit = new Produit();
-    $form = $this->createForm(ProduitType::class, $produit,);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $image = $form->get('imageproduit')->getData();
-
-        // Vérifiez si une image a été téléchargée
-        if ($image) {
-            // Générez un nom de fichier unique
-            $nomFichier = md5(uniqid()).'.'.$image->guessExtension();
-
-            // Déplacez le fichier vers le répertoire public/images
-            $image->move(
-                $this->getParameter('images_directory'), // Le chemin vers votre répertoire Images dans le dossier public
-                $nomFichier
-            );
-
-            // Définir le nom du fichier de l'image de catégorie dans l'entité
-            $produit->setImageproduit($nomFichier);
-        }
-
-        // Enregistrez la catégorie dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($produit);
-        $entityManager->flush();
-
-        // Redirigez l'utilisateur après l'ajout réussi
-        return $this->redirectToRoute('app_produit_ajouter');
-    }
-
-    // Récupérer le mot-clé de la requête GET
-    $keyword = $request->query->get('keyword');
-
-    // Recherche de produits correspondant au mot-clé
-    $produits = $produitRepository->findByCategoryName($keyword); 
-    $categories = $this->getDoctrine()
-    ->getRepository(Categorie::class)
-    ->createQueryBuilder('c')
-    ->select('c, COUNT(p.categorie) as count')
-    ->leftJoin(Produit::class, 'p', 'WITH', 'p.categorie = c.idcategorie')
-    ->groupBy('c.idcategorie')
-    ->orderBy('count', 'DESC')
-    ->getQuery()
-    ->getResult();
-    return $this->render('produit/ajouterProduit.html.twig', [
-        'form' => $form->createView(),
-        'produits' => $produits,
-        'keyword' => $keyword,
-        'categories' => $categories,
-
-    ]);
-}
-*/
-
 
 
 //afficher produits dans front + connecté user 1
@@ -556,4 +511,49 @@ public function trieNomDesc(Request $request): Response
             ]);
 }
 
+
+//generate pdf
+#[Route('/produit/pdf', name: 'app_produit_pdf')]
+public function generatePdf(): Response
+    {
+            // Créer une nouvelle instance de Dompdf avec des options
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true); // Activer l'utilisation de ressources distantes
+            $dompdf = new Dompdf($options);
+    
+            // Récupérer les produits depuis la base de données
+            $entityManager = $this->getDoctrine()->getManager();
+            $produits = $entityManager->getRepository(Produit::class)->findAll();
+    
+            // Générer le contenu HTML pour le PDF
+            $html = '<h1>Liste des produits</h1>';
+            $html .= '<table border="1">';
+            $html .= '<tr><th>Nom</th><th>Quantite</th><th>Prix</th></tr>';
+            foreach ($produits as $produit) {
+
+                $html .= '<tr>';
+                $html .= '<td>' . $produit->getNomProduit() . '</td>';
+                $html .= '<td>' . $produit->getQuantite() . '</td>';
+                $html .= '<td>' . $produit->getPrix() . '</td>';
+                $html .= '</tr>';
+            }
+            $html .= '</table>';
+    
+            // Charger le contenu HTML dans Dompdf
+            $dompdf->loadHtml($html);
+    
+            // Rendre le PDF
+            $dompdf->render();
+    
+            // Enregistrer le fichier PDF dans le répertoire public
+            $pdfFilePath = $this->getParameter('kernel.project_dir') . '/public/products.pdf';
+            file_put_contents($pdfFilePath, $dompdf->output());
+    
+            // Retourner une réponse indiquant le succès du téléchargement
+            $this->addFlash('success', 'Le fichier PDF a été généré et téléchargé avec succès.');
+    
+            // Rediriger l'utilisateur vers une autre page
+            return $this->redirectToRoute('app_produit_ajouter');    
+    }
 }
