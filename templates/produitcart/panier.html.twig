@@ -63,11 +63,11 @@
 						</style>
 						<!-- logo -->
 
-						<!-- menu start -->
+												<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
-								<li><a href="base.html.twig">Home</a></li>
-	                           <li><a href="">Dons</a></li>
+								<li><a href="{{path('app_produit')}}">Home</a></li>
+								<li><a href="">Dons</a></li>
 
 								<li><a href="">Evénements</a>
 									<ul class="sub-menu">
@@ -76,12 +76,18 @@
 									</ul>
 								</li>
 								<li><a href="">Publications</a></li>
-								
+
 								<li><a href="">Offres</a></li>
-								<li><a href="{{ path('app_produit_front')}}">Produits</a></li>
+
+								<li  class="current-list-item"><a href="{{ path('app_produit_front')}}">Produits</a>
+									<ul class="sub-menu">
+										<li><a href="checkout.html">Historique des commandes</a></li>
+										<li ><a href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}">Panier</a></li>
+									</ul>
+								</li>
 								<li>
 									<div class="header-icons">
-										<a class=class="current-list-item" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+										<a class="shopping-cart" href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 									</div>
 								</li>

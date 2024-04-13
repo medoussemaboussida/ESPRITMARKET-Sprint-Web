@@ -214,6 +214,7 @@ $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeyword
     $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
     $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
     $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
+
     return $this->render('produit/frontProduit.html.twig', [
         'produits' => $produits,
          'user'=> $user,

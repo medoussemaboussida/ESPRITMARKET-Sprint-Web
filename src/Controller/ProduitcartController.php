@@ -28,10 +28,11 @@ class ProduitcartController extends AbstractController
   
  
 
-    //ajouter meme produit +
+    //ajouter meme produit avec bouton +
     #[Route('/produitcart/ajouterPlus/{id}/{idp}', name: 'app_produitcart_ajouter')]
     public function ajouterP($id,$idp, ProduitcartRepository $repository, PanierRepository $panierRepository): Response
     {
+        
         $panier = $panierRepository->find($idp);
         $produit = $this->getDoctrine()->getRepository(Produit::class)->find($id);
 
@@ -53,10 +54,11 @@ class ProduitcartController extends AbstractController
 
 
  
-   //supprimer un produit de votre panier
+   //supprimer un produit de votre panier avec bouton -
    #[Route('/produitcart/supprimer/{id}', name: 'app_produitcart_supprimer')]
    public function supprimer($id,ProduitcartRepository $repository): Response
    {
+     //recherche et suppression aleatoire de produit se repete plusieurs fois
        $produits = $repository->findBy(['idproduit' => $id]);
        $produit = $produits[array_rand($produits)];
 
@@ -71,14 +73,16 @@ class ProduitcartController extends AbstractController
 
  public function ajouter(Request $request, $idProduit, $idUser): Response
  {
+    //chercher le panier de user passé en parametre
      $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
+     //chercher le produit passe en parametre
      $produit = $this->getDoctrine()->getRepository(Produit::class)->find($idProduit);
 
     
      // Créer une nouvelle instance de Produitcart
      $produitCart = new Produitcart();
 
-     // Ajouter le produit au panier
+     // Ajouter le produit et panier dans produitcart
      $produitCart->setIdproduit($produit);
      $produitCart->setIdpanier($panier);
 
@@ -90,46 +94,52 @@ class ProduitcartController extends AbstractController
      return $this->redirectToRoute('app_produit_front');
  }
 
+
+
     //afficher la panier avec les produits choisis
     #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]
     public function afficherPanier($idUser): Response
     {
-        // Récupérer le panier de l'utilisateur spécifié
+        //user : 7atita hakeka bech najem navigi 
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
+
+        // Récupérer le panier de l'utilisateur spécifié en parametre 
         $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
         $produitCartRepository = $this->getDoctrine()->getRepository(Produitcart::class);
         $produitsDansPanier = $produitCartRepository->findBy(['idpanier' => $panier]);
 
-        //calcul montant
+        //selectionner produitcart selon panier specifique
         $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
+
+        //calcul montant facture
         $totalPrix = 0;
         // Parcourez chaque produit et ajoutez son prix au total
         foreach ($produitCart as $produit) {
             $totalPrix += $produit->getIdproduit()->getPrix(); 
         }
         
+
         $quantite = [];
         $produitsUniques = [];
 
-        // Parcourir chaque produit dans le panier
+        // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
         foreach ($produitCart as $produit) {
         
-            // Vérifier si le produit existe déjà dans le tableau $quantite
             if (array_key_exists($produit->getIdproduit()->getIdproduit(), $quantite)) {
-                // Si oui, augmenter la quantité
                 $quantite[$produit->getIdproduit()->getIdproduit()]++;
             } else {
-                // Sinon, initialiser la quantité à 1 et ajouter le produit au tableau des produits uniques
                 $quantite[$produit->getIdproduit()->getIdproduit()] = 1;
                 $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
             }
         }
-        // Afficher les détails du panier
+
         return $this->render('produitcart/panier.html.twig', [
             'produitsUniques' => $produitsUniques,
             'produitsDansPanier' => $produitsDansPanier,
             'panier' => $panier,
             'totalPrix' => $totalPrix,
             'quantite' => $quantite, // Passer le tableau de quantité à la vue
+            'user'=> $user,
 
         ]);
     }

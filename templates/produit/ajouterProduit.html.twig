@@ -560,7 +560,7 @@ $(document).ready(function() {
     <td>{{ produit.categorie.nomcategorie }}</td>
     <td>{{ produit.quantite }}</td>
     <td>{{ produit.prix |number_format(3, '.', ' ') }}</td>
-    <td></td>
+    
     <td>
       {% if produit.imageproduit %}
         <img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="Image" style="width: 200px; height: auto;">
