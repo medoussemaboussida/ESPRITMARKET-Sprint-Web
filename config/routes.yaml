@@ -65,3 +65,21 @@ modifier_points_don:
     path: '/modifier-points/{id}'
     controller: 'App\Controller\DonsController::modifierPointsDon'
     methods: ['GET', 'POST']
+
+
+modifier_points_demande_don:
+    path: /modifier-points-demande/{id}
+    controller: App\Controller\DemandeDonsController::modifierPointsDemandeDon
+    methods: ['GET', 'POST']
+
+
+demander_dons_action:
+    path: /demander_dons_action
+    controller: App\Controller\DemandeDonsController::demanderDonsAction
+    methods: [GET, POST]
+
+generate_qr_code:
+    path: '/generate-qr-code/{content}'
+    controller: 'App\Controller\QrCodeGeneratorController::generateQrCodeUri'
+
+

@@ -2,68 +2,36 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Dons
- *
- * @ORM\Table(name="dons")
- * @ORM\Entity
- */
+
+#[ORM\Table(name: "dons")]
+#[ORM\Entity]
 class Dons
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idDons", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "idDons", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $iddons;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="nbpoints", type="integer", nullable=true)
-     */
+    #[ORM\Column(name: "nbpoints", type: "integer", nullable: true)]
     private $nbpoints;
 
-   /**
- * @var \DateTime
- *
- * @ORM\Column(name="date_ajout", type="datetime", nullable=false)
- */
-private $dateAjout;
+    #[ORM\Column(name: "date_ajout", type: "datetime", nullable: false)]
+    private $dateAjout;
 
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="etatStatutDons", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: "etatStatutDons", type: "string", length: 255, nullable: true)]
     private $etatstatutdons;
 
-    /**
-     * @var \Utilisateur
-     *
-     * @ORM\ManyToOne(targetEntity="Utilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idUser", referencedColumnName="idUser")
-     * })
-     */
+    #[ORM\ManyToOne(targetEntity: "Utilisateur")]
+    #[ORM\JoinColumn(name: "idUser", referencedColumnName: "idUser")]
     private $idUser;
 
+    #[ORM\ManyToOne(targetEntity: "Evenement")]
+    #[ORM\JoinColumn(name: "idEv", referencedColumnName: "id_ev")]
+    private $idEv;
 
-   /**
- * @var \Evenement
- *
- * @ORM\ManyToOne(targetEntity="Evenement")
- * @ORM\JoinColumns({
- *   @ORM\JoinColumn(name="idEv", referencedColumnName="id_ev")
- * })
- */
-private $idEv;
 
 
     public function getIdDons(): ?int

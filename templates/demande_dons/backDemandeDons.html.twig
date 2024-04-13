@@ -300,6 +300,7 @@
             </button>
           </div>
         </nav>
+        
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">              
@@ -308,6 +309,8 @@
                 <div class="card">
                   <div class="card-body">
                     <h4 class="card-title">Liste des Demandes de Dons</h4>
+                    <a href="{{ path('demander_dons_action') }}">Ajouter Demande de Dons</a>
+
 <div class="table-responsive">
   <table class="table">
     <thead>
@@ -333,9 +336,8 @@
             <i class="fas fa-trash"></i>
         </a>
         <!-- Bouton Ajouter -->
-        <a href="" class="btn btn-success btn-sm">
-            <i class="fas fa-plus"></i>
-        </a>
+                        <a href="{{ path('modifier_points_demande_don', {'id': demande.idDemande}) }}" class="btn btn-primary">Modifier points</a>
+
     </td>
       </tr>
       {% endfor %}

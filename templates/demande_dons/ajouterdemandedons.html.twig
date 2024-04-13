@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ajouter Demande de Dons</title>
+</head>
+<body>
+    <h1>Ajouter Demande de Dons</h1>
+    <form method="post">
+        <label for="utilisateur">Utilisateur:</label>
+        <select id="utilisateur" name="utilisateur">
+            {% for utilisateur in utilisateurs %}
+                <option value="{{ utilisateur.idUser }}">{{ utilisateur.nomUser }} {{ utilisateur.prenomUser }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="contenu">Contenu:</label>
+        <textarea id="contenu" name="contenu"></textarea><br><br>
+        <label for="objectifPoints">Objectif Points:</label>
+        <input type="text" id="objectifPoints" name="objectifPoints"><br><br>
+        <label for="delai">Délai:</label>
+        <input type="date" id="delai" name="delai"><br><br>
+        <button type="submit">Ajouter Demande</button>
+    </form>
+</body>
+</html>

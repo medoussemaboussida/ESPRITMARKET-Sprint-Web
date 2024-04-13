@@ -1,0 +1,12 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier les points de la demande de don{% endblock %}
+
+{% block body %}
+    <h1>Modifier les points de la demande de don</h1>
+    {{ form_start(form) }}
+        {{ form_row(form.nbpoints) }}
+        <button type="submit">Enregistrer</button>
+    {{ form_end(form) }}
+{% endblock %}

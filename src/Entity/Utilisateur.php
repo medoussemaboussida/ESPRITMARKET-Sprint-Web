@@ -4,78 +4,44 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Utilisateur
- *
- * @ORM\Table(name="utilisateur")
- * @ORM\Entity
- */
+
+#[ORM\Table(name: "utilisateur")]
+#[ORM\Entity]
 class Utilisateur
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idUser", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $idUser;
+    #[ORM\Column(name: "idUser", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    private ?int $idUser;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="nomUser", type="string", length=255, nullable=false)
-     */
-    private $nomUser;
+    #[ORM\Column(name: "nomUser", type: "string", length: 255, nullable: false)]
+    private string $nomUser;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="prenomUser", type="string", length=255, nullable=false)
-     */
-    private $prenomUser;
+    #[ORM\Column(name: "prenomUser", type: "string", length: 255, nullable: false)]
+    private string $prenomUser;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="emailUser", type="string", length=255, nullable=false)
-     */
-    private $emailUser;
+    #[ORM\Column(name: "emailUser", type: "string", length: 255, nullable: false)]
+    private string $emailUser;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="mdp", type="string", length=255, nullable=false)
-     */
-    private $mdp;
+    #[ORM\Column(name: "mdp", type: "string", length: 255, nullable: false)]
+    private string $mdp;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="nbPoints", type="integer", nullable=false)
-     */
-    private $nbPoints;
+    #[ORM\Column(name: "nbPoints", type: "integer", nullable: false)]
+    private int $nbPoints;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="numTel", type="integer", nullable=false)
-     */
-    private $numTel;
+    #[ORM\Column(name: "numTel", type: "integer", nullable: false)]
+    private int $numTel;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="role", type="string", length=255, nullable=false)
-     */
-    private $role;
-    
-    // Getters et setters pour tous les attributs
+    #[ORM\Column(name: "role", type: "string", length: 255, nullable: false)]
+    private string $role;
+
+    // Getters and setters for all attributes
 
     public function getIdUser(): ?int
     {
         return $this->idUser;
     }
+
     public function setIdUser(?int $idUser): self
     {
         $this->idUser = $idUser;

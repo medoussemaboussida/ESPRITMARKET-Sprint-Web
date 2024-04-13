@@ -34,6 +34,8 @@
 	<link rel="stylesheet" href="/front/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="/front/assets/css/responsive.css">
+	
+
 
 </head>
 
@@ -293,11 +295,18 @@
 
 
 
+
                     </div>
+					
                 </div>
             </div>
             {% endfor %}
+			
         </div>
+	<div class="d-flex justify-content-center">
+    {{ knp_pagination_render(demandes, 'pagination.html.twig') }}
+</div>
+
     </div>
 </div>
     <!-- jQuery -->

@@ -13,6 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\DemandedonsRepository; 
+use App\Form\ModifierPointsFormType;
+use Knp\Component\Pager\PaginatorInterface;
+
+
 
 
 
@@ -20,11 +24,17 @@ use App\Repository\DemandedonsRepository;
 
 class DemandeDonsController extends AbstractController
 {
+    private $paginator;
+
+    public function __construct(PaginatorInterface $paginator)
+    {
+        $this->paginator = $paginator;
+    }
     
-   /**
+  /**
  * @Route("/demander_dons/{idUser}", name="demander_dons", methods={"GET", "POST"})
  */
-public function demanderDons(Request $request, EntityManagerInterface $entityManager, $idUser): Response
+public function demanderDons(Request $request, EntityManagerInterface $entityManager, $idUser, PaginatorInterface $paginator): Response
 {
     // Récupérer l'utilisateur spécifié par son ID depuis la base de données
     $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($idUser);
@@ -33,6 +43,18 @@ public function demanderDons(Request $request, EntityManagerInterface $entityMan
     if (!$utilisateur) {
         throw $this->createNotFoundException('Utilisateur non trouvé.');
     }
+
+    // Récupérer toutes les demandes de dons pour cet utilisateur
+    $query = $entityManager->getRepository(Demandedons::class)->createQueryBuilder('d')
+    ->orderBy('d.datePublication', 'DESC')
+    ->getQuery();
+
+    // Paginer les résultats
+    $demandes = $paginator->paginate(
+        $query, // Requête à paginer
+        $request->query->getInt('page', 1), // Numéro de page par défaut
+        3 // Nombre d'éléments par page
+    );
 
     // Si le formulaire est soumis
     if ($request->isMethod('POST')) {
@@ -59,26 +81,10 @@ public function demanderDons(Request $request, EntityManagerInterface $entityMan
         return $this->redirectToRoute('demander_dons', ['idUser' => $idUser]);
     }
 
-// Calculer la différence entre la date actuelle et la date de délai pour chaque demande
-$demandes = $this->getDoctrine()->getRepository(Demandedons::class)->findAll();
-  // Initialiser le tableau des temps restants
-  $tempsRestants = [];
-
-  // Calculer la différence entre la date actuelle et la date de délai pour chaque demande
-  foreach ($demandes as $demande) {
-      $delai = $demande->getDelai();
-      if ($delai) {
-          $tempsRestants[$demande->getIdDemande()] = $delai->diff(new \DateTime());
-      } else {
-          $tempsRestants[$demande->getIdDemande()] = null;
-      }
-  }
-
     return $this->render('demande_dons/demanderdons.html.twig', [
         'utilisateur' => $utilisateur,
         'idUser' => $idUser,
         'demandes' => $demandes,
-        'tempsRestants' => $tempsRestants,
 
     ]);
 }
@@ -168,4 +174,115 @@ public function backDemandesDons(DemandedonsRepository $demandedonsRepository): 
         return $this->redirectToRoute('admin_demandedons');
     }
 
+
+
+    /**
+ * @Route("/modifier-points-demande/{id}", name="modifier_points_demande_don", methods={"GET", "POST"})
+ */
+public function modifierPointsDemandeDon(Request $request, int $id): Response
+{
+    // Récupérer la demande de don correspondant à l'identifiant
+    $demandeDon = $this->getDoctrine()->getRepository(Demandedons::class)->find($id);
+
+    // Vérifier si la demande de don existe
+    if (!$demandeDon) {
+        throw $this->createNotFoundException('La demande de don avec l\'identifiant '.$id.' n\'existe pas.');
+    }
+
+    // Récupérer l'utilisateur associé à la demande de don
+    $utilisateur = $demandeDon->getIdUtilisateur();
+
+    // Récupérer le nombre de points avant la modification de la demande de don
+    $ancienPoints = $demandeDon->getNbpoints();
+
+    // Créer le formulaire avec le type de formulaire ModifierPointsFormType
+    $form = $this->createForm(ModifierPointsFormType::class, $demandeDon);
+
+    // Traiter la soumission du formulaire
+    $form->handleRequest($request);
+
+    // Vérifier si le formulaire est soumis et valide
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer le nouveau nombre de points saisi dans le formulaire
+        $nouveauPoints = $demandeDon->getNbpoints();
+
+        // Calculer les points mis à jour
+        $pointsMisAJour = $utilisateur->getNbPoints() + $ancienPoints - $nouveauPoints;
+
+        // Mettre à jour le nombre de points de l'utilisateur
+        $utilisateur->setNbPoints($pointsMisAJour);
+
+        // Enregistrer les modifications dans la base de données
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+
+        // Rafraîchir la page actuelle pour afficher les modifications
+        return $this->redirectToRoute('admin_demandedons');
+    }
+
+    // Afficher le formulaire dans le template
+    return $this->render('demande_dons/updatenbpointsdemande.html.twig', [
+        'form' => $form->createView(),
+        'demandeDon' => $demandeDon, // Passer la variable "demandeDon" au template
+    ]);
+}
+
+
+
+#[Route('/demander_dons_action', name: 'demander_dons_action', methods: ['GET', 'POST'])]
+public function demanderDonsAction(Request $request): Response
+{
+    $entityManager = $this->getDoctrine()->getManager();
+
+    // Récupérer tous les utilisateurs
+    $utilisateurs = $entityManager->getRepository(Utilisateur::class)->findAll();
+
+    // Si le formulaire est soumis
+    if ($request->isMethod('POST')) {
+        // Récupérer l'ID de l'utilisateur sélectionné dans le formulaire
+        $idUser = $request->request->get('utilisateur');
+
+        // Récupérer l'utilisateur correspondant à l'ID
+        $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($idUser);
+
+        // Si l'utilisateur n'existe pas, renvoyer une erreur
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        }
+
+        // Récupérer le nom et le prénom de l'utilisateur
+        $nomUser = $utilisateur->getNomUser();
+        $prenomUser = $utilisateur->getPrenomUser();
+
+        $objectifPoints = $request->request->get('objectifPoints'); // Récupérer la valeur d'objectifPoints
+        $contenu = $request->request->get('contenu');
+        $idUtilisateur = $request->request->get('utilisateur');
+        $delai = new \DateTime($request->request->get('delai'));
+
+
+        // Autres données du formulaire...
+
+        // Créer une nouvelle demande
+        $demande = new Demandedons();
+        $demande->setIdUtilisateur($utilisateur);
+        $demande->setNomuser($nomUser);
+        $demande->setPrenomuser($prenomUser);
+        $demande->setContenu($contenu);
+       
+        $demande->setObjectifPoints($objectifPoints);
+        $demande->setDelai($delai);
+
+
+        // Persistez la demande dans la base de données
+        $entityManager->persist($demande);
+        $entityManager->flush();
+
+        // Rediriger vers la même page pour éviter la soumission répétée du formulaire
+        return $this->redirectToRoute('admin_demandedons');
+    }
+
+    return $this->render('demande_dons/ajouterdemandedons.html.twig', [
+        'utilisateurs' => $utilisateurs,
+    ]);
+}
 }

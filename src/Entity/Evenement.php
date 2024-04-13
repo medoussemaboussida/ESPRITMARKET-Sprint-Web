@@ -7,83 +7,44 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Evenement
- *
- * @ORM\Table(name="evenement")
- * @ORM\Entity
- */
+
+#[ORM\Table(name: "evenement")]
+#[ORM\Entity]
 class Evenement
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id_ev", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $idEv;
+    #[ORM\Column(name: "id_ev", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    private ?int $idEv;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="nom_ev", type="string", length=255, nullable=false)
-     */
-    private $nomEv;
+    #[ORM\Column(name: "nom_ev", type: "string", length: 255, nullable: false)]
+    private string $nomEv;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type_ev", type="string", length=255, nullable=false)
-     */
-    private $typeEv;
+    #[ORM\Column(name: "type_ev", type: "string", length: 255, nullable: false)]
+    private string $typeEv;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
-     */
-    private $date;
+    #[ORM\Column(name: "date", type: "date", nullable: false)]
+    private \DateTimeInterface $date;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="image_ev", type="string", length=255, nullable=false)
-     */
-    private $imageEv;
+    #[ORM\Column(name: "image_ev", type: "string", length: 255, nullable: false)]
+    private string $imageEv;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description_ev", type="string", length=255, nullable=false)
-     */
-    private $descriptionEv;
+    #[ORM\Column(name: "description_ev", type: "string", length: 255, nullable: false)]
+    private string $descriptionEv;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="code_participant", type="integer", nullable=false)
-     */
-    private $codeParticipant;
+    #[ORM\Column(name: "code_participant", type: "integer", nullable: false)]
+    private int $codeParticipant;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Dons", mappedBy="evenement")
-     */
-    private $dons;
+    #[ORM\OneToMany(targetEntity: "Dons", mappedBy: "evenement")]
+    private Collection $dons;
+
+    #[ORM\Column(name: "nb_points", type: "integer", nullable: false)]
+    private int $nbPoints;
 
     public function __construct()
     {
         $this->dons = new ArrayCollection();
     }
-
-
-    /**
-     * @ORM\Column(name="nb_points", type="integer", nullable=false)
-     */
-    private $nbPoints;
-
-
- 
 
     public function getIdEv(): ?int
     {
@@ -98,7 +59,6 @@ class Evenement
     public function setNomEv(string $nomEv): static
     {
         $this->nomEv = $nomEv;
-
         return $this;
     }
 
@@ -110,7 +70,6 @@ class Evenement
     public function setTypeEv(string $typeEv): static
     {
         $this->typeEv = $typeEv;
-
         return $this;
     }
 
@@ -122,7 +81,6 @@ class Evenement
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
-
         return $this;
     }
 
@@ -134,7 +92,6 @@ class Evenement
     public function setImageEv(string $imageEv): static
     {
         $this->imageEv = $imageEv;
-
         return $this;
     }
 
@@ -146,7 +103,6 @@ class Evenement
     public function setDescriptionEv(string $descriptionEv): static
     {
         $this->descriptionEv = $descriptionEv;
-
         return $this;
     }
 
@@ -158,7 +114,6 @@ class Evenement
     public function setCodeParticipant(int $codeParticipant): static
     {
         $this->codeParticipant = $codeParticipant;
-
         return $this;
     }
 
@@ -200,8 +155,6 @@ class Evenement
     public function setNbPoints(int $nbPoints): static
     {
         $this->nbPoints = $nbPoints;
-
         return $this;
     }
-
 }
