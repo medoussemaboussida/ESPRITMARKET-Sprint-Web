@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eeaf0a1b977cb26ee311e4efc1861a15",
+    "content-hash": "36072267e4c292cc7f1055a68d616ae6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2039,6 +2039,47 @@
                 "source": "https://github.com/php-fig/log/tree/2.0.0"
             },
             "time": "2021-07-14T16:41:46+00:00"
+        },
+        {
+            "name": "sideclick/bootstrap-modal-bundle",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Sideclick/BootstrapModalBundle.git",
+                "reference": "9a2fe558d713bb638509a1f43e00b0d430f073b1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Sideclick/BootstrapModalBundle/zipball/9a2fe558d713bb638509a1f43e00b0d430f073b1",
+                "reference": "9a2fe558d713bb638509a1f43e00b0d430f073b1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5",
+                "symfony/framework-bundle": "^3.4|^4.0|^5.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Sideclick\\BootstrapModalBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rowan Reid",
+                    "email": "rowan@sideclick.co.za"
+                }
+            ],
+            "description": "Bundle for Symfony 3.4+ that makes it easy to load pages into a Bootstrap modal window.",
+            "support": {
+                "issues": "https://github.com/Sideclick/BootstrapModalBundle/issues",
+                "source": "https://github.com/Sideclick/BootstrapModalBundle/tree/master"
+            },
+            "time": "2020-02-05T07:52:55+00:00"
         },
         {
             "name": "symfony/amqp-messenger",

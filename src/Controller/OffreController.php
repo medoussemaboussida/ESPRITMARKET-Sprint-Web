@@ -155,8 +155,8 @@ public function modifier(Request $request, int $id): Response {
 }
 
 
-    #[Route('/supprimer-offre/{id}', name: 'supprimer_offre')]
-    public function supprimerOffre(int $id, Modal $modal): Response
+#[Route('/supprimer-offre/{id}', name: 'supprimer_offre')]
+    public function supprimerOffre(int $id): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
     
@@ -182,16 +182,9 @@ public function modifier(Request $request, int $id): Response {
     
         // Ajouter un message flash pour indiquer la suppression réussie
         $this->addFlash('success', 'Offre supprimée avec succès.');
-
-        // Utiliser la boîte de dialogue modale de confirmation
-         $modal->confirm('Êtes-vous sûr de vouloir supprimer cette offre ?', function () use ($id) {
-        // Logique de suppression de l'offre
-        // Redirection après suppression
-        return $this->redirectToRoute('afficher_offres');
-    });
     
         // Rediriger vers la page d'affichage des offres
-        return $this->render('offre/supprimer.html.twig');
+        return $this->redirectToRoute('afficher_offres');
     }
 
 

@@ -456,7 +456,37 @@
                                         <td>
                                             <a href="{{ path('modifier_offre', {'id': offre.idOffre}) }}" class="btn btn-sm btn-primary">Modifier</a>
                                             <a href="{{ path('consulter_offre', {'id': offre.idOffre}) }}" class="btn btn-sm btn-info">Consulter</a>
-                                            <a href="{{ path('supprimer_offre', {'id': offre.idOffre}) }}" class="btn btn-sm btn-danger">Supprimer</a>
+                                            <a href="#" 
+                                                    data-toggle="modal"
+                                                    data-url="{{ path('supprimer_offre', {'id': offre.idOffre}) }}"
+                                                    data-target="#confirmDeleteModal-{{ offre.idOffre }}"
+                                                    class="btn btn-sm btn-danger"> Supprimer
+                                                </a>
+                                            <!-- Modal de confirmation de suppression -->
+                                            <div class="modal fade" id="confirmDeleteModal-{{ offre.idOffre }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                              <div class="modal-dialog" role="document">
+                                                  <div class="modal-content">
+                                                      <div class="modal-header">
+                                                          <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                              <span aria-hidden="true">&times;</span>
+                                                          </button>
+                                                      </div>
+                                                      <div class="modal-body">
+                                                          Êtes-vous sûr de vouloir supprimer cette offre ?
+                                                      </div>
+                                                      <div class="modal-footer">
+                                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                          <!-- Formulaire de suppression -->
+                                                          <form action="{{ path('supprimer_offre', {'id': offre.idOffre}) }}" method="post">
+                                                              <input type="hidden" name="_method" value="DELETE">
+                                                              <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idOffre) }}">
+                                                              <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                          </form>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -507,5 +537,12 @@
     <!-- Custom js for this page -->
     <script src="assets/js/dashboard.js"></script>
     <!-- End custom js for this page -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Inclure le fichier JavaScript pour le bundle SideclickBootstrapModalBundle -->
+    <script src="{{ asset('bundles/sideclickbootstrapmodal/js/bootstrap-modalmanager.js') }}"></script>
+    <script src="{{ asset('bundles/sideclickbootstrapmodal/js/bootstrap-modal.js') }}"></script>
+        <!-- End custom js for this page -->
   </body>
 </html>

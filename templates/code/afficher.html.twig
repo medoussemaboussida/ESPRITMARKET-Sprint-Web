@@ -438,10 +438,40 @@
                                                             class="btn btn-sm btn-primary">Modifier</a>
                                                         <a href="{{ path('consulter_code', {'id': code.idCode}) }}"
                                                             class="btn btn-sm btn-info">Consulter</a>
-                                                        <a href="{{ path('supprimer_code', {'id': code.idCode}) }}"
-                                                            class="btn btn-sm btn-danger">Supprimer</a>
-                                                    </td>
-                                                </tr>
+        
+                                                            <a href="#" 
+                                                            data-toggle="modal"
+                                                            data-url="{{ path('supprimer_code', {'id': code.idCode}) }}"
+                                                            data-target="#confirmDeleteModal-{{ code.idCode }}"
+                                                            class="btn btn-sm btn-danger"> Supprimer
+                                                        </a>
+                                                    <!-- Modal de confirmation de suppression -->
+                                                    <div class="modal fade" id="confirmDeleteModal-{{ code.idCode }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                                      <div class="modal-dialog" role="document">
+                                                          <div class="modal-content">
+                                                              <div class="modal-header">
+                                                                  <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                                                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                      <span aria-hidden="true">&times;</span>
+                                                                  </button>
+                                                              </div>
+                                                              <div class="modal-body">
+                                                                  Êtes-vous sûr de vouloir supprimer ce code promo ?
+                                                              </div>
+                                                              <div class="modal-footer">
+                                                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                                  <!-- Formulaire de suppression -->
+                                                                  <form action="{{ path('supprimer_code', {'id': code.idCode}) }}" method="post">
+                                                                      <input type="hidden" name="_method" value="DELETE">
+                                                                      <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ code.idCode) }}">
+                                                                      <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                                  </form>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                                 {% endfor %}
                                             </tbody>
                                         </table>
@@ -490,6 +520,7 @@
     <!-- Custom js for this page -->
     <script src="assets/js/dashboard.js"></script>
     <!-- End custom js for this page -->
+    
 </body>
 
 </html>
