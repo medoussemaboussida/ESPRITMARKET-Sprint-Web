@@ -382,14 +382,62 @@
                     <h4 class="card-title">Modifier offre</h4>
                     <p class="card-description"></p>
                     {% block body %}
-                    <h2>Modifier Offre</h2>
+             
+                    {{ form_start(form, {'attr': {'class': 'forms-sample'}}) }}
+                    <div class="form-group" >
+                     {{ form_label(form.nomoffre, "nom de l'offre", {'attr': {'class': 'form-control-label'}}) }}
+                     {{ form_widget(form.nomoffre, {'attr': {'class': 'form-control', 'placeholder': "nom de l'offre"}}) }}
+                     {% if form_errors(form.nomoffre) %}
+                   <div class="alert alert-danger">{{ form_errors(form.nomoffre)|join(', ') }}</div>
+               {% endif %}
+                     </div>
+                    <div class="form-group" >
+                    {{ form_label(form.descriptionoffre, 'Description', {'attr': {'class': 'form-control-label'}}) }}
+                    {{ form_widget(form.descriptionoffre, {'attr': {'class': 'form-control', 'placeholder': "description de l'offre"}}) }}
+                    {% if form_errors(form.descriptionoffre) %}
+                   <div class="alert alert-danger">{{ form_errors(form.descriptionoffre)|join(', ') }}</div>
+               {% endif %}
+                    </div>
+                   
+                    <div class="form-group" >
+                    {{ form_label(form.datedebut, 'date de debut', {'attr': {'class': 'form-control-label'}}) }}
+                    {{ form_widget(form.datedebut, {'attr': {'class': 'form-control', 'placeholder': 'datedebut'}}) }}
+                    {% if form_errors(form.datedebut) %}
+                   <div class="alert alert-danger">{{ form_errors(form.datedebut)|join(', ') }}</div>
+               {% endif %}
+                    </div>
+                    <div class="form-group" >
+                    {{ form_label(form.datefin, 'date de fin', {'attr': {'class': 'form-control-label'}}) }}
+                    {{ form_widget(form.datefin, {'attr': {'class': 'form-control', 'placeholder': 'datefin'}}) }}
+                    {% if form_errors(form.datefin) %}
+                   <div class="alert alert-danger">{{ form_errors(form.datefin)|join(', ') }}</div>
+               {% endif %}
+                    </div>
+                    <div class="form-group">
+                    {{ form_label(form.imageoffre, 'Image', {'attr': {'class': 'form-control-label'}}) }}
+                    {{ form_widget(form.imageoffre, {'attr': {'class': 'form-control'}}) }}
+                 
+                    </div>
+                    <div class="form-group">
+                       {{ form_label(form.reduction, 'reduction', {'attr': {'class': 'form-control-label'}}) }}
+                       {{ form_widget(form.reduction, {'attr': {'class': 'form-control', 'placeholder': 'reduction'}}) }}
+                       {% if form_errors(form.reduction) %}
+                   <div class="alert alert-danger">{{ form_errors(form.reduction)|join(', ') }}</div>
+               {% endif %}
+                    </div>
                     
-                    {{ form_start(form) }}
-                        {{ form_widget(form) }}
-                        <button class="btn btn-primary">Sauvegarder</button>
+                    <div class="form-group">
+                     {{ form_label(form.produits, 'Produits', {'attr': {'class': 'form-control-label'}}) }}
+                     {{ form_widget(form.produits, {'attr': {'class': 'form-control'}}) }}
+                  
+                     </div>
+                 
+       
+                    <button type="submit" class="btn btn-success">Modifier</button>
                     {{ form_end(form) }}
-                    
+       
                     <a href="{{ path('afficher_offres') }}">Retour à la liste des offres</a>
+       
                     {% endblock %}
                   </div>
                 </div>

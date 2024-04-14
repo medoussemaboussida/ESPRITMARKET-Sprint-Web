@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use DateInterval;
 use DatePeriod;
 use DateTime;
-
+use Symfony\UX\Modal\Modal;
 
 class OffreController extends AbstractController
 {
@@ -85,79 +85,78 @@ class OffreController extends AbstractController
     }
 
     #[Route('/modifier-offre/{id}', name: 'modifier_offre')]
-    public function modifier(Request $request, int $id): Response {
-        $entityManager = $this->getDoctrine()->getManager();
-        $offre = $entityManager->getRepository(Offre::class)->find($id);
-    
-        if (!$offre) {
-            throw $this->createNotFoundException("No offer found for id ".$id);
+public function modifier(Request $request, int $id): Response {
+    $entityManager = $this->getDoctrine()->getManager();
+    $offre = $entityManager->getRepository(Offre::class)->find($id);
+
+    if (!$offre) {
+        throw $this->createNotFoundException("No offer found for id ".$id);
+    }
+   
+    // Sauvegarder le nom de l'ancienne image
+    $ancienneImage = $offre->getImageoffre();
+
+    $form = $this->createForm(OffreType::class, $offre);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+
+     // Récupérer les produits sélectionnés
+     $produitsSelectionnes = $form->get('produits')->getData();
+
+     // Récupérer tous les produits actuellement associés à l'offre
+     $produitsAssocies = $offre->getProduits();
+
+     // Dissocier chaque produit qui n'est pas sélectionné de l'offre
+     foreach ($produitsAssocies as $produit) {
+        // Vérifiez si le produit actuel n'est pas sélectionné dans le formulaire
+        if (!$produitsSelectionnes->contains($produit)) {
+            // Dissociez le produit de l'offre
+            $produit->setOffre(null);
+            // Persistez le produit pour mettre à jour la base de données
+            $entityManager->persist($produit);
         }
-       
-        // Sauvegarder le nom de l'ancienne image
-        $ancienneImage = $offre->getImageoffre();
+    }
     
-        $form = $this->createForm(OffreType::class, $offre);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
 
-         // Récupérer les produits sélectionnés
-         $produitsSelectionnes = $form->get('produits')->getData();
+     // Mettre à jour les nouvelles associations produit-offre avec l'offre modifiée
+     foreach ($produitsSelectionnes as $produit) {
+         $offre->addProduit($produit);
+         $produit->setOffre($offre);
+         $entityManager->persist($produit); // Persistez le produit pour mettre à jour la base de données
+     }
 
-         // Récupérer tous les produits actuellement associés à l'offre
-         $produitsAssocies = $offre->getProduits();
- 
-         // Dissocier chaque produit qui n'est pas sélectionné de l'offre
-         foreach ($produitsAssocies as $produit) {
-             if (!$produitsSelectionnes->contains($produit)) {
-                 $produit->setOffre(null);
-                 $entityManager->persist($produit); // Persistez le produit pour mettre à jour la base de données
-             }
-         }
- 
-         // Mettre à jour les nouvelles associations produit-offre avec l'offre modifiée
-         foreach ($produitsSelectionnes as $produit) {
-             $offre->addProduit($produit);
-             $produit->setOffre($offre);
-             $entityManager->persist($produit); // Persistez le produit pour mettre à jour la base de données
-         }
+        /** @var UploadedFile|null $image */
+        $image = $form->get('imageoffre')->getData();
 
-        // Mettre à jour les nouvelles associations produit-offre avec l'offre modifiée
-        foreach ($produitsSelectionnes as $produit) {
-            $offre->addProduit($produit);
-            $produit->setOffre($offre);
-        }
-
-            /** @var UploadedFile|null $image */
-            $image = $form->get('imageoffre')->getData();
-    
-            if ($image) {
-                $nomFichier = md5(uniqid()).'.'.$image->guessExtension();
-                try {
-                    $image->move($this->getParameter('images_directory'), $nomFichier);
-                    $offre->setImageoffre($nomFichier);
-                } catch (FileException $e) {
-                    // Gérer l'exception si quelque chose se passe mal pendant le téléchargement du fichier
-                }
-            } else {
-                // Si aucune nouvelle image n'est téléchargée, conserver l'ancienne image
-                $offre->setImageoffre($ancienneImage);
+        if ($image) {
+            $nomFichier = md5(uniqid()).'.'.$image->guessExtension();
+            try {
+                $image->move($this->getParameter('images_directory'), $nomFichier);
+                $offre->setImageoffre($nomFichier);
+            } catch (FileException $e) {
+                // Gérer l'exception si quelque chose se passe mal pendant le téléchargement du fichier
             }
-    
-            $entityManager->flush();
-            $this->addFlash('success', "L'offre a été modifiée avec succès.");
-    
-            return $this->redirectToRoute('afficher_offres');
+        } else {
+            // Si aucune nouvelle image n'est téléchargée, conserver l'ancienne image
+            $offre->setImageoffre($ancienneImage);
         }
-    
-        return $this->render('offre/modifier.html.twig', [
-            'offre' => $offre,
-            'form' => $form->createView(),
-        ]);
+
+        $entityManager->flush();
+        $this->addFlash('success', "L'offre a été modifiée avec succès.");
+
+        return $this->redirectToRoute('afficher_offres');
     }
 
+    return $this->render('offre/modifier.html.twig', [
+        'offre' => $offre,
+        'form' => $form->createView(),
+    ]);
+}
+
+
     #[Route('/supprimer-offre/{id}', name: 'supprimer_offre')]
-    public function supprimerOffre(int $id): Response
+    public function supprimerOffre(int $id, Modal $modal): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
     
@@ -183,9 +182,16 @@ class OffreController extends AbstractController
     
         // Ajouter un message flash pour indiquer la suppression réussie
         $this->addFlash('success', 'Offre supprimée avec succès.');
+
+        // Utiliser la boîte de dialogue modale de confirmation
+         $modal->confirm('Êtes-vous sûr de vouloir supprimer cette offre ?', function () use ($id) {
+        // Logique de suppression de l'offre
+        // Redirection après suppression
+        return $this->redirectToRoute('afficher_offres');
+    });
     
         // Rediriger vers la page d'affichage des offres
-        return $this->redirectToRoute('afficher_offres');
+        return $this->render('offre/supprimer.html.twig');
     }
 
 
