@@ -352,9 +352,44 @@
                                 </td>
                                  <td>
         <!-- Bouton Supprimer -->
-<a href="{{ path('admin_dons_delete', {'id': don.idDons}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce don ?')">Supprimer
-            <i class="fas fa-trash"></i>
-        </a>
+<!-- Icône pour supprimer -->
+<!-- Bouton pour ouvrir la modal de confirmation de suppression -->
+<!-- Bouton pour supprimer le don -->
+<a href="#" class="btn btn-danger delete-link"
+    data-toggle="modal"
+    data-url="{{ path('admin_dons_delete', {'id': don.idDons}) }}"
+    data-target="#confirmDeleteModal-{{ don.idDons }}"
+>
+    <i class="fas fa-trash"></i> Supprimer
+</a>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="confirmDeleteModal-{{ don.idDons }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer ce don ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <!-- Formulaire de suppression -->
+                <form action="{{ path('admin_dons_delete', {'id': don.idDons}) }}" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ don.idDons) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <a href="{{ path('modifier_points_don', {'id': don.idDons}) }}" class="btn btn-primary btn-sm">
     <i class="fas fa-pencil-alt"></i> Modifier les points
 </a>
@@ -407,6 +442,12 @@
     <script src="back/assets/js/misc.js"></script>
     <script src="back/assets/js/settings.js"></script>
     <script src="back/assets/js/todolist.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Inclure le fichier JavaScript pour le bundle SideclickBootstrapModalBundle -->
+<script src="{{ asset('bundles/sideclickbootstrapmodal/js/bootstrap-modalmanager.js') }}"></script>
+<script src="{{ asset('bundles/sideclickbootstrapmodal/js/bootstrap-modal.js') }}"></script>
  
 
     <!-- endinject -->

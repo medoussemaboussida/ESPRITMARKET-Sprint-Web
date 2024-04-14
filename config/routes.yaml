@@ -53,13 +53,12 @@ add_points_to_event_form:
 admin_dons_delete:
     path: /admin/dons/{id}/delete
     controller: App\Controller\DonsController::deleteDon
-    methods: ['GET']
-
+    methods: ['GET', 'POST']
 
 admin_demandedons_delete:
     path: /admin/demandedons/{id}/delete
     controller: App\Controller\DemandeDonsController::deleteDemande
-    methods: ['GET']
+    methods: ['GET', 'POST']
 
 modifier_points_don:
     path: '/modifier-points/{id}'

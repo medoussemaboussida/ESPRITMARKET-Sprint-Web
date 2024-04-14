@@ -130,6 +130,8 @@ public function transferPoints(Request $request, EntityManagerInterface $entityM
     
     // Enregistrer les changements dans la base de données
     $entityManager->flush();
+    $this->addFlash('success', 'Les points ont été transférés avec succès.');
+
 
     // Rediriger vers la page demander_dons après le transfert
     return new JsonResponse(['success' => true, 'newPoints' => $newPoints]);
@@ -152,7 +154,7 @@ public function backDemandesDons(DemandedonsRepository $demandedonsRepository): 
 }
 
 /**
-     * @Route("/admin/demandedons/{id}/delete", name="admin_demandedons_delete", methods={"GET"})
+     * @Route("/admin/demandedons/{id}/delete", name="admin_demandedons_delete", methods={"GET", "POST"})
      */
     public function deleteDemande(Request $request, DemandedonsRepository $demandedonsRepository, $id): Response
 

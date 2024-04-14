@@ -33,6 +33,8 @@
 	<link rel="stylesheet" href="/front/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="/front/assets/css/responsive.css">
+	 <link rel="stylesheet" href="{{ asset('bundles/mercuryseriesflashy/css/flashy.css') }}">
+
 
 </head>
 
@@ -177,6 +179,14 @@
         </div>
     </div>
 
+	
+	{% for message in app.flashes('success') %}
+    <div class="alert alert-success">
+        {{ message }}
+    </div>
+{% endfor %}
+
+
 
 
 
@@ -189,6 +199,8 @@
                 <div class="single-latest-news">
                     <a href=""><div class=""></div></a>
                     <div class="news-text-box">
+<img src="{{ asset('images/' ~ evenement.imageEv) }}" alt="">
+
                         <h3><a href="single-news.html"> {{ evenement.nomEv }}</a></h3>
                         <p class="blog-meta">
                             <span class="date"><i class="fas fa-calendar"></i>{{ evenement.date()|date('Y-m-d H:i:s') }}</span>
@@ -199,10 +211,19 @@
                     </div>
                 </div>
             </div>
+		{% set totalPointsEvenement = evenement.nbPoints %}
+{% set pourcentageProgression = (totalPointsEvenement / maximumPoints) * 100 %}
+
+<div class="progress progress-md portfolio-progress">
+    <div class="progress-bar bg-success" role="progressbar" style="width: {{ pourcentageProgression }}%" aria-valuenow="{{ pourcentageProgression }}" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+
             {% endfor %}
         </div>
     </div>
 </div>
+
 
 
 
@@ -234,14 +255,37 @@
 
                     
                     <!-- Icône pour supprimer -->
-                    <a href="{{ path('don_delete', {'id': don.idDons}) }}" onclick="event.preventDefault(); if(confirm('Êtes-vous sûr de vouloir supprimer ce don ?')) { document.getElementById('delete-form-{{ don.idDons }}').submit(); }">
-                        <i class="fas fa-trash"></i>
-                    </a>
+<a href="#" class="delete-link" data-toggle="modal" data-target="#confirmDeleteModal-{{ don.idDons }}">
+    <i class="fas fa-trash"></i>
+</a>
 
-                    <form id="delete-form-{{ don.idDons }}" action="{{ path('don_delete', {'id': don.idDons}) }}" method="POST" style="display: none;">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ don.idDons) }}">
-                    </form>
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="confirmDeleteModal-{{ don.idDons }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer ce don ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <!-- Formulaire de suppression -->
+                <form action="{{ path('don_delete', {'id': don.idDons}) }}" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ don.idDons) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
                 </td>
 				{% else %}
             <td></td> <!-- Ne rien afficher si l'état est "reçu" -->
@@ -252,6 +296,7 @@
         <tr>
             <td colspan="4" class="text-right">Total des points donnés : {{ totalPoints }}</td>
         </tr>
+		
     </tbody>
 </table>
     <div class="footer-area">
@@ -324,6 +369,7 @@
 			</div>
 		</div>
 	</div>
+	
 	<!-- end copyright -->
 	
 <!-- jquery -->
@@ -346,6 +392,12 @@
 	<script src="/front/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="/front/assets/js/main.js"></script>
+	<!-- Flashy depends on jQuery -->
+    <script src="//code.jquery.com/jquery.js"></script>
+    <!-- Load Flashy default JavaScript -->
+    <script src="{{ asset('bundles/mercuryseriesflashy/js/flashy.js') }}"></script>
+	    {{ include('@MercurySeriesFlashy/flashy.html.twig') }}
+
 
 </body>
 

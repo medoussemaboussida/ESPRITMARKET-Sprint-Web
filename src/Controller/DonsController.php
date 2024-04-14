@@ -19,6 +19,8 @@ use App\Repository\EvenementRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Form\ModifierPointsFormType;
+use Flashy\Flashy;
+
 
 
 
@@ -27,6 +29,7 @@ use App\Form\ModifierPointsFormType;
 
 class DonsController extends AbstractController
 {
+    
 
     private $requestStack;
 
@@ -52,7 +55,8 @@ public function index(Request $request, DonsRepository $donsRepository, Evenemen
     $dons = $donsRepository->getDonsByUserId($userId);
     $evenementsDons = $evenementRepository->findByTypeEv('dons');
 
-    
+    $maximumPoints = 200; // Par exemple, vous pouvez définir le maximum à 200
+
     // Récupérer tous les événements disponibles depuis la base de données
     $evenements = $evenementRepository->findAll();
     
@@ -81,6 +85,7 @@ public function index(Request $request, DonsRepository $donsRepository, Evenemen
 
     // Vérifier si le formulaire a été soumis et est valide
     if ($form->isSubmitted() && $form->isValid()) {
+
         // Récupérer l'événement sélectionné
 $evenementId = $form->get('idEv')->getData();
         $evenement = $evenementRepository->find($evenementId);
@@ -102,6 +107,8 @@ $evenementId = $form->get('idEv')->getData();
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($don);
         $entityManager->flush();
+        $this->addFlash('success', 'Don ajouté avec succès.');
+
 
         // Rediriger l'utilisateur vers la page des dons
         return $this->redirectToRoute('dons_page', ['userId' => $userId]);
@@ -113,6 +120,8 @@ $evenementId = $form->get('idEv')->getData();
         'dons' => $dons,
         'nbPointsUtilisateur' => $utilisateur->getNbPoints(),
         'evenementsDons' => $evenementsDons,
+        'maximumPoints' => $maximumPoints, // Passer le maximum de points à la vue Twig
+
 
     ]);
 }
@@ -141,6 +150,8 @@ public function addPointsToEventForm(Request $request, Evenement $evenement): Re
         // Enregistrer les modifications dans la base de données
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->flush();
+        $this->addFlash('success', 'Don ajouté avec succès.');
+
 
         // Rediriger l'utilisateur vers une autre page ou afficher un message de confirmation
         // Ici, je redirige l'utilisateur vers la page de détails de l'événement
@@ -201,6 +212,7 @@ public function delete(Request $request, DonsRepository $donsRepository, int $id
     // Rediriger vers la page des dons ou une autre page après la suppression
     return $this->redirectToRoute('dons_page', ['userId' => $don->getIdUser()->getIdUser()]);
 }
+
     /**
  * @Route("/edit/{id}", name="edit_don")
  */
@@ -213,6 +225,8 @@ public function editDon(Request $request, int $id): Response
     if (!$don) {
         throw $this->createNotFoundException('Le don avec l\'identifiant '.$id.' n\'existe pas.');
     }
+    $nomEv = $don->getIdEv()->getNomEv();
+
 
     // Récupérer l'utilisateur associé au don
     $utilisateur = $don->getIdUser();
@@ -241,6 +255,8 @@ public function editDon(Request $request, int $id): Response
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($don);
         $entityManager->flush();
+        $this->addFlash('success', 'Don modifié avec succès.');
+
 
         // Rediriger l'utilisateur vers une autre page après l'édition
         return $this->redirectToRoute('dons_page', ['userId' => $don->getIdUser()->getIdUser()]);
@@ -251,6 +267,9 @@ public function editDon(Request $request, int $id): Response
         'form' => $form->createView(),
         'don' => $don, // Passer la variable "don" au template
         'nbPointsUtilisateur' => $utilisateur->getNbPoints(),
+        'nomEv' => $nomEv,
+
+
 
     ]);
 }
@@ -272,7 +291,7 @@ public function editDon(Request $request, int $id): Response
   
     
     /**
- * @Route("/admin/dons/{id}/delete", name="admin_dons_delete", methods={"GET"})
+ * @Route("/admin/dons/{id}/delete", name="admin_dons_delete", methods={"GET", "POST"})
  */
 
 public function deleteDon(Request $request, DonsRepository $donsRepository, $id): Response
