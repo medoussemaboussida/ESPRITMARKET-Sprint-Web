@@ -7,6 +7,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Positive;
 
 
 use App\Entity\Evenement;
@@ -19,14 +23,17 @@ class DonsType extends AbstractType
         $builder
             // Autres champs de votre formulaire...
             ->add('idEv', EntityType::class, [
+                'label' => 'Choisissez un événement :',
+
                 'class' => Evenement::class,
                 'choice_label' => 'nomEv',
             ])
             ->add('nbpoints', IntegerType::class, [
-                'attr' => [
-                    'max' => 100, // or any other value you want to limit the input to
-                ],
-            ])
+                'label' => 'Saisir le nombre de points :',
+                'constraints' => [
+                    new NotBlank(['message' => 'Le nombre de points est obligatoire.']),
+                    new Positive(['message' => 'Le nombre de points doit être positif .']),
+                ], ])
             ->getForm();
 
             

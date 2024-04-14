@@ -15,6 +15,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\DemandedonsRepository; 
 use App\Form\ModifierPointsFormType;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Positive;
+use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Form\ChoiceType;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
+
+
+
 
 
 
@@ -31,9 +45,9 @@ class DemandeDonsController extends AbstractController
         $this->paginator = $paginator;
     }
     
-  /**
- * @Route("/demander_dons/{idUser}", name="demander_dons", methods={"GET", "POST"})
- */
+
+#[Route('/demander_dons/{idUser}', name: 'demander_dons', methods: ['GET', 'POST'])]
+
 public function demanderDons(Request $request, EntityManagerInterface $entityManager, $idUser, PaginatorInterface $paginator): Response
 {
     // Récupérer l'utilisateur spécifié par son ID depuis la base de données
@@ -43,8 +57,6 @@ public function demanderDons(Request $request, EntityManagerInterface $entityMan
     if (!$utilisateur) {
         throw $this->createNotFoundException('Utilisateur non trouvé.');
     }
-
-    // Récupérer toutes les demandes de dons pour cet utilisateur
     $query = $entityManager->getRepository(Demandedons::class)->createQueryBuilder('d')
     ->orderBy('d.datePublication', 'DESC')
     ->getQuery();
@@ -55,23 +67,54 @@ public function demanderDons(Request $request, EntityManagerInterface $entityMan
         $request->query->getInt('page', 1), // Numéro de page par défaut
         3 // Nombre d'éléments par page
     );
+    $demande = new Demandedons();
 
-    // Si le formulaire est soumis
-    if ($request->isMethod('POST')) {
+
+    // Créer le formulaire directement dans le contrôleur
+    $form = $this->createFormBuilder()
+        ->add('contenu', TextType::class, [
+            'constraints' => [
+                new NotBlank(['message' => 'Le contenu est obligatoire.']),
+                new Length([
+                    'min' => 4,
+                    'max' => 50,
+                    'minMessage' => 'Le contenu doit contenir au moins {{ limit }} mots.',
+                    'maxMessage' => 'Le contenu ne peut pas contenir plus de {{ limit }} mots.'
+                ]),
+            ],
+        ])
+        ->add('objectifPoints', IntegerType::class, [
+            'constraints' => [
+                new NotBlank(['message' => "L'objectif de points est obligatoire."]),
+                new Positive(['message' => "L'objectif de points doit être positif ."]),
+            ],
+        ])
+        ->add('delai', DateType::class, [
+            'constraints' => [
+                new NotBlank(['message' => 'Le délai est obligatoire.']),
+                new GreaterThan([
+                    'value' => new \DateTime(), // Utilisez une instance de DateTime pour représenter la date actuelle
+                    'message' => 'Le délai doit être postérieur à la date d\'aujourd\'hui.'
+                ]),
+                            ],
+        ])
+        ->getForm();
+
+    // Gérer la soumission du formulaire
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
         // Récupérer les données du formulaire
-        $contenu = $request->request->get('contenu');
-        $objectifPoints = $request->request->get('objectifPoints');
-        $delai = new \DateTime($request->request->get('delai'));
+        $data = $form->getData();
 
         // Créer une nouvelle demande
         $demande = new Demandedons();
-        $demande->setContenu($contenu);
+        $demande->setContenu($data['contenu']);
         // Assigner l'objet Utilisateur récupéré à la demande de don
         $demande->setIdUtilisateur($utilisateur);
         $demande->setNomuser($utilisateur->getNomuser());
         $demande->setPrenomuser($utilisateur->getPrenomuser());
-        $demande->setObjectifPoints($objectifPoints);
-        $demande->setDelai($delai);
+        $demande->setObjectifPoints($data['objectifPoints']);
+        $demande->setDelai($data['delai']);
 
         // Persistez la demande dans la base de données
         $entityManager->persist($demande);
@@ -81,13 +124,16 @@ public function demanderDons(Request $request, EntityManagerInterface $entityMan
         return $this->redirectToRoute('demander_dons', ['idUser' => $idUser]);
     }
 
+    // Render the form and other data
     return $this->render('demande_dons/demanderdons.html.twig', [
         'utilisateur' => $utilisateur,
         'idUser' => $idUser,
+        'form' => $form->createView(), // Pass the form to the template
         'demandes' => $demandes,
 
     ]);
 }
+
 
 /**
  * @Route("/transfer_points/{idUser}", name="transfer_points", methods={"POST"})
@@ -226,6 +272,8 @@ public function modifierPointsDemandeDon(Request $request, int $id): Response
     return $this->render('demande_dons/updatenbpointsdemande.html.twig', [
         'form' => $form->createView(),
         'demandeDon' => $demandeDon, // Passer la variable "demandeDon" au template
+        'utilisateur' => $utilisateur, // Passer la variable "utilisateur" au template
+
     ]);
 }
 
@@ -239,41 +287,63 @@ public function demanderDonsAction(Request $request): Response
     // Récupérer tous les utilisateurs
     $utilisateurs = $entityManager->getRepository(Utilisateur::class)->findAll();
 
-    // Si le formulaire est soumis
-    if ($request->isMethod('POST')) {
-        // Récupérer l'ID de l'utilisateur sélectionné dans le formulaire
-        $idUser = $request->request->get('utilisateur');
+    $form = $this->createFormBuilder()
+    ->add('utilisateur', EntityType::class, [
+        'class' => Utilisateur::class,
+        'choice_label' => function ($utilisateur) {
+            return $utilisateur->getNomUser() . ' ' . $utilisateur->getPrenomUser();
+        },
+    ])
+        ->add('contenu', TextType::class, [
+            'constraints' => [
+                new NotBlank(['message' => 'Le contenu est obligatoire.']),
+                new Length([
+                    'min' => 4,
+                    'max' => 50,
+                    'minMessage' => 'Le contenu doit contenir au moins {{ limit }} mots.',
+                    'maxMessage' => 'Le contenu ne peut pas contenir plus de {{ limit }} mots.'
+                ]),
+            ],
+        ])
+        ->add('objectifPoints', IntegerType::class, [
+            'constraints' => [
+                new NotBlank(['message' => "L'objectif de points est obligatoire."]),
+                new Positive(['message' => "L'objectif de points doit être positif."]),
+            ],
+        ])
+        ->add('delai', DateType::class, [
+            'constraints' => [
+                new NotBlank(['message' => 'Le délai est obligatoire.']),
+                new GreaterThan([
+                    'value' => new \DateTime(),
+                    'message' => 'Le délai doit être postérieur à la date d\'aujourd\'hui.'
+                ]),
+            ],
+        ])
+        ->getForm();
 
-        // Récupérer l'utilisateur correspondant à l'ID
-        $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($idUser);
+    // Gérer la soumission du formulaire
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer les données du formulaire
+        $data = $form->getData();
 
-        // Si l'utilisateur n'existe pas, renvoyer une erreur
-        if (!$utilisateur) {
-            throw $this->createNotFoundException('Utilisateur non trouvé.');
-        }
-
-        // Récupérer le nom et le prénom de l'utilisateur
-        $nomUser = $utilisateur->getNomUser();
-        $prenomUser = $utilisateur->getPrenomUser();
-
-        $objectifPoints = $request->request->get('objectifPoints'); // Récupérer la valeur d'objectifPoints
-        $contenu = $request->request->get('contenu');
-        $idUtilisateur = $request->request->get('utilisateur');
-        $delai = new \DateTime($request->request->get('delai'));
-
-
-        // Autres données du formulaire...
+        // Récupérer l'utilisateur sélectionné
+        $utilisateur = $data['utilisateur'];
 
         // Créer une nouvelle demande
         $demande = new Demandedons();
         $demande->setIdUtilisateur($utilisateur);
-        $demande->setNomuser($nomUser);
-        $demande->setPrenomuser($prenomUser);
-        $demande->setContenu($contenu);
-       
-        $demande->setObjectifPoints($objectifPoints);
-        $demande->setDelai($delai);
+        $demande->setNomPrenomUtilisateur($nomCompletUtilisateur); // Champ pour le nom complet de l'utilisateur
 
+        $demande->setContenu($data['contenu']);
+        $demande->setObjectifPoints($data['objectifPoints']);
+        $demande->setDelai($data['delai']);
+
+        // Récupérer le prénom de l'utilisateur
+        $nomCompletUtilisateur = $utilisateur->getNomUser() . ' ' . $utilisateur->getPrenomUser();
+
+    
 
         // Persistez la demande dans la base de données
         $entityManager->persist($demande);
@@ -285,6 +355,8 @@ public function demanderDonsAction(Request $request): Response
 
     return $this->render('demande_dons/ajouterdemandedons.html.twig', [
         'utilisateurs' => $utilisateurs,
+        'form' => $form->createView(),
     ]);
 }
+
 }

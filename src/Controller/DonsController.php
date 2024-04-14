@@ -85,35 +85,39 @@ public function index(Request $request, DonsRepository $donsRepository, Evenemen
 
     // Vérifier si le formulaire a été soumis et est valide
     if ($form->isSubmitted() && $form->isValid()) {
-
-        // Récupérer l'événement sélectionné
-$evenementId = $form->get('idEv')->getData();
-        $evenement = $evenementRepository->find($evenementId);
-
-        // Soustraire les points du don aux points de l'événement
-        $evenement->setNbPoints($evenement->getNbPoints() + $don->getNbpoints());
-
-        $utilisateur->setNbPoints($utilisateur->getNbPoints() - $don->getNbpoints());
-
-        // Définir l'utilisateur pour le don
-        $don->setIdUser($utilisateur);
-
-        // Définir l'état du don comme "en attente"
-        $don->setEtatstatutdons('en attente');
-
-        // Le reste de votre logique pour ajouter le don et l'utilisateur...
-
-        // Enregistrer les modifications dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($don);
-        $entityManager->flush();
-        $this->addFlash('success', 'Don ajouté avec succès.');
-
-
-        // Rediriger l'utilisateur vers la page des dons
-        return $this->redirectToRoute('dons_page', ['userId' => $userId]);
+        // Récupérer la valeur de nbpoints depuis le formulaire
+        $donPoints = $form->get('nbpoints')->getData();
+    
+        // Vérifier si l'utilisateur a suffisamment de points
+        if ($utilisateur->getNbPoints() < $donPoints) {
+            // Ajouter un message flash d'erreur
+            $this->addFlash('error', 'Vous n\'avez pas suffisamment de points pour effectuer ce don.');
+        } else {
+            // Récupérer l'événement sélectionné
+            $evenementId = $form->get('idEv')->getData();
+            $evenement = $evenementRepository->find($evenementId);
+    
+            // Soustraire les points du don aux points de l'événement
+            $evenement->setNbPoints($evenement->getNbPoints() + $donPoints);
+    
+            $utilisateur->setNbPoints($utilisateur->getNbPoints() - $donPoints);
+    
+            // Définir l'utilisateur pour le don
+            $don->setIdUser($utilisateur);
+    
+            // Définir l'état du don comme "en attente"
+            $don->setEtatstatutdons('en attente');
+    
+            // Le reste de votre logique pour ajouter le don et l'utilisateur...
+    
+            // Enregistrer les modifications dans la base de données
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($don);
+            $entityManager->flush();
+            $this->addFlash('success', 'Don ajouté avec succès.');
+        }
     }
-
+    
     // Rendre la vue Twig avec le formulaire, les dons et les événements de type "dons"
     return $this->render('dons/Dons.html.twig', [
         'form' => $form->createView(),
@@ -121,10 +125,7 @@ $evenementId = $form->get('idEv')->getData();
         'nbPointsUtilisateur' => $utilisateur->getNbPoints(),
         'evenementsDons' => $evenementsDons,
         'maximumPoints' => $maximumPoints, // Passer le maximum de points à la vue Twig
-
-
-    ]);
-}
+    ]);}
 
 
 public function addPointsToEventForm(Request $request, Evenement $evenement): Response
@@ -385,7 +386,7 @@ public function modifierPointsDon(Request $request, int $id): Response
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->flush();
 
-        // Rafraîchir la page actuelle pour afficher les modifications
+        // Rediriger vers la route admin_dons
         return $this->redirectToRoute('admin_dons');
     }
 
@@ -393,6 +394,8 @@ public function modifierPointsDon(Request $request, int $id): Response
     return $this->render('dons/afficherFormulaireModificationPoints.html.twig', [
         'form' => $form->createView(),
         'don' => $don, // Passer la variable "don" au template
+        'utilisateur' => $utilisateur, // Passer la variable "utilisateur" au template
     ]);
 }
+
 }

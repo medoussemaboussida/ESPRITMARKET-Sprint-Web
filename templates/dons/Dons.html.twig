@@ -161,26 +161,40 @@
 	<!-- end search area -->
 
 
- <div class="col-lg-4 col-md-6 text-center">
-        <div class="single-product-item">
-            <h1 style="font-size: 20px;">Faire un don</h1>
+<div class="container">
+    <div class="row">
+	
+        <div class="col-lg-7 col-md-10">
+            <div class="single-product-item">
+                <h1 style="font-size: 20px;">Faire un don</h1>
 
-            <form method="post">
-                {{ form_start(form) }}
-
-{{ form_widget(form.nbpoints) }}
-
-                {{ form_widget(form.idEv) }}
-
-                <button type="submit">Faire un don</button>
-
-                {{ form_end(form) }}
-            </form>
+                <form method="post">
+                    {{ form_start(form) }}
+                    <div class="form-group">
+                        {{ form_label(form.nbpoints, 'Saisir le nombre de points :', {'label_attr': {'class': 'col-form-label text-left'}}) }}
+                        <div class="form-group">
+                            {{ form_widget(form.nbpoints, {'attr': {'class': 'form-control'}}) }}
+                            {% if form_errors(form.nbpoints) %}
+                                <div class="text-danger">
+                                    {{ form_errors(form.nbpoints) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.idEv, 'Choisissez un événement :', {'label_attr': {'class': 'col-form-label text-left'}}) }}
+                        <div class="form-group">
+                            {{ form_widget(form.idEv, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+<button type="submit" class="btn btn-warning">Faire un don</button>
+                    {{ form_end(form) }}
+                </form>
+            </div>
         </div>
     </div>
-
-	
-	{% for message in app.flashes('success') %}
+</div>
+{% for message in app.flashes('success') %}
     <div class="alert alert-success">
         {{ message }}
     </div>
@@ -190,35 +204,32 @@
 
 
 
-	<div class="latest-news mt-150 mb-150">
+
+
+<div class="latest-news mt-150 mb-150">
     <div class="container">
         <div class="row">
-		
-{% for evenement in evenementsDons %}
-            <div class="col-lg-4 col-md-6">
-                <div class="single-latest-news">
-                    <a href=""><div class=""></div></a>
-                    <div class="news-text-box">
-<img src="{{ asset('images/' ~ evenement.imageEv) }}" alt="">
+            {% for evenement in evenementsDons %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="single-latest-news">
+                        <a href=""><div class=""></div></a>
+                        <div class="news-text-box">
+                            <img src="{{ asset('images/' ~ evenement.imageEv) }}" alt="">
+                            <h3><a href="single-news.html">{{ evenement.nomEv }}</a></h3>
+                            <p class="blog-meta">
+                                <span class="date"><i class="fas fa-calendar"></i>{{ evenement.date()|date('Y-m-d H:i:s') }}</span>
+                            </p>
+                            <p class="excerpt">Points gagnés: {{ evenement.nbPoints }}</p>
+                            
+                            {% set totalPointsEvenement = evenement.nbPoints %}
+                            {% set pourcentageProgression = (totalPointsEvenement / maximumPoints) * 100 %}
 
-                        <h3><a href="single-news.html"> {{ evenement.nomEv }}</a></h3>
-                        <p class="blog-meta">
-                            <span class="date"><i class="fas fa-calendar"></i>{{ evenement.date()|date('Y-m-d H:i:s') }}</span>
-                        </p>
-                        <p class="excerpt">Points gagnés: {{ evenement.nbPoints }}</p>
-
-
+                            <div class="progress progress-md portfolio-progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ pourcentageProgression }}%" aria-valuenow="{{ pourcentageProgression }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-		{% set totalPointsEvenement = evenement.nbPoints %}
-{% set pourcentageProgression = (totalPointsEvenement / maximumPoints) * 100 %}
-
-<div class="progress progress-md portfolio-progress">
-    <div class="progress-bar bg-success" role="progressbar" style="width: {{ pourcentageProgression }}%" aria-valuenow="{{ pourcentageProgression }}" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-
-
             {% endfor %}
         </div>
     </div>
@@ -229,8 +240,10 @@
 
 
 
+
+
     
-    <h1>Liste des dons</h1>
+    <h1>Historique des dons</h1>
 <table class="table table-striped">
     <thead>
         <tr>

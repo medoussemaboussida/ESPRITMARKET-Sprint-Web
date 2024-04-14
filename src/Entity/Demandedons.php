@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 
@@ -21,15 +23,26 @@ class Demandedons
     private ?int $idDemande;
 
     #[ORM\Column(name: "contenu", type: "text", length: 65535, nullable: true, options: ["default" => "NULL"])]
+    #[Assert\NotBlank(message:"Le contenu est obligatoire.")]
+    #[Assert\Length(
+        min:4,
+        max:50,
+        minMessage:"Le contenu doit avoir au moins {{ limit }} mots.",
+        maxMessage:"Le contenu ne peut pas dépasser {{ limit }} mots."
+    )]
+
     private ?string $contenu = null;
 
     #[ORM\Column(name: "image", type: "string", length: 255, nullable: true, options: ["default" => "NULL"])]
     private ?string $image = null;
 
     #[ORM\Column(name: "datePublication", type: "datetime", nullable: false)]
+
     private \DateTimeInterface $datePublication;
 
-    #[ORM\Column(name: "nbpoints", type: "integer", nullable: true, options: ["default" => "NULL"])]
+    #[ORM\Column(name: "nbpoints", type: "integer", nullable: true)]
+    #[Assert\NotBlank(message:"Le nombre de points est obligatoire.")]
+    #[Assert\PositiveOrZero(message:"Le nombre de points doit être positif ou zéro.")]
     private ?int $nbpoints = null;
 
     #[ORM\Column(name: "nomuser", type: "string", length: 255, nullable: true, options: ["default" => "NULL"])]
@@ -39,9 +52,12 @@ class Demandedons
     private ?string $prenomuser = null;
 
     #[ORM\Column(name: "objectifPoints", type: "integer", nullable: true)]
+    #[Assert\NotBlank(message:"L'objectif de points est obligatoire.")]
+    #[Assert\PositiveOrZero(message:"L'objectif de points doit être positif ou zéro.")]
     private ?int $objectifPoints;
 
     #[ORM\Column(name: "delai", type: "date", nullable: true)]
+    #[Assert\GreaterThan(value: "today", message: "La date de délai doit être ultérieure à la date actuelle.")]
     private ?\DateTimeInterface $delai;
 
     #[ORM\ManyToOne(targetEntity: "Dons")]

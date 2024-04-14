@@ -145,19 +145,27 @@
 	</div>
 
 
-<div class="container">
-    <div class="modifier-don-form" id="modifierDonForm{{ don.idDons }}">
+<div class="container" style="width: 100%;">
+    <div class="modifier-don-form" id="modifierDonForm{{ don.idDons }}" style="font-size: 20px;">
         <div class="modal-header">
-            <h5 class="modal-title">Modifier les données du don de l'événement : {{ nomEv }}</h5>
+            <h5 class="modal-title" style="font-size: 24px;">Modifier les données du don de l'événement : {{ nomEv }}</h5>
         </div>
         <div class="modal-body">
+            {% if form_errors(form.nbpoints) %}
+                <div class="text-danger" style="font-size: 18px;">
+                    {{ form_errors(form.nbpoints) }}
+                </div>
+            {% endif %}
             {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
             {{ form_widget(form) }}
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <button type="submit" class="btn btn-warning" style="font-size: 18px;">Enregistrer</button>
+
             {{ form_end(form) }}
         </div>
     </div>
 </div>
+
+
 
 
 

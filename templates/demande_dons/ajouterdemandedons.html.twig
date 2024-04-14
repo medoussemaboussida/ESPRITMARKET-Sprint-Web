@@ -117,14 +117,11 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-                <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input type="text" class="form-control" placeholder="Search products">
-                </form>
+               
               </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
-                <a class="nav-link btn btn-success create-new-button" id="createbuttonDropdown" data-toggle="dropdown" aria-expanded="false" href="#">+ Create New Project</a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
                   <h6 class="p-3 mb-0">Projects</h6>
                   <div class="dropdown-divider"></div>
@@ -302,45 +299,64 @@
         
         <!-- partial -->
         <div class="main-panel">
-          <div class="content-wrapper">              
-                   <div class="row ">
-              <div class="col-12 grid-margin">
+    <div class="content-wrapper">              
+        <div class="row">
+            <div class="col-12 grid-margin">
                 <div class="card">
-                  <div class="card-body">
-
-                  <h2>  Ajouter Demande de Dons</h2>
-
-                      <form method="post">
-        <label for="utilisateur">Utilisateur:</label>
-        <select id="utilisateur" name="utilisateur">
-            {% for utilisateur in utilisateurs %}
-                <option value="{{ utilisateur.idUser }}">{{ utilisateur.nomUser }} {{ utilisateur.prenomUser }}</option>
-            {% endfor %}
-        </select><br><br>
-        <label for="contenu">Contenu:</label>
-        <textarea id="contenu" name="contenu"></textarea><br><br>
-        <label for="objectifPoints">Objectif Points:</label>
-        <input type="text" id="objectifPoints" name="objectifPoints"><br><br>
-        <label for="delai">Délai:</label>
-        <input type="date" id="delai" name="delai"><br><br>
-        <button type="submit">Ajouter Demande</button>
-    </form>
-
-                    
-                  </div>
+                    <div class="card-body">
+                    <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Ajouter Demande de Dons</h4>
+            <form method="POST" action="{{ path('demander_dons_action') }}">
+                {{ form_start(form) }}
+                <div class="form-group">
+                    {{ form_label(form.utilisateur, 'Utilisateur') }}
+                    {{ form_widget(form.utilisateur, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.utilisateur) %}
+                        <span class="text-danger">{{ form_errors(form.utilisateur) }}</span>
+                    {% endif %}
                 </div>
-              </div>
+                <div class="form-group">
+                    {{ form_label(form.contenu, 'Contenu') }}
+                    {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.contenu) %}
+                        <span class="text-danger">{{ form_errors(form.contenu) }}</span>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.objectifPoints, 'Objectif Points') }}
+                    {{ form_widget(form.objectifPoints, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.objectifPoints) %}
+                        <span class="text-danger">{{ form_errors(form.objectifPoints) }}</span>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.delai, 'Délai') }}
+                    {{ form_widget(form.delai, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.delai) %}
+                        <span class="text-danger">{{ form_errors(form.delai) }}</span>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary mr-2">Soumettre</button>
+<a href="{{ path('admin_demandedons') }}" class="btn btn-dark">Annuler</a>
+                {{ form_end(form) }}
+            </form>
+        </div>
+    </div>
+</div>
+
+
+                       
+                </div>
             </div>
-          </div>
-          </div>
+        </div>
+    </div>
+</div>
+
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
-            </div>
-          </footer>
+          
           <!-- partial -->
         </div>
         <!-- main-panel ends -->
@@ -368,12 +384,6 @@
     <!-- Custom js for this page -->
     <script src="back/assets/js/dashboard.js"></script>
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<!-- Inclure le fichier JavaScript pour le bundle SideclickBootstrapModalBundle -->
-<script src="{{ asset('bundles/sideclickbootstrapmodal/js/bootstrap-modalmanager.js') }}"></script>
-<script src="{{ asset('bundles/sideclickbootstrapmodal/js/bootstrap-modal.js') }}"></script>
-    <!-- End custom js for this page -->
   </body>
 </html>

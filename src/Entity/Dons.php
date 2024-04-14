@@ -32,8 +32,6 @@ class Dons
     #[ORM\JoinColumn(name: "idEv", referencedColumnName: "id_ev")]
     private $idEv;
 
-
-
     public function getIdDons(): ?int
     {
         return $this->iddons;

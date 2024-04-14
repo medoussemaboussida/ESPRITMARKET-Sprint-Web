@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -99,8 +101,7 @@
               <span class="menu-title-active">Gestion des demande </span>
             </a>
           </li>
-                    
-         
+
         </ul>
       </nav>
       <!-- partial -->
@@ -116,15 +117,11 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-    <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search"  >
-        <input type="text" class="form-control" name="emailUser" placeholder="Search by user email">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-</li>
+               
+              </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
-                <a class="nav-link btn btn-success create-new-button" id="createbuttonDropdown" data-toggle="dropdown" aria-expanded="false" href="#">+ Create New Project</a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
                   <h6 class="p-3 mb-0">Projects</h6>
                   <div class="dropdown-divider"></div>
@@ -299,9 +296,18 @@
             </button>
           </div>
         </nav>
-    <div class="container">
-        <h1>Modifier les points de {{ don.idUser.nomUser }}</h1>
-<form action="{{ path('modifier_points_don', {'id': don.idDons}) }}" method="post">
+
+  <div class="main-panel">
+    <div class="content-wrapper">              
+        <div class="row">
+            <div class="col-12 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                    <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+                                    <h4 class="card-title">Modifier les points de {{ utilisateur.nomUser }}</h4>
+                <form action="{{ path('modifier_points_don', {'id': don.idDons}) }}" method="post">
             {{ form_start(form) }}
             <div class="form-group">
     {{ form_label(form.nbpoints, 'Nouveau nombre de points :') }}
@@ -311,13 +317,21 @@
             <button type="submit" class="btn btn-primary">Modifier</button>
             {{ form_end(form) }}
         </form>
+           </div>
     </div>
-<footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
+</div>
+
+
+                       
+                </div>
             </div>
-          </footer>
+        </div>
+    </div>
+</div>
+
+          <!-- content-wrapper ends -->
+          <!-- partial:partials/_footer.html -->
+          
           <!-- partial -->
         </div>
         <!-- main-panel ends -->
@@ -327,8 +341,6 @@
     <!-- container-scroller -->
     <!-- plugins:js -->
     <script src="back/assets/vendors/js/vendor.bundle.base.js"></script>
-    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
     <!-- endinject -->
     <!-- Plugin js for this page -->
     <script src="back/assets/vendors/chart.js/Chart.min.js"></script>
@@ -343,11 +355,10 @@
     <script src="back/assets/js/misc.js"></script>
     <script src="back/assets/js/settings.js"></script>
     <script src="back/assets/js/todolist.js"></script>
- 
-
     <!-- endinject -->
     <!-- Custom js for this page -->
     <script src="back/assets/js/dashboard.js"></script>
-    <!-- End custom js for this page -->
+
+
   </body>
 </html>
