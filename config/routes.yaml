@@ -1,0 +1,7 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+app_publication:
+    path: /publication/Listpublication
+    controller: App\Controller\PublicationController::index
+
