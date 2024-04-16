@@ -380,7 +380,7 @@
              
              {{ form_start(form, {'attr': {'class': 'forms-sample'}}) }}
              <div class="form-group" >
-              {{ form_label(form.nomoffre, "nom de l'offre", {'attr': {'class': 'form-control-label'}}) }}
+              {{ form_label(form.nomoffre, "nom de l'offre", {'attr':{'novalidate': 'novalidate'}}) }}
               {{ form_widget(form.nomoffre, {'attr': {'class': 'form-control', 'placeholder': "nom de l'offre"}}) }}
               {% if form_errors(form.nomoffre) %}
             <div class="alert alert-danger">{{ form_errors(form.nomoffre)|join(', ') }}</div>

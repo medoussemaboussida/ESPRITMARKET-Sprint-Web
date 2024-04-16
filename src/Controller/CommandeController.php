@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use DateTimeImmutable;
+use App\Entity\CodePromo;
+
+
 class CommandeController extends AbstractController
 {
     #[Route('/commande', name: 'app_commande')]
@@ -21,45 +24,145 @@ class CommandeController extends AbstractController
             'controller_name' => 'CommandeController',
         ]);
     }
-       //passer une commande dans partie front
-       #[Route('/commande/{idp}', name: 'app_commande_add')]
-       public function ajouter(Request $request,$idp): Response
-       {
-         
-           $panier = $this->getDoctrine()->getRepository(Panier::class)->find($idp);
-           $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $idp]);
-           if (empty($produitCart)) {
-               // Si la table produitcart est vide, rediriger l'utilisateur ou afficher un message d'erreur
-               $this->addFlash('error', 'Votre panier est vide.');
-               return $this->redirectToRoute('app_produit_front');
-           }
-           else {
-           //calcul montant facture pour l'envoyer sur sms
-           $totalPrix = 0;
-           foreach ($produitCart as $produit) {
-               $totalPrix += $produit->getIdproduit()->getPrix(); 
-           }
-           
-           $dateCommande = new DateTimeImmutable();
-           // Créer une nouvelle instance de Produitcart
-           $commande = new Commande();
-   
-           // Ajouter le produit au panier
-           $commande->setIdpanier($panier);
-           $commande->setDatecommande($dateCommande);
-           if (!$commande->getIdpanier()) {
-               throw new \ErrorException('idpanier field cannot be null.');
-           }
-           // Enregistrer l'entité Produitcart
-           $entityManager = $this->getDoctrine()->getManager();
-           $entityManager->persist($commande);
-           $entityManager->flush();
-           $this->addFlash('success', 'Votre commande a bien été passée.');
-   
-           return $this->redirectToRoute('app_produit_front');
-       }
-       }
-   
+        //passer une commande dans partie front
+    #[Route('/commande/{idp}', name: 'app_commande_add')]
+    public function ajouter(Request $request,$idp): Response
+    {
+      
+        $panier = $this->getDoctrine()->getRepository(Panier::class)->find($idp);
+        $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $idp]);
+        if (empty($produitCart)) {
+            // Si la table produitcart est vide, rediriger l'utilisateur ou afficher un message d'erreur
+            $this->addFlash('error', 'Votre panier est vide.');
+            return $this->redirectToRoute('app_produit_front');
+        }
+        else {
+        //calcul montant facture pour l'envoyer sur sms
+        $totalPrix = 0;
+        foreach ($produitCart as $produit) {
+            $totalPrix += $produit->getIdproduit()->getPrix(); 
+        }
+        
+        $dateCommande = new DateTimeImmutable();
+        // Créer une nouvelle instance de Produitcart
+        $commande = new Commande();
+
+        // Ajouter le produit au panier
+        $commande->setIdpanier($panier);
+        $commande->setDatecommande($dateCommande);
+        if (!$commande->getIdpanier()) {
+            throw new \ErrorException('idpanier field cannot be null.');
+        }
+        // Enregistrer l'entité Produitcart
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($commande);
+        $entityManager->flush();
+        $this->addFlash('success', 'Votre commande a bien été passée.');
+
+
+
+        ///////////////////////sms//////////////////////////////////////
+        $utilisateur = $panier->getIduser();
+        $numtel = $utilisateur->getNumtel();
+        $numtel = '+216' . $numtel;
+        $totalPrixFormate = number_format($totalPrix, 3, ',', ' ');
+
+        // Récupérer le SID et le token depuis les variables d'environnement
+         $sid = "AC2c5bcf5da51392b4ecbdb94e067d69cd";
+         $token = "91c7f5ccb05295d7e5e8f8f3ea3619c8";
+        // Créer une nouvelle instance du client Twilio
+      /*  $twilio = new Client($sid, $token);
+
+         // Envoi du SMS
+    try {
+        $twilio->messages->create(
+            $numtel, // Numéro de téléphone du destinataire
+            [
+                'from' => '+12514511090', // Votre numéro Twilio
+                'body' => 'Votre commande a été passée avec succès. Le total de votre facture est de ' . $totalPrixFormate . ' DT. Le livreur vous contactera lorsqu\'il arrivera. Merci!'
+                ]
+        );
+    } catch (\Exception $e) {
+        // Gérer les erreurs d'envoi de SMS
+        $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());
+        return $this->redirectToRoute('app_produit_front');
+    }*/
+
+
+
+        return $this->redirectToRoute('app_produit_front');
+    }
+    }
+
+         //passer une commande dans partie front
+    #[Route('/commande-with-code/{idp}', name: 'app_commande_add_with_code')]
+    public function ajouterco(Request $request,$idp): Response
+    {
+      
+        $panier = $this->getDoctrine()->getRepository(Panier::class)->find($idp);
+        $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $idp]);
+        if (empty($produitCart)) {
+            // Si la table produitcart est vide, rediriger l'utilisateur ou afficher un message d'erreur
+            $this->addFlash('error', 'Votre panier est vide.');
+            return $this->redirectToRoute('app_commande_add');
+        }
+        else {
+        //calcul montant facture pour l'envoyer sur sms
+        $totalPrix = 0;
+        foreach ($produitCart as $produit) {
+            $totalPrix += $produit->getIdproduit()->getPrix(); 
+        }
+        
+        $dateCommande = new DateTimeImmutable();
+        // Créer une nouvelle instance de Produitcart
+        $commande = new Commande();
+
+        // Ajouter le produit au panier
+        $commande->setIdpanier($panier);
+        $commande->setDatecommande($dateCommande);
+        if (!$commande->getIdpanier()) {
+            throw new \ErrorException('idpanier field cannot be null.');
+        }
+        // Enregistrer l'entité Produitcart
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($commande);
+        $entityManager->flush();
+        $this->addFlash('success', 'Votre commande a bien été passée.');
+
+
+
+        ///////////////////////sms//////////////////////////////////////
+        $utilisateur = $panier->getIduser();
+        $numtel = $utilisateur->getNumtel();
+        $numtel = '+216' . $numtel;
+        $totalPrixFormate = number_format($totalPrix, 3, ',', ' ');
+
+        // Récupérer le SID et le token depuis les variables d'environnement
+         $sid = "AC2c5bcf5da51392b4ecbdb94e067d69cd";
+         $token = "91c7f5ccb05295d7e5e8f8f3ea3619c8";
+        // Créer une nouvelle instance du client Twilio
+      /*  $twilio = new Client($sid, $token);
+
+         // Envoi du SMS
+    try {
+        $twilio->messages->create(
+            $numtel, // Numéro de téléphone du destinataire
+            [
+                'from' => '+12514511090', // Votre numéro Twilio
+                'body' => 'Votre commande a été passée avec succès. Le total de votre facture est de ' . $totalPrixFormate . ' DT. Le livreur vous contactera lorsqu\'il arrivera. Merci!'
+                ]
+        );
+    } catch (\Exception $e) {
+        // Gérer les erreurs d'envoi de SMS
+        $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());
+        return $this->redirectToRoute('app_produit_front');
+    }*/
+
+
+
+        return $this->redirectToRoute('app_commande_addt');
+    }
+    }
    
    
    

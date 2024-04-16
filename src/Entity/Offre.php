@@ -38,6 +38,10 @@ class Offre
      *
      * @ORM\Column(name="nomOffre", type="string", length=255, nullable=false)
      * @Assert\NotBlank(message="Ce champ ne peut pas être vide")
+     * @Assert\Regex(
+     *     pattern="/^[a-zA-Z]+$/",
+     *     message="Le nom de cette offre doit contenir uniquement des lettres"
+     * )
      */
     private $nomoffre;
 

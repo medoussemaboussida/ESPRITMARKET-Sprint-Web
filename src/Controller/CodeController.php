@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\CodeType;
-
+use App\Repository\CodeRepository;
 
 class CodeController extends AbstractController
 {
@@ -118,4 +118,32 @@ class CodeController extends AbstractController
         // Rediriger vers la page d'affichage des codes
         return $this->redirectToRoute('afficher_codes');
     }
+
+    
+#[Route('/afficher-codes', name: 'afficher_codes')]
+public function afficherCodesfiltre(Request $request, CodeRepository $codeRepository): Response
+{
+    $searchQuery = $request->query->get('search_query');
+
+    // Analysez la recherche de l'utilisateur
+    $code = null;
+    $reductionassocie = null;
+
+    // Si une recherche est effectuée
+    if ($searchQuery) {
+        // Vérifiez si la recherche correspond à une réduction (uniquement des chiffres)
+        if (ctype_digit($searchQuery)) {
+            $reductionassocie = $searchQuery;
+        } else {
+            $code = $searchQuery;
+        }
+    }
+
+    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
+    $codes = $codeRepository->findByCriteria($code, $reductionassocie);
+
+    return $this->render('code/afficher.html.twig', [
+        'codes' => $codes,
+    ]);
+}
 }

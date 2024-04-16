@@ -137,4 +137,53 @@ class ProduitcartController extends AbstractController
  
          ]);
      }
+
+//afficher la panier avec les produits choisis
+#[Route('/produitcart/afficher-panier-with-code/{idUser}', name: 'afficher_produit_panier_with_code')]
+public function afficherPanierCode($idUser): Response
+{
+    //user : 7atita hakeka bech najem navigi 
+    $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
+
+    // Récupérer le panier de l'utilisateur spécifié en parametre 
+    $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
+    $produitCartRepository = $this->getDoctrine()->getRepository(Produitcart::class);
+    $produitsDansPanier = $produitCartRepository->findBy(['idpanier' => $panier]);
+
+    //selectionner produitcart selon panier specifique
+    $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
+
+    //calcul montant facture
+    $totalPrix = 0;
+    // Parcourez chaque produit et ajoutez son prix au total
+    foreach ($produitCart as $produit) {
+        $totalPrix += $produit->getIdproduit()->getPrix(); 
+    }
+    
+
+    $quantite = [];
+    $produitsUniques = [];
+
+    // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
+    foreach ($produitCart as $produit) {
+    
+        if (array_key_exists($produit->getIdproduit()->getIdproduit(), $quantite)) {
+            $quantite[$produit->getIdproduit()->getIdproduit()]++;
+        } else {
+            $quantite[$produit->getIdproduit()->getIdproduit()] = 1;
+            $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
+        }
+    }
+
+    return $this->render('produitcart/panierCode.html.twig', [
+        'produitsUniques' => $produitsUniques,
+        'produitsDansPanier' => $produitsDansPanier,
+        'panier' => $panier,
+        'totalPrix' => $totalPrix,
+        'quantite' => $quantite, // Passer le tableau de quantité à la vue
+        'user'=> $user,
+
+    ]);
+}
+
 }

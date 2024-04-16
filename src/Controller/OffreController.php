@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Entity\Produit;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\OffreRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -236,4 +237,34 @@ public function afficherCalendrier(): JsonResponse
 
     return new JsonResponse($events);
 }
+
+#[Route('/afficher-offres', name: 'afficher_offres')]
+public function afficherOffresfiltre(Request $request, OffreRepository $offreRepository): Response
+{
+    $searchQuery = $request->query->get('search_query');
+
+    // Analysez la recherche de l'utilisateur
+    $nomOffre = null;
+    $reduction = null;
+
+    // Si une recherche est effectuée
+    if ($searchQuery) {
+        // Vérifiez si la recherche correspond à une réduction (uniquement des chiffres)
+        if (ctype_digit($searchQuery)) {
+            $reduction = $searchQuery;
+        } else {
+            $nomOffre = $searchQuery;
+        }
+    }
+
+    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
+    $offres = $offreRepository->findByCriteria($nomOffre, $reduction);
+
+    return $this->render('offre/afficher.html.twig', [
+        'offres' => $offres,
+    ]);
+}
+
+
+
 }

@@ -180,9 +180,14 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-                <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                  <input type="text" class="form-control" placeholder="Search products">
-                </form>
+                <form action="{{ path('afficher_offres') }}" method="get">
+                  <div class="form-row">
+                      <div class="form-group col-md-10">
+                          <label></label>
+                          <input type="text" class="form-control" id="search_query" name="search_query" placeholder="recherche">
+                      </div>
+                  </div>
+              </form>
               </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">

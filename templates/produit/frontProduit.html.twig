@@ -164,19 +164,29 @@
     </div>
 {% endfor %}
 		<div  id="product-lists" class="row product-lists">
-    {% for produit in produits %}
-	
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-box text-center">
-            <div class="single-product-item">
-                <div class="product-image">
-                <img src="{{ asset('images/' ~ produit.imageproduit) }}" alt=""></a>
-                </div>
-                <h3>{{ produit.nomproduit }}</h3>
-                <p class="product-price"><span>Stock :{{ produit.quantite }}</span> {{ produit.prix |number_format(3, '.', ' ')}}DT </p>
-            <a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-            </div>
-        </div>
-    {% endfor %}
+			{% for produit in produits %}
+			<div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-box text-center">
+				<div class="single-product-item">
+					<div class="product-image">
+						<img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="">
+					</div>
+					<h3>{{ produit.nomproduit }}</h3>
+					<p class="product-price"><span>Stock: {{ produit.quantite }}</span> {{ produit.prix | number_format(3, '.', ' ') }} DT</p>
+					{% if produit.offre is null %}
+						{# Si le produit n'a pas d'offre #}
+						<p>Aucune offre disponible</p>
+					{% else %}
+						{# Si le produit a une offre #}
+						<p class="product-offre">
+							<span>Offre: {{ produit.offre.nomOffre }}</span>
+							Réduction: {{ produit.offre.reduction }}% <br>
+							Montant final: {{ (produit.prix - (produit.prix * produit.offre.reduction / 100)) | number_format(3, '.', ' ') }} DT
+						</p>
+					{% endif %}
+					<a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+				</div>
+			</div>
+		{% endfor %}
 </div>
 
 <style>
