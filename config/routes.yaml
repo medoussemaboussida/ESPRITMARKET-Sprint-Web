@@ -81,4 +81,9 @@ generate_qr_code:
     path: '/generate-qr-code/{content}'
     controller: 'App\Controller\QrCodeGeneratorController::generateQrCodeUri'
 
+afficher_dons:
+    path: /afficher-dons
+    controller: App\Controller\DonsController::afficherDonsFiltre
+
+
 

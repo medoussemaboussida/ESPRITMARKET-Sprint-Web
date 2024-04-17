@@ -55,8 +55,11 @@ class Demandedons
     #[Assert\NotBlank(message:"L'objectif de points est obligatoire.")]
     #[Assert\PositiveOrZero(message:"L'objectif de points doit être positif ou zéro.")]
     private ?int $objectifPoints;
+    
 
     #[ORM\Column(name: "delai", type: "date", nullable: true)]
+    #[Assert\NotBlank(message:"Le nombre de points est obligatoire.")]
+
     #[Assert\GreaterThan(value: "today", message: "La date de délai doit être ultérieure à la date actuelle.")]
     private ?\DateTimeInterface $delai;
 

@@ -21,4 +21,13 @@ class DonsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findDonsByEmail(string $email)
+    {
+        return $this->createQueryBuilder('d')
+            ->join('d.idUser', 'u')
+            ->andWhere('u.emailUser = :email')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -20,6 +20,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Form\ModifierPointsFormType;
 use Flashy\Flashy;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use App\Repository\UtilisateurRepository;
+
+
 
 
 
@@ -276,19 +280,7 @@ public function editDon(Request $request, int $id): Response
 }
 
 
-/**
-     * @Route("/admin/dons", name="admin_dons")
-     */
-    public function backDons(DonsRepository $donsRepository): Response
-    {
-        // Récupérer tous les dons depuis le repository
-        $dons = $donsRepository->findAll();
 
-        // Rendre la vue Twig avec la liste des dons
-        return $this->render('dons/backDons.html.twig', [
-            'dons' => $dons,
-        ]);
-    }
   
     
     /**
@@ -317,7 +309,7 @@ public function deleteDon(Request $request, DonsRepository $donsRepository, $id)
       
 
 
-    /**
+/**
  * @Route("/update_etat_dons/{id}", name="update_etat_dons", methods={"POST"})
  */
 public function updateEtatDons(Request $request, int $id): Response
@@ -334,10 +326,15 @@ public function updateEtatDons(Request $request, int $id): Response
 
     // Vérifier que l'état est valide (reçu ou en attente)
     if ($etatstatutdons === 'reçu' || $etatstatutdons === 'en attente') {
-        $don->setEtatstatutdons($etatstatutdons);
-        $entityManager->flush();
+        // Vérifier si l'état actuel est "reçu"
+        if ($don->getEtatstatutdons() !== 'reçu') {
+            $don->setEtatstatutdons($etatstatutdons);
+            $entityManager->flush();
 
-        $this->addFlash('success', 'L\'état du don a été mis à jour avec succès.');
+            $this->addFlash('success', 'L\'état du don a été mis à jour avec succès.');
+        } else {
+            $this->addFlash('error', 'Impossible de modifier un don déjà reçu.');
+        }
     } else {
         $this->addFlash('error', 'L\'état du don n\'a pas pu être mis à jour. État invalide.');
     }
@@ -397,5 +394,28 @@ public function modifierPointsDon(Request $request, int $id): Response
         'utilisateur' => $utilisateur, // Passer la variable "utilisateur" au template
     ]);
 }
+
+/**
+ * @Route("/admin/dons", name="admin_dons")
+ */
+public function backDons(DonsRepository $donsRepository, Request $request): Response
+{
+    // Récupérer l'e-mail de la requête
+    $email = $request->query->get('email');
+
+    // Si un e-mail est fourni, récupérer les dons par cet e-mail
+    if ($email) {
+        $dons = $donsRepository->findDonsByEmail($email);
+    } else {
+        // Sinon, récupérer tous les dons
+        $dons = $donsRepository->findAll();
+    }
+
+    // Rendre la vue Twig avec la liste des dons
+    return $this->render('dons/backDons.html.twig', [
+        'dons' => $dons,
+    ]);
+}
+
 
 }

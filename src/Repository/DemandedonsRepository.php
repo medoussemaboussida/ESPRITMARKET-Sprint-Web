@@ -37,4 +37,16 @@ class DemandedonsRepository extends ServiceEntityRepository
         ->getSingleScalarResult();
 }
 
+public function findByEmail($email)
+{
+    return $this->createQueryBuilder('d')
+        ->join('d.idUtilisateur', 'u')
+        ->andWhere('u.emailUser = :email')
+        ->setParameter('email', $email)
+        ->getQuery()
+        ->getResult();
+}
+
+
+
 }

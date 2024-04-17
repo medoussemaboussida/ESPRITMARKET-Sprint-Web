@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+use Doctrine\DBAL\Types\Types;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,6 +17,10 @@ class Dons
     private $iddons;
 
     #[ORM\Column(name: "nbpoints", type: "integer", nullable: true)]
+    #[Assert\NotBlank(message:"L'objectif de points est obligatoire.")]
+    #[Assert\PositiveOrZero(message:"L'objectif de points doit être positif ou zéro.")]
+
+
     private $nbpoints;
 
     #[ORM\Column(name: "date_ajout", type: "datetime", nullable: false)]

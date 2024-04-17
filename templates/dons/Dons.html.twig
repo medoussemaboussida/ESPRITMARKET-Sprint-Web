@@ -169,7 +169,7 @@
                 <h1 style="font-size: 20px;">Faire un don</h1>
 
                 <form method="post">
-                    {{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                     <div class="form-group">
                         {{ form_label(form.nbpoints, 'Saisir le nombre de points :', {'label_attr': {'class': 'col-form-label text-left'}}) }}
                         <div class="form-group">

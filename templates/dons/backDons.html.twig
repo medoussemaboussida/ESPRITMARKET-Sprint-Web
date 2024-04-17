@@ -119,10 +119,13 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-    <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search"  >
-        <input type="text" class="form-control" name="emailUser" placeholder="Search by user email">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+<form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" method="GET" action="{{ path('admin_dons') }}">
+    <input type="text" class="form-control" name="email" placeholder="Search by user email">
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+
+
 </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
@@ -341,12 +344,17 @@
                                 <td>{{ don.nbpoints }}</td>
                                 <td>{{ don.dateAjout|date('Y-m-d H:i:s') }}</td>
                                 <td>
-                                     <form action="{{ path('update_etat_dons', { 'id': don.idDons }) }}" method="post">
-    <select name="etatstatutdons" class="form-control" onchange="this.form.submit()">
-        <option value="reçu" {% if don.etatstatutdons == 'reçu' %} selected {% endif %}>reçu</option>
-        <option value="en attente" {% if don.etatstatutdons == 'en attente' %} selected {% endif %}>en attente</option>
-    </select>
+<form action="{{ path('update_etat_dons', { 'id': don.idDons }) }}" method="post">
+    {% if don.etatstatutdons == 'en attente' %}
+        <select name="etatstatutdons" class="form-control" onchange="this.form.submit()">
+            <option value="reçu" {% if don.etatstatutdons == 'reçu' %} selected {% endif %}>reçu</option>
+            <option value="en attente" {% if don.etatstatutdons == 'en attente' %} selected {% endif %}>en attente</option>
+        </select>
+    {% else %}
+        <p>Reçu.</p>
+    {% endif %}
 </form>
+
 
                                 </td>
                                  <td>
@@ -359,7 +367,8 @@
     data-url="{{ path('admin_dons_delete', {'id': don.idDons}) }}"
     data-target="#confirmDeleteModal-{{ don.idDons }}"
 >
-    <i class="fas fa-trash"></i> Supprimer
+    <i class="mdi mdi-delete mdi-24px"></i> 
+
 </a>
 
 <!-- Modal de confirmation de suppression -->
@@ -390,8 +399,9 @@
 
 
     <a href="{{ path('modifier_points_don', {'id': don.idDons}) }}" class="btn btn-primary btn-sm">
-    <i class="fas fa-pencil-alt"></i> Modifier les points
+    <i class="mdi mdi-pencil mdi-24px"></i>
 </a>
+
 
     <!-- Bouton pour ouvrir le modal -->
 

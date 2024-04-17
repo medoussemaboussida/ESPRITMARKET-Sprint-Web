@@ -309,7 +309,7 @@
         <div class="card-body">
             <h4 class="card-title">Ajouter Demande de Dons</h4>
             <form method="POST" action="{{ path('demander_dons_action') }}">
-                {{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                 <div class="form-group">
                     {{ form_label(form.utilisateur, 'Utilisateur') }}
                     {{ form_widget(form.utilisateur, {'attr': {'class': 'form-control'}}) }}

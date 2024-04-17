@@ -159,7 +159,7 @@
                 </div>
                 <div id="form_status"></div>
                 <div class="contact-form">
-                    {{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                     <div class="form-group">
                         {{ form_label(form.contenu) }}
                         {{ form_widget(form.contenu) }}

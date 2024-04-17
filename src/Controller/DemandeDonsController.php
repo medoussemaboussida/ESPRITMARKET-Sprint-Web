@@ -31,8 +31,7 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 
 
-
-
+use App\Form\DemandedonsType; // Assurez-vous d'avoir ce fichier de formulaire
 
 
 
@@ -46,93 +45,58 @@ class DemandeDonsController extends AbstractController
     }
     
 
-#[Route('/demander_dons/{idUser}', name: 'demander_dons', methods: ['GET', 'POST'])]
-
-public function demanderDons(Request $request, EntityManagerInterface $entityManager, $idUser, PaginatorInterface $paginator): Response
-{
-    // Récupérer l'utilisateur spécifié par son ID depuis la base de données
-    $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($idUser);
-
-    // Si l'utilisateur n'existe pas, renvoyer une erreur
-    if (!$utilisateur) {
-        throw $this->createNotFoundException('Utilisateur non trouvé.');
-    }
-    $query = $entityManager->getRepository(Demandedons::class)->createQueryBuilder('d')
-    ->orderBy('d.datePublication', 'DESC')
-    ->getQuery();
-
-    // Paginer les résultats
-    $demandes = $paginator->paginate(
-        $query, // Requête à paginer
-        $request->query->getInt('page', 1), // Numéro de page par défaut
-        3 // Nombre d'éléments par page
-    );
-    $demande = new Demandedons();
-
-
-    // Créer le formulaire directement dans le contrôleur
-    $form = $this->createFormBuilder()
-        ->add('contenu', TextType::class, [
-            'constraints' => [
-                new NotBlank(['message' => 'Le contenu est obligatoire.']),
-                new Length([
-                    'min' => 4,
-                    'max' => 50,
-                    'minMessage' => 'Le contenu doit contenir au moins {{ limit }} mots.',
-                    'maxMessage' => 'Le contenu ne peut pas contenir plus de {{ limit }} mots.'
-                ]),
-            ],
-        ])
-        ->add('objectifPoints', IntegerType::class, [
-            'constraints' => [
-                new NotBlank(['message' => "L'objectif de points est obligatoire."]),
-                new Positive(['message' => "L'objectif de points doit être positif ."]),
-            ],
-        ])
-        ->add('delai', DateType::class, [
-            'constraints' => [
-                new NotBlank(['message' => 'Le délai est obligatoire.']),
-                new GreaterThan([
-                    'value' => new \DateTime(), // Utilisez une instance de DateTime pour représenter la date actuelle
-                    'message' => 'Le délai doit être postérieur à la date d\'aujourd\'hui.'
-                ]),
-                            ],
-        ])
-        ->getForm();
-
-    // Gérer la soumission du formulaire
-    $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer les données du formulaire
-        $data = $form->getData();
-
-        // Créer une nouvelle demande
+    
+    #[Route('/demander_dons/{idUser}', name: 'demander_dons', methods: ['GET', 'POST'])]
+    public function demanderDons(Request $request, EntityManagerInterface $entityManager, $idUser, PaginatorInterface $paginator): Response
+    {
+        // Récupérer l'utilisateur spécifié par son ID depuis la base de données
+        $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($idUser);
+    
+        // Si l'utilisateur n'existe pas, renvoyer une erreur
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        }
+    
         $demande = new Demandedons();
-        $demande->setContenu($data['contenu']);
-        // Assigner l'objet Utilisateur récupéré à la demande de don
-        $demande->setIdUtilisateur($utilisateur);
-        $demande->setNomuser($utilisateur->getNomuser());
-        $demande->setPrenomuser($utilisateur->getPrenomuser());
-        $demande->setObjectifPoints($data['objectifPoints']);
-        $demande->setDelai($data['delai']);
-
-        // Persistez la demande dans la base de données
-        $entityManager->persist($demande);
-        $entityManager->flush();
-
-        // Rediriger vers la même page pour éviter la soumission répétée du formulaire
-        return $this->redirectToRoute('demander_dons', ['idUser' => $idUser]);
+        $form = $this->createForm(DemandedonsType::class, $demande);
+    
+        // Gérer la soumission du formulaire
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Assigner l'objet Utilisateur récupéré à la demande de don
+            $demande->setIdUtilisateur($utilisateur);
+            $demande->setNomuser($utilisateur->getNomuser());
+            $demande->setPrenomuser($utilisateur->getPrenomuser());
+    
+            // Persistez la demande dans la base de données
+            $entityManager->persist($demande);
+            $entityManager->flush();
+    
+            // Rediriger vers la même page pour éviter la soumission répétée du formulaire
+            return $this->redirectToRoute('demander_dons', ['idUser' => $idUser]);
+        }
+    
+        // Paginer les résultats
+        $query = $entityManager->getRepository(Demandedons::class)->createQueryBuilder('d')
+            ->orderBy('d.datePublication', 'DESC')
+            ->getQuery();
+    
+        $demandes = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            3
+        );
+    
+        // Render the form and other data
+        return $this->render('demande_dons/demanderdons.html.twig', [
+            'utilisateur' => $utilisateur,
+            'idUser' => $idUser,
+            'form' => $form->createView(),
+            'demandes' => $demandes,
+        ]);
     }
-
-    // Render the form and other data
-    return $this->render('demande_dons/demanderdons.html.twig', [
-        'utilisateur' => $utilisateur,
-        'idUser' => $idUser,
-        'form' => $form->createView(), // Pass the form to the template
-        'demandes' => $demandes,
-
-    ]);
-}
+    
+    
 
 
 /**
@@ -188,14 +152,22 @@ public function transferPoints(Request $request, EntityManagerInterface $entityM
 /**
  * @Route("/admin/demandedons", name="admin_demandedons")
  */
-public function backDemandesDons(DemandedonsRepository $demandedonsRepository): Response
+public function backDemandesDons(DemandedonsRepository $demandedonsRepository, Request $request): Response
 {
-    // Récupérer toutes les demandes de dons depuis le repository
-    $Demandedons = $demandedonsRepository->findAll();
+    // Récupérer l'adresse e-mail saisie dans le formulaire
+    $email = $request->query->get('email');
+
+    // Si une adresse e-mail est saisie, filtrer les demandes de dons correspondantes
+    if ($email) {
+        $demandesDons = $demandedonsRepository->findByEmail($email);
+    } else {
+        // Sinon, récupérer toutes les demandes de dons
+        $demandesDons = $demandedonsRepository->findAll();
+    }
 
     // Rendre la vue Twig avec la liste des demandes de dons
     return $this->render('demande_dons/backDemandeDons.html.twig', [
-        'Demandedons' => $Demandedons,
+        'Demandedons' => $demandesDons,
     ]);
 }
 
