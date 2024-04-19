@@ -425,9 +425,9 @@
                                             <thead>
                                                 <tr>
                                                     <th>Code promo</th>
-                                                    <th>Date de début</th>
+                                                    <th><a href="{{ path('afficher_codes', {'sort_by': 'datedebut', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Date de début</a></th>
                                                     <th>Date de fin</th>
-                                                    <th>Réduction</th>
+                                                    <th><a href="{{ path('afficher_codes', {'sort_by': 'reductionassocie', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Réduction</a></th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -487,6 +487,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- content-wrapper ends -->
             <!-- partial:partials/_footer.html -->
             <footer class="footer">
@@ -525,6 +526,7 @@
     <!-- Custom js for this page -->
     <script src="assets/js/dashboard.js"></script>
     <!-- End custom js for this page -->
+   
     
 </body>
 

@@ -442,9 +442,9 @@
                                     <tr>
                                         <th>Description</th>
                                         <th>Nom de l'offre</th>
-                                        <th>Date de début</th>
+                                        <th><a href="{{ path('afficher_offres', {'sort_by': 'datedebut', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Date de début</a></th>
                                         <th>Date de fin</th>
-                                        <th>Réduction</th>
+                                        <th><a href="{{ path('afficher_offres', {'sort_by': 'reduction', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Réduction</a></th>
                                         <th>Image</th>
                                         <th>Action</th>
                                     </tr>

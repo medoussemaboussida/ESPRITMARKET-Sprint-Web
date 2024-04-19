@@ -13,4 +13,5 @@ return [
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
     CalendarBundle\CalendarBundle::class => ['all' => true],
     Sideclick\BootstrapModalBundle\SideclickBootstrapModalBundle::class => ['all' => true],
+    Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
 ];

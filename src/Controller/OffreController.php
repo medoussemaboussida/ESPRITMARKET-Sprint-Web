@@ -17,6 +17,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Symfony\UX\Modal\Modal;
+use Knp\Component\Pager\PaginatorInterface;
 
 class OffreController extends AbstractController
 {
@@ -75,10 +76,16 @@ class OffreController extends AbstractController
         ]);
     }
 #[Route('/afficher-offres', name: 'afficher_offres')]
-    public function afficherOffres(): Response
+    public function afficherOffres(Request $request,PaginatorInterface $paginator): Response
     {
         // Récupérer toutes les offres depuis la base de données
         $offres = $this->getDoctrine()->getRepository(Offre::class)->findAll();
+
+        $offres = $paginator->paginate(
+        $offres, 
+        $request->query->getInt('page', 1), // Numéro de page par défaut
+        2 // Nombre d'éléments par page
+        );
 
         return $this->render('offre/afficher.html.twig', [
             'offres' => $offres,
@@ -267,4 +274,46 @@ public function afficherOffresfiltre(Request $request, OffreRepository $offreRep
 
 
 
+
+#[Route('/afficher-offres', name: 'afficher_offres')]
+public function findByCriteriaTriDate(Request $request, OffreRepository $offreRepository, $sort_by = 'datedebut'): Response
+{
+    $sortOrder = $request->query->get('sort_order', 'asc');
+
+    // Vérifiez si l'ordre de tri est valide
+    $validSortOrders = ['asc', 'desc'];
+    if (!in_array($sortOrder, $validSortOrders)) {
+        throw new \InvalidArgumentException('Invalid sort order.');
+    }
+
+    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
+    $offres = $offreRepository->findByCriteriaTriDate([], $sort_by, $sortOrder);
+
+    return $this->render('offre/afficher.html.twig', [
+        'offres' => $offres,
+        'sort_by' => $sort_by,
+        'sort_order' => $sortOrder,
+    ]);
+}
+
+#[Route('/afficher-offres', name: 'afficher_offres')]
+public function findByCriteriaTriReduction(Request $request, OffreRepository $offreRepository, $sort_by = 'reduction'): Response
+{
+    $sortOrder = $request->query->get('sort_order', 'asc');
+
+    // Vérifiez si l'ordre de tri est valide
+    $validSortOrders = ['asc', 'desc'];
+    if (!in_array($sortOrder, $validSortOrders)) {
+        throw new \InvalidArgumentException('Invalid sort order.');
+    }
+
+    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
+    $offres = $offreRepository->findByCriteriaTriReduction([], $sort_by, $sortOrder);
+
+    return $this->render('offre/afficher.html.twig', [
+        'offres' => $offres,
+        'sort_by' => $sort_by,
+        'sort_order' => $sortOrder,
+    ]);
+}
 }
