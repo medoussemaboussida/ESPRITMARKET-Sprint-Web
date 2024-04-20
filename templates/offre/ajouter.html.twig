@@ -369,7 +369,11 @@
            <!-- partial -->
 <div class="main-panel">
     <div class="content-wrapper">
-      
+      {% for flash_message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
     <div class="row">
         <div class="col-md-6 grid-margin stretch-card">
           <div class="card">

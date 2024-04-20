@@ -17,6 +17,8 @@ use Knp\Component\Pager\PaginatorInterface;
 
 class CodeController extends AbstractController
 {
+
+
 /**#[Route('/ajouter-code', name: 'ajouter_code')]
     public function ajouterCode(Request $request): Response
 {
@@ -46,6 +48,12 @@ class CodeController extends AbstractController
     ]);
 }*/
 
+private $paginator;
+
+    public function __construct(PaginatorInterface $paginator)
+    {
+        $this->paginator = $paginator;
+    }
 
 #[Route('/ajouter-code', name: 'ajouter_code')]
     public function ajouterCode(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager): Response
@@ -105,8 +113,6 @@ class CodeController extends AbstractController
 
         return $emails;
     }
-
-
 
 #[Route('/afficher-codes', name: 'afficher_codes')]
     public function afficherCodes(Request $request,PaginatorInterface $paginator): Response

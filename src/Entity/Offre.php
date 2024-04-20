@@ -50,6 +50,10 @@ class Offre
      *
      * @ORM\Column(name="dateDebut", type="date", nullable=false)
      * @Assert\NotBlank(message="Ce champ ne peut pas être vide")
+     * @Assert\GreaterThan(
+     *     value="today",
+     *     message="La date de début doit être postérieure a la date actuelle."
+     * )
      */
     private $datedebut;
 
@@ -57,6 +61,10 @@ class Offre
      * @var \DateTime
      *
      * @ORM\Column(name="dateFin", type="date", nullable=false)
+     * @Assert\GreaterThan(
+     *     value="today",
+     *     message="La date de fin doit être postérieure a la date actuelle."
+     * )
      */
     private $datefin;
 

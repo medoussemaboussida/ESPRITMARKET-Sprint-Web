@@ -9,9 +9,11 @@ use App\Entity\Produitcart;
 use App\Entity\Panier;
 use App\Entity\Utilisateur;
 use App\Entity\Produit;
-use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ProduitcartRepository;
 use App\Repository\PanierRepository;
+use App\Form\CodePromoType;
+use App\Entity\Codepromo;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProduitcartController extends AbstractController
 {
@@ -92,8 +94,9 @@ class ProduitcartController extends AbstractController
  
      //afficher la panier avec les produits choisis
      #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]
-     public function afficherPanier($idUser): Response
+     public function afficherPanier($idUser, Request $request): Response
      {
+
          //user : 7atita hakeka bech najem navigi 
          $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
  
@@ -104,13 +107,45 @@ class ProduitcartController extends AbstractController
  
          //selectionner produitcart selon panier specifique
          $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
- 
-         //calcul montant facture
+
+                //calcul montant facture
          $totalPrix = 0;
          // Parcourez chaque produit et ajoutez son prix au total
          foreach ($produitCart as $produit) {
              $totalPrix += $produit->getIdproduit()->getPrix(); 
+         
          }
+           // Créer le formulaire de saisie du code promo
+           $codePromoForm = $this->createForm(CodePromoType::class);
+           $codePromoForm->handleRequest($request);
+
+    // Calculer le montant final initial (avant réduction)
+    $montantFinal = $totalPrix;
+
+    if ($codePromoForm->isSubmitted() && $codePromoForm->isValid()) {
+        // Récupérer le code promo saisi par l'utilisateur
+        $codePromo = $codePromoForm->getData()['code'];
+
+        // Vérifier si le code promo existe dans la base de données
+        $codePromoEntity = $this->getDoctrine()->getRepository(Codepromo::class)->findOneBy(['code' => $codePromo]);
+
+        if ($codePromoEntity) {
+            // Code promo valide, récupérer la réduction associée
+            $reductionAssociee = $codePromoEntity->getReductionassocie();
+
+            // Appliquer la réduction au montantFinal
+            $montantFinal = $totalPrix * (100 - $reductionAssociee) / 100;
+
+            // Afficher un message indiquant que le code promo est activé
+            $this->addFlash('success', 'Le code promo est correct. Vous bénéficiez d\'une réduction de '.$reductionAssociee.'%. Le montant total est maintenant '.$montantFinal.' DT.');
+
+            // Rediriger vers la même page pour afficher le nouveau montantFinal
+            return $this->redirectToRoute('afficher_produit_panier', ['idUser' => $idUser]);
+        } else {
+            // Code promo invalide, afficher un message d'erreur
+            $this->addFlash('error', 'Code promo invalide.');
+        }
+    }
          
  
          $quantite = [];
@@ -126,6 +161,7 @@ class ProduitcartController extends AbstractController
                  $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
              }
          }
+        
  
          return $this->render('produitcart/panier.html.twig', [
              'produitsUniques' => $produitsUniques,
@@ -134,11 +170,14 @@ class ProduitcartController extends AbstractController
              'totalPrix' => $totalPrix,
              'quantite' => $quantite, // Passer le tableau de quantité à la vue
              'user'=> $user,
+             'form' => $codePromoForm->createView(), // Passer la vue du formulaire à la vue Twig
+             'montantFinal' => $montantFinal,
+
  
          ]);
      }
 
-//afficher la panier avec les produits choisis
+/*afficher la panier avec les produits choisis
 #[Route('/produitcart/afficher-panier-with-code/{idUser}', name: 'afficher_produit_panier_with_code')]
 public function afficherPanierCode($idUser): Response
 {
@@ -184,6 +223,6 @@ public function afficherPanierCode($idUser): Response
         'user'=> $user,
 
     ]);
-}
+}*/
 
 }

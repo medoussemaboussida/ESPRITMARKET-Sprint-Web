@@ -16,13 +16,41 @@ use App\Repository\OffreRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
-use Symfony\UX\Modal\Modal;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class OffreController extends AbstractController
 {
+
+    #[Route('/afficher-offres-calendrier', name: 'afficher_offres_calendrier')]
+public function afficherOffresCalendrier(): Response
+{
+    // Récupérer toutes les offres depuis la base de données
+    $offres = $this->getDoctrine()->getRepository(Offre::class)->findAll();
+
+    // Transformer les données d'offres en un format compatible avec FullCalendar
+    $events = [];
+    foreach ($offres as $offre) {
+        $events[] = [
+            'title' => $offre->getNomoffre(),
+            'start' => $offre->getDatedebut()->format('Y-m-d'),
+            'end' => $offre->getDatefin()->format('Y-m-d'),
+            // Vous pouvez ajouter d'autres propriétés ici selon vos besoins
+        ];
+    }
+
+    // Convertir le tableau en JSON
+    $eventsJson = json_encode($events);
+
+    // Passer les données transformées à la vue Twig
+    return $this->render('offre/calender.html.twig', [
+        'events' => $eventsJson,
+    ]);
+}
+
+
     #[Route('/ajouter-offre', name: 'ajouter_offre')]
-    public function ajouterOffre(Request $request): Response
+    public function ajouterOffre(Request $request,FlashBagInterface $flashBag): Response
     {
         $offre = new Offre();
         $form = $this->createForm(OffreType::class, $offre);
@@ -34,9 +62,14 @@ class OffreController extends AbstractController
 
             // Associer chaque produit à l'offre
             foreach ($produits as $produit) {
-                $produit->setOffre($offre);
+                if ($produit->getOffre() !== null) {
+                    // Si le produit est déjà associé à une autre offre, ajoutez un flash message
+                    $flashBag->add('error', 'Parmi les produits sélectionnés, il existe un produit déjà affecté à une autre offre.');
+                    
+                    // Redirigez l'utilisateur vers la page d'ajout d'offre pour lui permettre de corriger
+                    return $this->redirectToRoute('ajouter_offre');
+                }
             }
-
             /** @var UploadedFile $image */
             $image = $form->get('imageoffre')->getData();
 
@@ -210,40 +243,7 @@ public function modifier(Request $request, int $id): Response {
             'offre' => $offre,
         ]);
     }
-    #[Route('/afficher-calendrier', name: 'afficher_calendrier')]
-public function afficherCalendrier(): JsonResponse
-{
-    $entityManager = $this->getDoctrine()->getManager();
-    $offres = $entityManager->getRepository(Offre::class)->findAll();
-
-    $events = [];
-
-    foreach ($offres as $offre) {
-        $nomOffre = $offre->getNomoffre();
-        $dateDebut = $offre->getDatedebut();
-        $dateFin = $offre->getDatefin();
-
-        // Créez un intervalle d'une journée
-        $interval = new DateInterval('P1D');
-
-        // Déterminez le nombre de jours entre la date de début et la date de fin
-        $nombreJours = $dateFin->diff($dateDebut)->days;
-
-        // Créez un objet DateTime pour la date de début
-        $currentDate = clone $dateDebut;
-
-        // Parcourez chaque jour entre la date de début et la date de fin
-        for ($i = 0; $i <= $nombreJours; $i++) {
-            $events[] = [
-                'title' => $nomOffre,
-                'start' => $currentDate->format('Y-m-d')
-            ];
-            $currentDate->add($interval); // Ajoutez un jour à la date actuelle
-        }
-    }
-
-    return new JsonResponse($events);
-}
+   
 
 #[Route('/afficher-offres', name: 'afficher_offres')]
 public function afficherOffresfiltre(Request $request, OffreRepository $offreRepository): Response

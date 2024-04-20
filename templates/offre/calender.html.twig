@@ -1,0 +1,22 @@
+{# templates/offre/calendrier.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div id="calendar"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var events = '{{ events | raw | raw }}'; // Encapsulation dans des guillemets simples
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: JSON.parse(events), // Conversion en objet JavaScript avec JSON.parse
+                // Vous pouvez ajouter d'autres options de configuration ici
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}
