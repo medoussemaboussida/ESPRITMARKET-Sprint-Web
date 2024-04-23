@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProduitcartController extends AbstractController
 {
@@ -48,24 +49,70 @@ class ProduitcartController extends AbstractController
     $entityManager->persist($nouveauProduit);
     $entityManager->flush();
 
-    // Rediriger l'utilisateur vers la page du panier
-    return $this->redirectToRoute('app_produit_front');
+    $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
+    $quantite = [];
+    $produitsUniques = [];
+
+    // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
+    foreach ($produitCart as $produit) {
+    
+        if (array_key_exists($produit->getIdproduit()->getIdproduit(), $quantite)) {
+            $quantite[$produit->getIdproduit()->getIdproduit()]++;
+        } else {
+            $quantite[$produit->getIdproduit()->getIdproduit()] = 1;
+            $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
+        }
+    }
+
+    // Renvoyer une réponse JSON avec les données mises à jour
+    $response = new JsonResponse([
+        'success' => true,
+        'message' => 'Produit ajouté au panier avec succès',
+        'quantite' => $quantite
+
+    ]);
+
+    return $response;
     }
 
 
  
    //supprimer un produit de votre panier avec bouton -
-   #[Route('/produitcart/supprimer/{id}', name: 'app_produitcart_supprimer')]
-   public function supprimer($id,ProduitcartRepository $repository): Response
+   #[Route('/produitcart/supprimer/{id}/{idp}', name: 'app_produitcart_supprimer')]
+   public function supprimer($id,$idp,ProduitcartRepository $repository,PanierRepository $panierRepository): Response
    {
      //recherche et suppression aleatoire de produit se repete plusieurs fois
-       $produits = $repository->findBy(['idproduit' => $id]);
-       $produit = $produits[array_rand($produits)];
+     $panier = $panierRepository->find($idp);
+     $produits = $repository->findBy(['idproduit' => $id, 'idpanier' => $panier]);
+     $produit = $produits[array_rand($produits)];
 
        $em = $this->getDoctrine()->getManager();
        $em->remove($produit);
        $em->flush();
-       return $this->redirectToRoute('app_produit_front');
+       $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
+       $quantite = [];
+       $produitsUniques = [];
+   
+       // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
+       foreach ($produitCart as $produit) {
+       
+           if (array_key_exists($produit->getIdproduit()->getIdproduit(), $quantite)) {
+               $quantite[$produit->getIdproduit()->getIdproduit()]++;
+           } else {
+               $quantite[$produit->getIdproduit()->getIdproduit()] = 1;
+               $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
+           }
+       }
+       // Renvoyer une réponse JSON avec les données mises à jour
+    $response = new JsonResponse([
+        'success' => true,
+        'message' => 'Produit supprimé au panier avec succès',
+        'quantite' => $quantite
+
+        // Vous pouvez également renvoyer d'autres données comme la nouvelle quantité, etc.
+    ]);
+
+    return $response;
    }
    
  //ajouter un produit a votre panier
@@ -73,8 +120,11 @@ class ProduitcartController extends AbstractController
 
  public function ajouter(Request $request, $idProduit, $idUser): Response
  {
+
+
     //chercher le panier de user passé en parametre
      $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
+    
      //chercher le produit passe en parametre
      $produit = $this->getDoctrine()->getRepository(Produit::class)->find($idProduit);
 
@@ -100,8 +150,8 @@ class ProduitcartController extends AbstractController
     #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]
     public function afficherPanier($idUser): Response
     {
-        //user : 7atita hakeka bech najem navigi 
-        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
+        //user connecté 
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(['iduser' => $idUser]);
 
         // Récupérer le panier de l'utilisateur spécifié en parametre 
         $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);

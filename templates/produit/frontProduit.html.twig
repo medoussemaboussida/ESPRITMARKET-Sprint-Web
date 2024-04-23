@@ -173,6 +173,7 @@
                 </div>
                 <h3>{{ produit.nomproduit }}</h3>
                 <p class="product-price"><span>Stock :{{ produit.quantite }}</span> {{ produit.prix |number_format(3, '.', ' ')}}DT </p>
+                    <p>{{ prixEnEuros[produit.idproduit] | number_format(3, '.', ' ')}} EUR</p>
             <a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
             </div>
         </div>

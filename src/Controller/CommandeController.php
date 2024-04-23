@@ -47,8 +47,7 @@ class CommandeController extends AbstractController
     //passer une commande dans partie front
     #[Route('/commande/{idp}', name: 'app_commande_add')]
     public function ajouter(Request $request,$idp): Response
-    {
-      
+    {   
         $panier = $this->getDoctrine()->getRepository(Panier::class)->find($idp);
         $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $idp]);
         if (empty($produitCart)) {
@@ -89,7 +88,7 @@ class CommandeController extends AbstractController
 
         // Récupérer le SID et le token depuis les variables d'environnement
          $sid = "AC2c5bcf5da51392b4ecbdb94e067d69cd";
-         $token = "91c7f5ccb05295d7e5e8f8f3ea3619c8";
+         $token = "875adf76743f232f00a2889eecdea213";
         // Créer une nouvelle instance du client Twilio
         $twilio = new Client($sid, $token);
 

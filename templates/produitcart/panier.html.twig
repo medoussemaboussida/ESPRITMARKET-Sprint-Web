@@ -156,16 +156,99 @@
     {% for produitId, produit in produitsUniques %}
         <tr class="table-body-row">
             <td class="product-image"><img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="" class="product-img" ></td>
-            <td class="product-quantity">{{ quantite[produitId] }}</td>
+<td class="product-quantity" id="quantite-{{ produitId }}">{{ quantite[produitId] }}</td>
             <td class="product-action">
-                <a href="{{ path('app_produitcart_supprimer', {'id': produitId }) }}" class="cart-btn" ></i>-</a>
-<a href="{{ path('app_produitcart_ajouter', {'id': produitId, 'idp': panier.idpanier }) }}" class="cart-btn" >+</i></a>
+<a href="#" class="cart-btn remove-from-cart" data-produit="{{ produitId }}" data-panier="{{ panier.idpanier }}">-</a>
+    <a href="#" class="cart-btn add-to-cart" data-produit="{{ produitId }}" data-panier="{{ panier.idpanier }}">+</a>
 
             </td>
         </tr>
     {% endfor %}
 </tbody>
 </table>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addToCartButtons = document.querySelectorAll(".add-to-cart");
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener("click", function(event) {
+            event.preventDefault(); // Empêche le comportement par défaut du lien
+
+            const produitId = this.getAttribute("data-produit");
+            const panierId = this.getAttribute("data-panier");
+
+            fetch("{{ path('app_produitcart_ajouter', {'id': 0, 'idp': 0 }) }}".replace('0', produitId).replace('0', panierId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest' // Indique que la requête est AJAX
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Erreur lors de l\'ajout du produit au panier');
+                }
+            })
+.then(data => {
+    // Mettez à jour l'affichage en fonction des données JSON reçues
+    for (const produitId in data.quantite) {
+        const quantiteElement = document.getElementById(`quantite-${produitId}`);
+        if (quantiteElement) {
+            quantiteElement.textContent = data.quantite[produitId]; // Met à jour la quantité affichée
+        }
+    }
+})       .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const removeFromCartButtons = document.querySelectorAll(".remove-from-cart");
+
+    removeFromCartButtons.forEach(button => {
+        button.addEventListener("click", function(event) {
+            event.preventDefault(); // Empêche le comportement par défaut du lien
+
+            const produitId = this.getAttribute("data-produit");
+            const panierId = this.getAttribute("data-panier");
+
+            fetch("{{ path('app_produitcart_supprimer', {'id': 0, 'idp': 0 }) }}".replace('0', produitId).replace('0', panierId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest' // Indique que la requête est AJAX
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Erreur lors de la suppression du produit du panier');
+                }
+            })
+  .then(data => {
+                // Mettez à jour l'affichage en fonction des données JSON reçues
+                const quantiteElement = document.getElementById(`quantite-${produitId}`);
+                if (quantiteElement) {
+                    quantiteElement.textContent = data.quantite[produitId]; // Met à jour la quantité affichée
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+
+
+</script>
+
+
 <style>
 .product-img {
    transform: scale(2);

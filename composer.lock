@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "42cbdbfdd1490a3f8dfa95487356ad57",
+    "content-hash": "a44cc35b6edc2e03afaa0786ec7a1c46",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1920,6 +1920,49 @@
             ],
             "abandoned": "endroid/qr-code",
             "time": "2024-03-08T11:24:40+00:00"
+        },
+        {
+            "name": "hexaequo/currency-converter-bundle",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MikeDevresse/Currency-Converter-Bundle.git",
+                "reference": "0ace468389bcfb6ae5ad5198b002f6d77073a936"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MikeDevresse/Currency-Converter-Bundle/zipball/0ace468389bcfb6ae5ad5198b002f6d77073a936",
+                "reference": "0ace468389bcfb6ae5ad5198b002f6d77073a936",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0",
+                "symfony/cache": "^5.1",
+                "symfony/framework-bundle": "^5.1",
+                "symfony/http-client": "^5.1"
+            },
+            "type": "bundle",
+            "autoload": {
+                "psr-4": {
+                    "Hexaequo\\CurrencyConverterBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Devresse",
+                    "email": "mike.devresse@hexaequo.com"
+                }
+            ],
+            "description": "Bundle that allow to convert currencies and crypto currencies through differents api",
+            "support": {
+                "issues": "https://github.com/MikeDevresse/Currency-Converter-Bundle/issues",
+                "source": "https://github.com/MikeDevresse/Currency-Converter-Bundle/tree/v1.0.3"
+            },
+            "time": "2021-05-25T16:07:50+00:00"
         },
         {
             "name": "knplabs/knp-components",

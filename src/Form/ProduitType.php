@@ -37,7 +37,11 @@ class ProduitType extends AbstractType
             ])
             ->add('categorie', EntityType::class, [
                 'class' => Categorie::class,
-                'choice_label' => 'nomcategorie', 
+                'choice_label' => 'nomcategorie',
+                'expanded' => true, // Définit les boutons radio au lieu d'une liste déroulante
+                'choice_attr' => function() {
+                    return ['style' => 'margin-right: 15px']; // Ajoutez un espace entre les boutons radio
+                },
             ])
         ;
     }

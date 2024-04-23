@@ -6,6 +6,7 @@
 parameters:
  images_directory: '%kernel.project_dir%/public/images'
 services:
+    Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'
 
     # default configuration for services in *this* file
     _defaults:
