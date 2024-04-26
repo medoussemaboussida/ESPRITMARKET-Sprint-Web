@@ -148,14 +148,38 @@ public function ajouterOffre(Request $request,FlashBagInterface $flashBag): Resp
     ]);
 }
 #[Route('/afficher-offres', name: 'afficher_offres')]
-    public function afficherOffres(Request $request,PaginatorInterface $paginator): Response
-    {
-        // Récupérer toutes les offres depuis la base de données
-        $offres = $this->getDoctrine()->getRepository(Offre::class)->findAll();
-        return $this->render('offre/afficher.html.twig', [
-            'offres' => $offres,
-        ]);
+public function afficherOffres(Request $request, OffreRepository $offreRepository): Response
+{
+    // Récupération des critères de filtrage
+    $searchQuery = $request->query->get('search_query');
+    $sortBy = $request->query->get('sort_by', 'datedebut'); // Défaut tri par date de début
+    $sortOrder = $request->query->get('sort_order', 'asc'); // Ordre de tri
+
+    $nomOffre = null;
+    $reduction = null;
+
+    // Traitement des critères de recherche
+    if ($searchQuery) {
+        if (ctype_digit($searchQuery)) {
+            $reduction = (int)$searchQuery;
+        } else {
+            $nomOffre = $searchQuery;
+        }
     }
+
+    // Appel au repository avec les paramètres de tri
+    $criteria = [
+        'nomOffre' => $nomOffre,
+        'reduction' => $reduction
+    ];
+    $offres = $offreRepository->findByCriteriaAndSort($criteria, $sortBy, $sortOrder);
+
+    return $this->render('offre/afficher.html.twig', [
+        'offres' => $offres,
+        'sort_order' => $sortOrder
+    ]);
+}
+
 
 
 
@@ -277,79 +301,7 @@ public function modifier(Request $request, int $id): Response {
             'offre' => $offre,
         ]);
     }
-   
 
-    #[Route('/afficher-offres', name: 'afficher_offres')]
-    public function afficherOffresfiltre(Request $request, OffreRepository $offreRepository): Response
-    {
-        $searchQuery = $request->query->get('search_query');
-    
-        // Analysez la recherche de l'utilisateur
-        $nomOffre = null;
-        $reduction = null;
-    
-        // Si une recherche est effectuée
-        if ($searchQuery) {
-            // Vérifiez si la recherche correspond à une réduction (uniquement des chiffres)
-            if (ctype_digit($searchQuery)) {
-                $reduction = $searchQuery;
-            } else {
-                $nomOffre = $searchQuery;
-            }
-        }
-    
-        // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-        $offres = $offreRepository->findByCriteria($nomOffre, $reduction);
-    
-        return $this->render('offre/afficher.html.twig', [
-            'offres' => $offres,
-        ]);
-    }
-
-
-
-
-#[Route('/afficher-offres', name: 'afficher_offres')]
-public function findByCriteriaTriDate(Request $request, OffreRepository $offreRepository, $sort_by = 'datedebut'): Response
-{
-    $sortOrder = $request->query->get('sort_order', 'asc');
-
-    // Vérifiez si l'ordre de tri est valide
-    $validSortOrders = ['asc', 'desc'];
-    if (!in_array($sortOrder, $validSortOrders)) {
-        throw new \InvalidArgumentException('Invalid sort order.');
-    }
-
-    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-    $offres = $offreRepository->findByCriteriaTriDate([], $sort_by, $sortOrder);
-
-    return $this->render('offre/afficher.html.twig', [
-        'offres' => $offres,
-        'sort_by' => $sort_by,
-        'sort_order' => $sortOrder,
-    ]);
-}
-
-#[Route('/afficher-offres', name: 'afficher_offres')]
-public function findByCriteriaTriReduction(Request $request, OffreRepository $offreRepository, $sort_by = 'reduction'): Response
-{
-    $sortOrder = $request->query->get('sort_order', 'asc');
-
-    // Vérifiez si l'ordre de tri est valide
-    $validSortOrders = ['asc', 'desc'];
-    if (!in_array($sortOrder, $validSortOrders)) {
-        throw new \InvalidArgumentException('Invalid sort order.');
-    }
-
-    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-    $offres = $offreRepository->findByCriteriaTriReduction([], $sort_by, $sortOrder);
-
-    return $this->render('offre/afficher.html.twig', [
-        'offres' => $offres,
-        'sort_by' => $sort_by,
-        'sort_order' => $sortOrder,
-    ]);
-}
      #[Route('/export/offres', name: 'export_offres')]
     public function exportOffres(PDFExporterService $pdfExporterService, OffreRepository $offreRepository): StreamedResponse
     {
