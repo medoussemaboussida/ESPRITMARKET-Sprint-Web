@@ -30,6 +30,12 @@ class Codepromo
      *
      * @ORM\Column(name="reductionAssocie", type="integer", nullable=false)
      * @Assert\NotBlank(message="Ce champ ne peut pas être vide")
+     * @Assert\Range(
+    *     min = 1,
+    *     max = 100,
+    *     minMessage = "La valeur minimale pour ce champ est 1",
+    *     maxMessage = "La valeur maximale pour ce champ est 100"
+    * )
      */
     private $reductionassocie;
 

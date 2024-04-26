@@ -195,12 +195,11 @@
                     </button>
                     <ul class="navbar-nav w-100">
                         <li class="nav-item w-100">
-                            <form action="{{ path('afficher_codes') }}" method="get">
-                                <div class="form-row">
+                            <form action="{{ path('rechercher_code') }}" method="get">
+                               <div class="form-row">
                                     <div class="form-group col-md-10">
                                         <label></label>
-                                        <input type="text" class="form-control" id="search_query" name="search_query" placeholder="recherche">
-                                    </div>
+                                            <input type="text" class="form-control" name="search_query" placeholder="Recherche...">                                    </div>
                                 </div>
                             </form>
                         </li>
@@ -425,7 +424,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Code promo</th>
-                                                    <th><a href="{{ path('afficher_codes', {'sort_by': 'datedebut', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Date de début</a></th>
+                                                    <th>Date de début</th>
                                                     <th>Date de fin</th>
                                                     <th><a href="{{ path('afficher_codes', {'sort_by': 'reductionassocie', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Réduction</a></th>
                                                     <th>Action</th>
@@ -478,9 +477,6 @@
                                                 </td>
                                             </tr>
                                                 {% endfor %}
-                                                <div class="d-flex justify-content-center">
-                                                    {{ knp_pagination_render(codes, 'pagination.html.twig') }}
-                                                </div>
                                                 
                                             </tbody>
                                         </table>

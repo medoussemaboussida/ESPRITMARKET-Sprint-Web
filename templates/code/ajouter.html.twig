@@ -378,8 +378,7 @@
               <p class="card-description"></p>
              {% block body %}
              
-             {{ form_start(form, {'attr': {'class': 'forms-sample'}}) }}
-            
+             {{form_start(form,{'attr':{'class':'form-horizontal'}})}}            
              <div class="form-group" >
              {{ form_label(form.code, 'Description', {'attr': {'class': 'form-control-label'}}) }}
              {{ form_widget(form.code, {'attr': {'class': 'form-control', 'placeholder': "code promo"}}) }}

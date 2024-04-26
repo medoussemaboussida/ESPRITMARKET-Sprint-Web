@@ -382,7 +382,7 @@
               <p class="card-description"></p>
              {% block body %}
              
-             {{ form_start(form, {'attr': {'class': 'forms-sample'}}) }}
+             {{ form_start(form, {'attr':{'novalidate': 'novalidate'}}) }}
              <div class="form-group" >
               {{ form_label(form.nomoffre, "nom de l'offre", {'attr':{'novalidate': 'novalidate'}}) }}
               {{ form_widget(form.nomoffre, {'attr': {'class': 'form-control', 'placeholder': "nom de l'offre"}}) }}

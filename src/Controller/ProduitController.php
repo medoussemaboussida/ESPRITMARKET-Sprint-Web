@@ -56,6 +56,26 @@ public function produitsParCategorie(Request $request,$id): Response
 
     ]);
 }
+#[Route('/produit/frontProduit/rate_produit/{id}', name: 'rate_produit')]
+public function rateProduit(Request $request, $idProduit): Response {
+    $rating = $request->request->get('rating');
+    $produit = $this->getDoctrine()->getRepository(Produit::class)->find($idProduit);
 
+    if ($produit) {
+        $total_rating = ($produit->getAverageRating() * $produit->getReviewCount()) + $rating;
+        $new_review_count = $produit->getReviewCount() + 1;
+        $average_rating = $total_rating / $new_review_count;
 
+        $produit->setAverageRating($average_rating);
+        $produit->setReviewCount($new_review_count);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($produit);
+        $entityManager->flush();
+
+        return new Response('Rating submitted');
+    }
+
+    return new Response('Produit not found', 404);
+}
 }

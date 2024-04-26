@@ -78,7 +78,7 @@ private $paginator;
                 $body = "Bonjour,\n\nUn Nouveau Code Promo a été ajouté dans notre épicerie. Le code est : " . $code->getCode() . ".\n\nCordialement,\nEsprit Market";
             
                 $email = (new Email())
-                    ->from('ghassenbenmahmoud3@gmail.com') // Adresse e-mail de l'expéditeur
+                    ->from('mehergames29@gmail') // Adresse e-mail de l'expéditeur
                     ->to($email) // Adresse e-mail du destinataire
                     ->subject($subject)
                     ->text($body);
@@ -198,34 +198,18 @@ private $paginator;
         // Rediriger vers la page d'affichage des codes
         return $this->redirectToRoute('afficher_codes');
     }
-
+    #[Route('/afficher-codes', name: 'afficher_codes')]
+    public function rechercheCodePromo(CodeRepository $codeRepository, Request $request): Response
+    {
+        $searchQuery = $request->query->get('search_query', ''); // Récupère la valeur du champ de recherche
     
-#[Route('/afficher-codes', name: 'afficher_codes')]
-public function afficherCodesfiltre(Request $request, CodeRepository $codeRepository): Response
-{
-    $searchQuery = $request->query->get('search_query');
-
-    // Analysez la recherche de l'utilisateur
-    $code = null;
-    $reductionassocie = null;
-
-    // Si une recherche est effectuée
-    if ($searchQuery) {
-        // Vérifiez si la recherche correspond à une réduction (uniquement des chiffres)
-        if (ctype_digit($searchQuery)) {
-            $reductionassocie = $searchQuery;
-        } else {
-            $code = $searchQuery;
-        }
+        $codes = $codeRepository->findBySearchQuery($searchQuery); // Recherche les codes promo
+    
+        return $this->render('code/afficher.html.twig', [
+            'codes' => $codes,
+        ]);
     }
-
-    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-    $codes = $codeRepository->findByCriteria($code, $reductionassocie);
-
-    return $this->render('code/afficher.html.twig', [
-        'codes' => $codes,
-    ]);
-}
+    
 
 #[Route('/afficher-codes', name: 'afficher_codes')]
 public function findByCriteriaTriDate(Request $request, CodeRepository $codeRepository, $sort_by = 'datedebut'): Response

@@ -429,6 +429,7 @@
                         </div>
                         <!-- afficherOffre.html.twig -->
                         <div class="col-md-6 text-right">
+                          <a href="{{ path('export_offres') }}" class="btn btn-secondary">Exporter les Offres en PDF</a>
 
                           <a href="{{ path('afficher_offres_calendrier') }}" class="btn btn-primary">Calendrier des offres</a>
                             <a href="{{ path('ajouter_offre') }}" class="btn btn-success">Ajouter Offre</a>
@@ -440,7 +441,7 @@
                                     <tr>
                                         <th>Description</th>
                                         <th>Nom de l'offre</th>
-                                        <th><a href="{{ path('afficher_offres', {'sort_by': 'datedebut', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Date de début</a></th>
+                                        <th>Date de début</th>
                                         <th>Date de fin</th>
                                         <th><a href="{{ path('afficher_offres', {'sort_by': 'reduction', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Réduction</a></th>
                                         <th>Image</th>
@@ -448,8 +449,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for offre in offres %}
-                                    <tr>
+                                  {% for offre in offres  %}
+                                  <tr>
                                         <td>{{ offre.descriptionoffre }}</td>
                                         <td>{{ offre.nomoffre }}</td>
                                         <td>{{ offre.datedebut|date('Y-m-d') }}</td>
@@ -496,15 +497,15 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Liens de navigation pour la pagination -->
+
                     </div>
                 </div>
             </div>
         </div>
-        
-
-
             </div>
           </div>
+          
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">

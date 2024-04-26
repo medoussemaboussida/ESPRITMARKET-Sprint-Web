@@ -16,11 +16,50 @@ use App\Repository\OffreRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use Symfony\UX\Modal\Modal;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Service\PDFExporterService;
+use SebastianBergmann\Environment\Console;
+use Symfony\Component\Mercure\PublisherInterface;
+use Symfony\Component\Mercure\Update;
 
 class OffreController extends AbstractController
 {
+
+    #[Route('/update-offre-date', name: 'update_offre_date', methods: ['POST'])]
+    public function updateOffreDate(Request $request): JsonResponse
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $eventId = $request->request->get('id'); // Récupérer l'ID de l'offre
+    
+        if (empty($eventId)) {
+            return new JsonResponse(['status' => 'error', 'message' => 'Offer ID is missing'], 400);
+        }
+    
+        $offre = $entityManager->getRepository(Offre::class)->find($eventId);
+    
+        if (!$offre) {
+            return new JsonResponse(['status' => 'error', 'message' => 'Offer not found'], 404);
+        }
+    
+        $newStart = $request->request->get('start');
+        $newEnd = $request->request->get('end');
+    
+        if (new \DateTime($newStart) >= new \DateTime($newEnd)) {
+            return new JsonResponse(['status' => 'error', 'message' => 'Start date must be before end date']);
+        }
+    
+        $offre->setDatedebut(new \DateTime($newStart));
+        $offre->setDatefin(new \DateTime($newEnd));
+    
+        $entityManager->flush();
+    
+        return new JsonResponse(['status' => 'success', 'message' => 'Dates updated successfully']);
+    }
+    
+    
 
     #[Route('/afficher-offres-calendrier', name: 'afficher_offres_calendrier')]
 public function afficherOffresCalendrier(): Response
@@ -49,81 +88,76 @@ public function afficherOffresCalendrier(): Response
 }
 
 
-    #[Route('/ajouter-offre', name: 'ajouter_offre')]
-    public function ajouterOffre(Request $request,FlashBagInterface $flashBag): Response
-    {
-        $offre = new Offre();
-        $form = $this->createForm(OffreType::class, $offre);
-        $form->handleRequest($request);
+#[Route('/ajouter-offre', name: 'ajouter_offre')]
+public function ajouterOffre(Request $request,FlashBagInterface $flashBag): Response
+{
+    $offre = new Offre();
+    $form = $this->createForm(OffreType::class, $offre);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Récupérer les produits sélectionnés
-            $produits = $form->get('produits')->getData();
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer les produits sélectionnés
+        $produits = $form->get('produits')->getData();
 
-            // Associer chaque produit à l'offre
-            foreach ($produits as $produit) {
-                if ($produit->getOffre() !== null) {
-                    // Si le produit est déjà associé à une autre offre, ajoutez un flash message
-                    $flashBag->add('error', 'Parmi les produits sélectionnés, il existe un produit déjà affecté à une autre offre.');
-                    
-                    // Redirigez l'utilisateur vers la page d'ajout d'offre pour lui permettre de corriger
-                    return $this->redirectToRoute('ajouter_offre');
-                }
+        // Associer chaque produit à l'offre
+        foreach ($produits as $produit) {
+            if ($produit->getOffre() !== null) {
+                // Si le produit est déjà associé à une autre offre, ajoutez un flash message
+                $flashBag->add('error', 'Parmi les produits sélectionnés, il existe un produit déjà affecté à une autre offre.');
+                
+                // Redirigez l'utilisateur vers la page d'ajout d'offre pour lui permettre de corriger
+                return $this->redirectToRoute('ajouter_offre');
             }
-            /** @var UploadedFile $image */
-            $image = $form->get('imageoffre')->getData();
+        }
+        /** @var UploadedFile $image */
+        $image = $form->get('imageoffre')->getData();
 
-            // Vérifiez si une image a été téléchargée
-            if ($image) {
-                // Générez un nom de fichier unique
-                $nomFichier = md5(uniqid()).'.'.$image->guessExtension();
+        // Vérifiez si une image a été téléchargée
+        if ($image) {
+            // Générez un nom de fichier unique
+            $nomFichier = md5(uniqid()).'.'.$image->guessExtension();
 
-                // Déplacez le fichier vers le répertoire public/images
-                $image->move(
-                    $this->getParameter('images_directory'), // Le chemin vers votre répertoire Images dans le dossier public
-                    $nomFichier
-                );
+            // Déplacez le fichier vers le répertoire public/images
+            $image->move(
+                $this->getParameter('images_directory'), // Le chemin vers votre répertoire Images dans le dossier public
+                $nomFichier
+            );
 
-                // Définir le nom du fichier de l'image de catégorie dans l'entité
-                $offre->setImageoffre($nomFichier);
-            }
-
-            // Enregistrez la catégorie dans la base de données
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($offre);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Offre ajoutée avec succès.');
-
-            // Redirigez l'utilisateur après l'ajout réussi
-            return $this->redirectToRoute('afficher_offres');
+            // Définir le nom du fichier de l'image de catégorie dans l'entité
+            $offre->setImageoffre($nomFichier);
         }
 
-        // Récupérer tous les produits depuis la base de données
-        $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
+        // Enregistrez la catégorie dans la base de données
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($offre);
+        $entityManager->flush();
 
-        // Affichage du formulaire
-        return $this->render('offre/ajouter.html.twig', [
-            'form' => $form->createView(),
-            'produits' => $produits, // Passer les produits au modèle Twig
-        ]);
+        $this->addFlash('success', 'Offre ajoutée avec succès.');
+
+        // Redirigez l'utilisateur après l'ajout réussi
+        return $this->redirectToRoute('afficher_offres');
     }
+
+    // Récupérer tous les produits depuis la base de données
+    $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
+
+    // Affichage du formulaire
+    return $this->render('offre/ajouter.html.twig', [
+        'form' => $form->createView(),
+        'produits' => $produits, // Passer les produits au modèle Twig
+    ]);
+}
 #[Route('/afficher-offres', name: 'afficher_offres')]
     public function afficherOffres(Request $request,PaginatorInterface $paginator): Response
     {
         // Récupérer toutes les offres depuis la base de données
         $offres = $this->getDoctrine()->getRepository(Offre::class)->findAll();
-
-        $offres = $paginator->paginate(
-        $offres, 
-        $request->query->getInt('page', 1), // Numéro de page par défaut
-        2 // Nombre d'éléments par page
-        );
-
         return $this->render('offre/afficher.html.twig', [
             'offres' => $offres,
         ]);
     }
+
+
 
     #[Route('/modifier-offre/{id}', name: 'modifier_offre')]
 public function modifier(Request $request, int $id): Response {
@@ -245,32 +279,32 @@ public function modifier(Request $request, int $id): Response {
     }
    
 
-#[Route('/afficher-offres', name: 'afficher_offres')]
-public function afficherOffresfiltre(Request $request, OffreRepository $offreRepository): Response
-{
-    $searchQuery = $request->query->get('search_query');
-
-    // Analysez la recherche de l'utilisateur
-    $nomOffre = null;
-    $reduction = null;
-
-    // Si une recherche est effectuée
-    if ($searchQuery) {
-        // Vérifiez si la recherche correspond à une réduction (uniquement des chiffres)
-        if (ctype_digit($searchQuery)) {
-            $reduction = $searchQuery;
-        } else {
-            $nomOffre = $searchQuery;
+    #[Route('/afficher-offres', name: 'afficher_offres')]
+    public function afficherOffresfiltre(Request $request, OffreRepository $offreRepository): Response
+    {
+        $searchQuery = $request->query->get('search_query');
+    
+        // Analysez la recherche de l'utilisateur
+        $nomOffre = null;
+        $reduction = null;
+    
+        // Si une recherche est effectuée
+        if ($searchQuery) {
+            // Vérifiez si la recherche correspond à une réduction (uniquement des chiffres)
+            if (ctype_digit($searchQuery)) {
+                $reduction = $searchQuery;
+            } else {
+                $nomOffre = $searchQuery;
+            }
         }
+    
+        // Utilisez la méthode findByCriteria du repository pour rechercher les offres
+        $offres = $offreRepository->findByCriteria($nomOffre, $reduction);
+    
+        return $this->render('offre/afficher.html.twig', [
+            'offres' => $offres,
+        ]);
     }
-
-    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-    $offres = $offreRepository->findByCriteria($nomOffre, $reduction);
-
-    return $this->render('offre/afficher.html.twig', [
-        'offres' => $offres,
-    ]);
-}
 
 
 
@@ -316,4 +350,25 @@ public function findByCriteriaTriReduction(Request $request, OffreRepository $of
         'sort_order' => $sortOrder,
     ]);
 }
+     #[Route('/export/offres', name: 'export_offres')]
+    public function exportOffres(PDFExporterService $pdfExporterService, OffreRepository $offreRepository): StreamedResponse
+    {
+        $offres = $offreRepository->findAll(); // Récupérer toutes les offres
+
+        $filePath = tempnam(sys_get_temp_dir(), 'offres_') . '.pdf'; // Chemin du fichier temporaire
+
+        // Utiliser le service pour exporter les offres en PDF
+        $pdfExporterService->exportToPDF($offres, $filePath);
+
+        $response = new StreamedResponse(function () use ($filePath) {
+            readfile($filePath); // Envoyer le contenu du PDF au client
+        });
+
+        // Configurer la réponse pour le téléchargement
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="offres.pdf"');
+
+        return $response; // Retourner la réponse
+    }
+
 }

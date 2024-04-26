@@ -388,18 +388,30 @@
                 <div class="form-group">
                     {{ form_label(form.code, 'code', {'attr': {'class': 'form-control-label'}}) }}
                     {{ form_widget(form.code, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.code) %}
+                    <div class="alert alert-danger">{{ form_errors(form.code)|join(', ') }}</div>
+                {% endif %}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.datedebut, 'Date de début', {'attr': {'class': 'form-control-label'}}) }}
                     {{ form_widget(form.datedebut, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.datedebut) %}
+                    <div class="alert alert-danger">{{ form_errors(form.datedebut)|join(', ') }}</div>
+                {% endif %}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.datefin, 'Date de fin', {'attr': {'class': 'form-control-label'}}) }}
                     {{ form_widget(form.datefin, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.datefin) %}
+                    <div class="alert alert-danger">{{ form_errors(form.datefin)|join(', ') }}</div>
+                {% endif %}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.reductionassocie, 'reductionassocie', {'attr': {'class': 'form-control-label'}}) }}
                     {{ form_widget(form.reductionassocie, {'attr': {'class': 'form-control'}}) }}
+                    {% if form_errors(form.reductionassocie) %}
+                    <div class="alert alert-danger">{{ form_errors(form.reductionassocie)|join(', ') }}</div>
+                {% endif %}
                 </div>
                    <button type="submit" class="btn btn-primary">Modifier</button>
                    {{ form_end(form) }}

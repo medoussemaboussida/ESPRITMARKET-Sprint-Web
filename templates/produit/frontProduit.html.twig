@@ -183,6 +183,22 @@
 							Montant final: {{ (produit.prix - (produit.prix * produit.offre.reduction / 100)) | number_format(3, '.', ' ') }} DT
 						</p>
 					{% endif %}
+
+					<div class="rating">
+                        <p>Average Rating: {{ produit.average_rating }}</p>
+                        <form action="{{ path('rate_produit', {'idProduit': produit.idproduit}) }}" method="post">
+                            <label for="rating">Rate this product:</label>
+                            <select name="rating" id="rating">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+					
 					<a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 				</div>
 			</div>

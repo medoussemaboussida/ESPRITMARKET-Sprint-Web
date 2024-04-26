@@ -93,7 +93,6 @@
 								</li>
 							</ul>
 						</nav>
-					
 						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 						<div class="mobile-menu"></div>
 						<!-- menu end -->
@@ -202,46 +201,51 @@
 							</tbody>
 						</table>
 						<div class="cart-buttons">
-
 							<a  href="{{ path('app_commande_add', {'idp':panier.idpanier}) }}" class="boxed-btn black">Passer Commande</a>
 							<a href="{{ path('app_commande_delete', {'idp':panier.idpanier}) }}" class="boxed-btn">Annuler</a>
 						</div>
 					</div>
-
 					
-					<!-- Modal -->
-					{# Afficher le formulaire de saisie du code promo #}
-			{{ form_start(form) }}
-			{{ form_widget(form) }}
-			<button type="submit" class="boxed-btn black">Appliquer code promo</button>
-			{{ form_end(form) }}
-
-			{# Afficher les messages flash #}
-			{% for message in app.flashes('success') %}
-				<div class="alert alert-success">{{ message }}</div>
-			{% endfor %}
-
-			{% for message in app.flashes('error') %}
-				<div class="alert alert-danger">{{ message }}</div>
-			{% endfor %}
-
-			{# Affichage du montant final après réduction #}
-			<div class="montant-final">
-				{% if montantFinal is defined %}
-					{% if montantFinal is not null %}
-						<p>Montant final après réduction : {{ montantFinal }} DT</p>
-					{% endif %}
-				{% endif %}
-			</div>
-
-								
-					
+					<div class="coupon-section">
+						<h3>Apply Coupon</h3>
+						<div class="coupon-form-wrap">
+							<form action="{{ path('app_commande_add', {'idp':panier.idpanier}) }}" method="post">  <!-- Mise à jour du chemin -->
+								<p><input type="text" placeholder="Coupon" name="coupon" oninput="toggleApplyButton()"></p>
+								<p><input type="submit" value="Apply" id="apply_button" class="hidden"></p>  <!-- Bouton caché -->
+							</form>
+						</div>
+					</div>
+					{% for message in app.flashes('success') %}
+					<div class="alert alert-success">{{ message }}</div>
+				{% endfor %}
+				{% for message in app.flashes('error') %}
+					<div class="alert alert-danger">{{ message }}</div>
+				{% endfor %}
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- end cart -->
+	<style>
+		/* Classe pour cacher le bouton */
+		.hidden {
+			display: none;
+		}
+	</style>
+	<script>
+		// Fonction pour afficher/cacher le bouton en fonction du champ de texte
+		function toggleApplyButton() {
+			const couponField = document.querySelector('input[name="coupon"]'); // Identifiez le champ du coupon
+			const applyButton = document.getElementById('apply_button'); // Identifiez le bouton de soumission
 
+			// Afficher le bouton si le champ de texte n'est pas vide, sinon cacher
+			if (couponField.value.trim() !== '') {
+				applyButton.classList.remove('hidden');
+			} else {
+				applyButton.classList.add('hidden');
+			}
+		}
+	</script>
 	<!-- logo carousel -->
 	<div class="logo-carousel-section">
 		<div class="container">
@@ -362,32 +366,6 @@
 	<script src="/front/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="/front/assets/js/main.js"></script>
-	<script>
-        // JavaScript pour contrôler l'affichage de la modal
-        var modal = document.getElementById('codePromoModal');
-        var btn = document.getElementById('passerCommandeBtn');
-        var span = document.getElementsByClassName("close")[0];
 
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        // Bouton pour passer commande sans code promo
-        var passerSansCodeBtn = document.getElementById('passerSansCode');
-        passerSansCodeBtn.onclick = function() {
-            // Redirection vers la page de passage de commande sans code promo
-            window.location.href = "{{ path('app_commande_add', {'idp':panier.idpanier}) }}";
-        }
-    </script>
 </body>
 </html>

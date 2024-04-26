@@ -1,4 +1,4 @@
 # config/packages/mailer.yaml
 framework:
     mailer:
-        dsn: 'smtp://ghassenbenmahmoud3@gmail.com:blnaexeiiuseqakv@smtp.gmail.com:587'
+        dsn: 'gmail+smtp://mehergames29@gmail.com:hpjdezarcfeoctgw@default'
