@@ -19,7 +19,7 @@ class CodeController extends AbstractController
 {
 
 
-/**#[Route('/ajouter-code', name: 'ajouter_code')]
+#[Route('/ajouter-code', name: 'ajouter_code')]
     public function ajouterCode(Request $request): Response
 {
     $code = new Codepromo();
@@ -46,73 +46,8 @@ class CodeController extends AbstractController
         'codes' => $codes,
 
     ]);
-}*/
+}
 
-private $paginator;
-
-    public function __construct(PaginatorInterface $paginator)
-    {
-        $this->paginator = $paginator;
-    }
-
-#[Route('/ajouter-code', name: 'ajouter_code')]
-    public function ajouterCode(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager): Response
-    {
-        $code = new Codepromo();
-        $form = $this->createForm(CodeType::class, $code);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            // Enregistrez la catégorie dans la base de données
-            $entityManager->persist($code);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Code promo ajoutée avec succès.');
-
-            // Envoyer un e-mail à tous les utilisateurs
-            $userEmails = $this->getAllUserEmails($entityManager); 
-
-            foreach ($userEmails as $email) {
-                $subject = "Nouveaux Code Promo Ajouté";
-                $body = "Bonjour,\n\nUn Nouveau Code Promo a été ajouté dans notre épicerie. Le code est : " . $code->getCode() . ".\n\nCordialement,\nEsprit Market";
-            
-                $email = (new Email())
-                    ->from('mehergames29@gmail') // Adresse e-mail de l'expéditeur
-                    ->to($email) // Adresse e-mail du destinataire
-                    ->subject($subject)
-                    ->text($body);
-            
-                // Envoyer l'e-mail
-                $mailer->send($email);
-            }
-            
-
-            // Redirigez l'utilisateur après l'ajout réussi
-            return $this->redirectToRoute('afficher_codes');
-        }
-
-        // Affichez le formulaire
-        $codes = $this->getDoctrine()->getRepository(Codepromo::class)->findAll();
-     
-        return $this->render('code/ajouter.html.twig', [
-            'form' => $form->createView(),
-            'codes' => $codes,
-        ]);
-    }
-
-    private function getAllUserEmails(EntityManagerInterface $entityManager): array
-    {
-        $userRepository = $entityManager->getRepository(Utilisateur::class);
-        $users = $userRepository->findAll();
-
-        $emails = [];
-        foreach ($users as $user) {
-            $emails[] = $user->getEmailuser();
-        }
-
-        return $emails;
-    }
 
 #[Route('/afficher-codes', name: 'afficher_codes')]
     public function afficherCodes(Request $request,PaginatorInterface $paginator): Response
@@ -253,6 +188,7 @@ public function findByCriteriaTriReduction(Request $request, CodeRepository $cod
         'sort_order' => $sortOrder,
     ]);
 }
+
 
 
 }

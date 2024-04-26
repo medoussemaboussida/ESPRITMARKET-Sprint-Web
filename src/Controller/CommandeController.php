@@ -16,6 +16,7 @@ use DateTimeImmutable;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Twilio\Rest\Client;
+use App\Entity\Codepromo;
 
 class CommandeController extends AbstractController
 {
@@ -99,6 +100,48 @@ public function ajouterAvecCode(Request $request,$idp): Response
 }
 
 
+
+
+#[Route('/apply-coupon/{idp}', name: 'apply_coupon')]
+public function applyCoupon(Request $request,$idp): Response
+{
+    $couponCode = $request->request->get('coupon');  // Récupérer le code promo saisi
+
+    // Rechercher le code promo dans la base de données
+    $codePromo = $this->getDoctrine()->getRepository(Codepromo::class)->findOneBy(['code' => $couponCode]);
+
+    
+    $panier = $this->getDoctrine()->getRepository(Panier::class)->find($idp);
+    $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $idp]);
+
+    //calcul montant facture pour l'envoyer sur sms
+    $totalPrix = 0;
+    foreach ($produitCart as $produit) {
+        $totalPrix += $produit->getIdproduit()->getPrix(); 
+    }
+    if ($codePromo) {
+        // Vérifiez si le code est valide en termes de dates
+        $today = new \DateTime();
+        if ($codePromo->getDatedebut() <= $today && $codePromo->getDatefin() >= $today) {
+            $reduction = $codePromo->getReductionassocie();  // Pourcentage de réduction
+            
+            // Calculer le nouveau total avec la réduction
+       
+              
+                 $nouveauTotal = $totalPrix - ($totalPrix * ($reduction / 100));
+            
+            $this->addFlash('success', 'Coupon applied successfully! New total: ' . number_format($nouveauTotal, 3, '.', ' ') . ' DT');
+            
+            return $this->redirectToRoute('app_produit_front');  // Redirigez vers la page de paiement ou panier
+        } else {
+            $this->addFlash('error', 'Coupon is not valid at this time.');
+        }
+    } else {
+        $this->addFlash('error', 'Invalid coupon code.');
+    }
+
+    return $this->redirectToRoute('app_produit_front');  // Redirigez vers la page de paiement ou panier
+}
 
     //passer une commande dans partie front
     #[Route('/commande/{idp}', name: 'app_commande_add')]
@@ -208,6 +251,5 @@ public function ajouterAvecCode(Request $request,$idp): Response
 }
     }
     
-
-
+    
     }

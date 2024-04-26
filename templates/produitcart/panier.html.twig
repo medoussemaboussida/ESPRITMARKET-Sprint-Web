@@ -209,7 +209,7 @@
 					<div class="coupon-section">
 						<h3>Apply Coupon</h3>
 						<div class="coupon-form-wrap">
-							<form action="{{ path('app_commande_add', {'idp':panier.idpanier}) }}" method="post">  <!-- Mise à jour du chemin -->
+							<form action="{{ path('apply_coupon', {'idp':panier.idpanier}) }}" method="post">
 								<p><input type="text" placeholder="Coupon" name="coupon" oninput="toggleApplyButton()"></p>
 								<p><input type="submit" value="Apply" id="apply_button" class="hidden"></p>  <!-- Bouton caché -->
 							</form>

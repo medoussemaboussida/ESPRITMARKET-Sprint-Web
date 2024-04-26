@@ -51,7 +51,7 @@ class Offre
      * @ORM\Column(name="dateDebut", type="date", nullable=false)
      * @Assert\NotBlank(message="Ce champ ne peut pas être vide")
      * @Assert\GreaterThan(
-     *     value="today",
+     *     value="yesterday",
      *     message="La date de début doit être postérieure a la date actuelle."
      * )
      */
