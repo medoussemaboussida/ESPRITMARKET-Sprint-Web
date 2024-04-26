@@ -22,6 +22,12 @@ use App\Form\ModifierPointsFormType;
 use Flashy\Flashy;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Repository\UtilisateurRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
+
+
 
 
 
@@ -34,6 +40,7 @@ use App\Repository\UtilisateurRepository;
 class DonsController extends AbstractController
 {
     
+    
 
     private $requestStack;
 
@@ -41,146 +48,166 @@ class DonsController extends AbstractController
     {
         $this->requestStack = $requestStack;
     }
-   
-/**
- * @Route("/dons/{userId}", name="dons_page")
- */
-public function index(Request $request, DonsRepository $donsRepository, EvenementRepository $evenementRepository, int $userId): Response
-{
-    // Récupérer l'utilisateur spécifié par son ID depuis la base de données
-    $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
-    
-    // Vérifier si l'utilisateur existe
-    if (!$utilisateur) {
-        throw $this->createNotFoundException('Aucun utilisateur trouvé avec l\'ID spécifié.');
-    }
+    #[Route('/dons', name: 'dons_page')]
+    public function index(Request $request, DonsRepository $donsRepository, EvenementRepository $evenementRepository, SessionInterface $session): Response
+    {
+        // Récupérer l'ID de l'utilisateur à partir de la requête
+        $userId = $session->get('iduser');
 
-    // Récupérer les dons de l'utilisateur spécifié
-    $dons = $donsRepository->getDonsByUserId($userId);
-    $evenementsDons = $evenementRepository->findByTypeEv('dons');
+        // Si l'ID de l'utilisateur est fourni dans l'URL, récupérer l'utilisateur correspondant
+        if ($userId) {
+            // Récupérer l'utilisateur à partir de l'ID
+            $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
 
-    $maximumPoints = 200; // Par exemple, vous pouvez définir le maximum à 200
-
-    // Récupérer tous les événements disponibles depuis la base de données
-    $evenements = $evenementRepository->findAll();
-    
-
-    // Créer un tableau pour stocker les noms des événements avec leurs ID comme clés
-    $evenementsChoices = [];
-    foreach ($evenements as $evenement) {
-        $evenementsChoices[$evenement->getIdEv()] = $evenement->getNomEv();
-    }
-
-    // Créer un nouvel objet Dons
-    $don = new Dons();
-
-    // Créer le formulaire en utilisant le formulaire DonsType
-    $form = $this->createForm(DonsType::class, $don)
-    ->add('idEv', EntityType::class, [
-        'class' => Evenement::class,
-        'choice_label' => 'nomEv', // Assurez-vous que 'nomEv' correspond au champ que vous souhaitez afficher
-        'label' => 'Choisir un événement'
-    ]
-
-);
-
-    // Gérer la soumission du formulaire
-    $form->handleRequest($request);
-
-    // Vérifier si le formulaire a été soumis et est valide
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer la valeur de nbpoints depuis le formulaire
-        $donPoints = $form->get('nbpoints')->getData();
-    
-        // Vérifier si l'utilisateur a suffisamment de points
-        if ($utilisateur->getNbPoints() < $donPoints) {
-            // Ajouter un message flash d'erreur
-            $this->addFlash('error', 'Vous n\'avez pas suffisamment de points pour effectuer ce don.');
+            // Vérifier si l'utilisateur existe
+            if (!$utilisateur) {
+                throw $this->createNotFoundException('Utilisateur non trouvé.');
+            }
+             // Récupérer le nom et le prénom de l'utilisateur connecté
+$nomUtilisateur = $utilisateur->getNomuser();
+$prenomUtilisateur = $utilisateur->getPrenomuser();
+            // Récupérer le nombre de points de l'utilisateur
+            $nbPointsUtilisateur = $utilisateur->getNbpoints();
         } else {
-            // Récupérer l'événement sélectionné
-            $evenementId = $form->get('idEv')->getData();
-            $evenement = $evenementRepository->find($evenementId);
+            // Si aucun ID utilisateur n'est fourni dans l'URL, utiliser l'utilisateur connecté
+            $utilisateur = $this->getUser();
+
+            // Vérifier si l'utilisateur est connecté
+            if (!$utilisateur instanceof Utilisateur) {
+                throw $this->createNotFoundException('Utilisateur non trouvé.');
+            }
+
+            // Récupérer le nombre de points de l'utilisateur
+            $nbPointsUtilisateur = $utilisateur->getNbpoints();
+        }
+
+        // Récupérer les dons de l'utilisateur
+        $dons = $donsRepository->getDonsByUserId($userId);
+        $evenementsDons = $evenementRepository->findByTypeEv('dons');
+
+        $maximumPoints = 200; // Par exemple, vous pouvez définir le maximum à 200
+
+        // Récupérer tous les événements disponibles depuis la base de données
+        $evenements = $evenementRepository->findAll();
+
+        // Créer un tableau pour stocker les noms des événements avec leurs ID comme clés
+        $evenementsChoices = [];
+        foreach ($evenements as $evenement) {
+            $evenementsChoices[$evenement->getIdEv()] = $evenement->getNomEv();
+        }
+
+        // Créer un nouvel objet Dons
+        $don = new Dons();
+
+        // Créer le formulaire en utilisant le formulaire DonsType
+        $form = $this->createForm(DonsType::class, $don)
+            ->add('idEv', EntityType::class, [
+                'class' => Evenement::class,
+                'choice_label' => 'nomEv', // Assurez-vous que 'nomEv' correspond au champ que vous souhaitez afficher
+                'label' => 'Choisir un événement'
+            ]);
+
+        // Gérer la soumission du formulaire
+        $form->handleRequest($request);
+
+        // Vérifier si le formulaire a été soumis et est valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer la valeur de nbpoints depuis le formulaire
+            $donPoints = $form->get('nbpoints')->getData();
+
+            // Vérifier si l'utilisateur a suffisamment de points
+            if ($nbPointsUtilisateur < $donPoints) {
+                // Ajouter un message flash d'erreur
+                $this->addFlash('error', 'Vous n\'avez pas suffisamment de points pour effectuer ce don.');
+            } else {
+                // Récupérer l'événement sélectionné
+                $evenementId = $form->get('idEv')->getData();
+                $evenement = $evenementRepository->find($evenementId);
+
+                // Soustraire les points du don aux points de l'événement
+                $evenement->setNbPoints($evenement->getNbPoints() + $donPoints);
+
+                // Mettre à jour les points de l'utilisateur en soustrayant les points du don
+                $nbPointsUtilisateur -= $donPoints;
+                $session->set('nbPointsUtilisateur', $nbPointsUtilisateur); // Mettre à jour les points de l'utilisateur en session
+
+                // Définir l'utilisateur pour le don
+                $don->setIdUser($utilisateur);
+
+                // Définir l'état du don comme "en attente"
+                $don->setEtatstatutdons('en attente');
+
+                // Enregistrer les modifications dans la base de données
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($don);
+                $entityManager->flush();
+                $this->addFlash('success', 'Don ajouté avec succès.');
+            }
+        }
+
+        // Rendre la vue Twig avec le formulaire, les dons et les événements de type "dons"
+        return $this->render('dons/Dons.html.twig', [
+            'form' => $form->createView(),
+            'dons' => $dons,
+            'nbPointsUtilisateur' => $nbPointsUtilisateur,
+            'evenementsDons' => $evenementsDons,
+            'maximumPoints' => $maximumPoints, // Passer le maximum de points à la vue Twig
+            'nomUtilisateur'=>$nomUtilisateur,
+            'prenomUtilisateur'=>$prenomUtilisateur,
+
+        ]);
+    }
+
+
+
+
+
+    public function addPointsToEventForm(Request $request, Evenement $evenement, SessionInterface $session): Response
+    {
+        // Récupérer le nombre de points de l'utilisateur à partir de la session
+        $nbPointsUtilisateur = $session->get('nbPointsUtilisateur');
     
-            // Soustraire les points du don aux points de l'événement
-            $evenement->setNbPoints($evenement->getNbPoints() + $donPoints);
+        // Créer le formulaire d'ajout de points
+        $form = $this->createFormBuilder()
+            ->add('nbPoints', IntegerType::class, [
+                'label' => 'Nombre de points à ajouter',
+                'data' => $nbPointsUtilisateur, // Utiliser le nombre de points de l'utilisateur comme valeur par défaut
+            ])
+            ->add('submit', SubmitType::class, ['label' => 'Ajouter des points'])
+            ->getForm();
     
-            $utilisateur->setNbPoints($utilisateur->getNbPoints() - $donPoints);
+        // Gérer la soumission du formulaire
+        $form->handleRequest($request);
     
-            // Définir l'utilisateur pour le don
-            $don->setIdUser($utilisateur);
+        // Vérifier si le formulaire a été soumis et est valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer les données du formulaire
+            $data = $form->getData();
     
-            // Définir l'état du don comme "en attente"
-            $don->setEtatstatutdons('en attente');
+            // Ajouter les points à l'événement
+            $evenement->setNbPoints($evenement->getNbPoints() + $data['nbPoints']);
     
-            // Le reste de votre logique pour ajouter le don et l'utilisateur...
+            // Mettre à jour le nombre de points de l'utilisateur en soustrayant les points ajoutés à l'événement
+            $nbPointsUtilisateur -= $data['nbPoints'];
+            $session->set('nbPointsUtilisateur', $nbPointsUtilisateur);
     
             // Enregistrer les modifications dans la base de données
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($don);
             $entityManager->flush();
-            $this->addFlash('success', 'Don ajouté avec succès.');
+            $this->addFlash('success', 'Points ajoutés avec succès.');
+    
+            // Rediriger l'utilisateur vers une autre page ou afficher un message de confirmation
+            // Ici, je redirige l'utilisateur vers la page de détails de l'événement
+            return $this->redirect($this->generateUrl('evenement_details', ['id' => $evenement->getId()]));
         }
+    
+        // Afficher le formulaire dans le template
+        return $this->render('dons/add_points_to_event_form.html.twig', [
+            'form' => $form->createView(),
+            'evenement' => $evenement,
+        ]);
     }
     
-    // Rendre la vue Twig avec le formulaire, les dons et les événements de type "dons"
-    return $this->render('dons/Dons.html.twig', [
-        'form' => $form->createView(),
-        'dons' => $dons,
-        'nbPointsUtilisateur' => $utilisateur->getNbPoints(),
-        'evenementsDons' => $evenementsDons,
-        'maximumPoints' => $maximumPoints, // Passer le maximum de points à la vue Twig
-    ]);}
-
-
-public function addPointsToEventForm(Request $request, Evenement $evenement): Response
-{
-    
-    // Créer le formulaire d'ajout de points
-    $form = $this->createFormBuilder()
-        ->add('nbPoints', IntegerType::class, ['label' => 'Nombre de points à ajouter'])
-        ->add('submit', SubmitType::class, ['label' => 'Ajouter des points'])
-        ->getForm();
-
-    // Gérer la soumission du formulaire
-    $form->handleRequest($request);
-
-    // Vérifier si le formulaire a été soumis et est valide
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer les données du formulaire
-        $data = $form->getData();
-
-        // Ajouter les points à l'événement
-        $evenement->setNbPoints($evenement->getNbPoints() + $data['nbPoints']);
-
-        // Enregistrer les modifications dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
-        $this->addFlash('success', 'Don ajouté avec succès.');
-
-
-        // Rediriger l'utilisateur vers une autre page ou afficher un message de confirmation
-        // Ici, je redirige l'utilisateur vers la page de détails de l'événement
-        return $this->redirect($this->getRefererUrl());
-    }
-
-    // Afficher le formulaire dans le template
-    return $this->render('dons/add_points_to_event_form.html.twig', [
-        'form' => $form->createView(),
-        'evenement' => $evenement,
-    ]);
-}
-private function getRefererUrl(): string
-{
-    $request = $this->requestStack->getCurrentRequest();
-    $referer = $request->headers->get('referer');
-    // Vérifiez si l'URL référente existe
-    if ($referer) {
-        // Filtrer l'URL pour des raisons de sécurité si nécessaire
-        return $referer;
-    }
-    // Si l'URL référente n'existe pas, redirigez vers une autre page
-    return $this->generateUrl('default_route');
-}
 
 
 
@@ -411,9 +438,15 @@ public function backDons(DonsRepository $donsRepository, Request $request): Resp
         $dons = $donsRepository->findAll();
     }
 
-    // Rendre la vue Twig avec la liste des dons
+    // Calculer le nombre de demandes reçues et en attente
+    $demandesRecues = $donsRepository->countByEtatstatutdons('reçu');
+    $demandesEnAttente = $donsRepository->countByEtatstatutdons('en attente');
+
+    // Rendre la vue Twig avec la liste des dons et les informations sur les demandes
     return $this->render('dons/backDons.html.twig', [
         'dons' => $dons,
+        'demandesRecues' => $demandesRecues,
+        'demandesEnAttente' => $demandesEnAttente,
     ]);
 }
 

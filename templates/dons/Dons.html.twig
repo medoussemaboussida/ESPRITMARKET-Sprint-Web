@@ -1,6 +1,7 @@
 
 {# templates/dons/Dons.html.twig #}
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,6 +35,20 @@
 	<!-- responsive -->
 	<link rel="stylesheet" href="/front/assets/css/responsive.css">
 	 <link rel="stylesheet" href="{{ asset('bundles/mercuryseriesflashy/css/flashy.css') }}">
+	     <style>
+        /* Alignement à droite */
+        .header-icons {
+            display: flex;
+            justify-content: flex-end; /* Alignement des éléments à droite */
+            align-items: center; /* Centre les éléments verticalement */
+        }
+
+        /* Style pour le nom d'utilisateur */
+        .username {
+            color: #ffffff; /* Couleur du texte en blanc */
+            margin-left: 10px; /* Marge à gauche pour espacer du reste des icônes */
+        }
+    </style>
 
 
 </head>
@@ -75,8 +90,8 @@
 								<li><a href="about.html">About</a></li>
 								<li class="current-list-item"><a href="#">Dons</a>
 									<ul class="sub-menu">
-                                        <li><a href='/dons/{userId}'>Faire un don</a></li>
-										<li><a href='/demander_dons/{idUser}'>Demander dons</a></li>
+                                        <li><a href='/dons'>Faire un don</a></li>
+										<li><a href='/demander_dons'>Demander dons</a></li>
 										
 									</ul>
 								</li>
@@ -95,14 +110,21 @@
 										<li><a href="cart.html">Cart</a></li>
 									</ul>
 								</li>
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
+							
+
+								  <!-- Ajoutez cette section pour afficher le nom de l'utilisateur -->
+                            <li>
+                                <li>
+                                    <div class="header-icons">
+                                        <a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+                                        <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                        <span class="username">{{ nomUtilisateur }} {{ prenomUtilisateur }}</span>
+										                                        <a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
+
+                                    </div>
+                                </li>
+                            </ul>
+                        </nav>
 						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 						<div class="mobile-menu"></div>
 						<!-- menu end -->
@@ -153,7 +175,7 @@
         <img src="https://smartrevision.net/wp-content/uploads/2023/01/Optimized-coinz-150x150.jpeg" width="40" height="40">
         <div class="points-inner">
             <span style="font-size: 20px;">Vous avez</span>
-            <label style="font-size: 20px; font-weight: bold;">{{ nbPointsUtilisateur }} Points</label>
+        <label style="font-size: 20px; font-weight: bold;">{{ nbPointsUtilisateur }} Points</label>
     </div>
 </div>       
     

@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-
 #[ORM\Table(name: "utilisateur")]
 #[ORM\Entity]
 class Utilisateur
@@ -12,72 +11,67 @@ class Utilisateur
     #[ORM\Column(name: "idUser", type: "integer", nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
-    private ?int $idUser;
+    private $iduser;
 
     #[ORM\Column(name: "nomUser", type: "string", length: 255, nullable: false)]
-    private string $nomUser;
+    private $nomuser;
 
     #[ORM\Column(name: "prenomUser", type: "string", length: 255, nullable: false)]
-    private string $prenomUser;
+    private $prenomuser;
 
     #[ORM\Column(name: "emailUser", type: "string", length: 255, nullable: false)]
-    private string $emailUser;
+    private $emailuser;
 
     #[ORM\Column(name: "mdp", type: "string", length: 255, nullable: false)]
-    private string $mdp;
+    private $mdp;
 
     #[ORM\Column(name: "nbPoints", type: "integer", nullable: false)]
-    private int $nbPoints;
+    private $nbpoints;
 
     #[ORM\Column(name: "numTel", type: "integer", nullable: false)]
-    private int $numTel;
+    private $numtel;
 
     #[ORM\Column(name: "role", type: "string", length: 255, nullable: false)]
-    private string $role;
+    private $role;
 
-    // Getters and setters for all attributes
-
-    public function getIdUser(): ?int
+    public function getIduser(): ?int
     {
-        return $this->idUser;
+        return $this->iduser;
     }
 
-    public function setIdUser(?int $idUser): self
+    public function getNomuser(): ?string
     {
-        $this->idUser = $idUser;
+        return $this->nomuser;
+    }
+
+    public function setNomuser(string $nomuser): static
+    {
+        $this->nomuser = $nomuser;
+
         return $this;
     }
 
-    public function getNomUser(): ?string
+    public function getPrenomuser(): ?string
     {
-        return $this->nomUser;
+        return $this->prenomuser;
     }
 
-    public function setNomUser(string $nomUser): self
+    public function setPrenomuser(string $prenomuser): static
     {
-        $this->nomUser = $nomUser;
+        $this->prenomuser = $prenomuser;
+
         return $this;
     }
 
-    public function getPrenomUser(): ?string
+    public function getEmailuser(): ?string
     {
-        return $this->prenomUser;
+        return $this->emailuser;
     }
 
-    public function setPrenomUser(string $prenomUser): self
+    public function setEmailuser(string $emailuser): static
     {
-        $this->prenomUser = $prenomUser;
-        return $this;
-    }
+        $this->emailuser = $emailuser;
 
-    public function getEmailUser(): ?string
-    {
-        return $this->emailUser;
-    }
-
-    public function setEmailUser(string $emailUser): self
-    {
-        $this->emailUser = $emailUser;
         return $this;
     }
 
@@ -86,31 +80,34 @@ class Utilisateur
         return $this->mdp;
     }
 
-    public function setMdp(string $mdp): self
+    public function setMdp(string $mdp): static
     {
         $this->mdp = $mdp;
+
         return $this;
     }
 
-    public function getNbPoints(): ?int
+    public function getNbpoints(): ?int
     {
-        return $this->nbPoints;
+        return $this->nbpoints;
     }
 
-    public function setNbPoints(int $nbPoints): self
+    public function setNbpoints(int $nbpoints): static
     {
-        $this->nbPoints = $nbPoints;
+        $this->nbpoints = $nbpoints;
+
         return $this;
     }
 
-    public function getNumTel(): ?int
+    public function getNumtel(): ?int
     {
-        return $this->numTel;
+        return $this->numtel;
     }
 
-    public function setNumTel(int $numTel): self
+    public function setNumtel(int $numtel): static
     {
-        $this->numTel = $numTel;
+        $this->numtel = $numtel;
+
         return $this;
     }
 
@@ -119,9 +116,12 @@ class Utilisateur
         return $this->role;
     }
 
-    public function setRole(string $role): self
+    public function setRole(string $role): static
     {
         $this->role = $role;
+
         return $this;
     }
+
+
 }

@@ -34,6 +34,20 @@
 	<link rel="stylesheet" href="/front/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="/front/assets/css/responsive.css">
+		     <style>
+        /* Alignement à droite */
+        .header-icons {
+            display: flex;
+            justify-content: flex-end; /* Alignement des éléments à droite */
+            align-items: center; /* Centre les éléments verticalement */
+        }
+
+        /* Style pour le nom d'utilisateur */
+        .username {
+            color: #ffffff; /* Couleur du texte en blanc */
+            margin-left: 10px; /* Marge à gauche pour espacer du reste des icônes */
+        }
+    </style>
 	
 
 
@@ -76,8 +90,8 @@
 								<li><a href="about.html">About</a></li>
 								<li class="current-list-item"><a href="#">Dons</a>
 									<ul class="sub-menu">
-<li><a href='/dons/{userId}'> Faire don </a></li>
-										<li><a href='/demander_dons/{idUser}'>Demander dons</a></li>
+<li><a href='/dons'> Faire don </a></li>
+										<li><a href='/demander_dons'>Demander dons</a></li>
 										
 									</ul>
 								</li>
@@ -96,11 +110,18 @@
 										<li><a href="cart.html">Cart</a></li>
 									</ul>
 								</li>
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-									</div>
+								
+                                <li>
+                                    <div class="header-icons">
+                                        <a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+                                        <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                        <span class="username">{{ nomUtilisateur }} {{ prenomUtilisateur }}</span>
+										                                        <a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
+
+                                    </div>
+                                </li>
+                            </ul>
+                        </nav>
 								</li>
 							</ul>
 						</nav>
@@ -199,7 +220,28 @@
 
 
 
-	
+
+<h2>Filtrer et trier</h2>
+<form action="{{ path('demander_dons') }}" method="get">
+    <select name="filter_sort">
+        <option value="">-- Sélectionnez une option --</option>
+        <optgroup label="Filtrer par ordre">
+            <option value="alphabetical">Alphabétique</option>
+            <option value="date">Date de publication</option>
+        </optgroup>
+        <optgroup label="Trier par points gagnés">
+            <option value="asc">Croissants</option>
+            <option value="desc">Décroissants</option>
+        </optgroup>
+    </select>
+    <button type="submit">Filtrer</button>
+</form>
+
+
+
+  
+
+
 	<h2>Les demandes de dons</h2>
 
 <!-- Liste des demandes de dons -->
@@ -293,11 +335,11 @@
             var idDemande = $(this).attr('id').replace('submitForm', '');
             var donPoints = $('#donPoints' + idDemande).val();
 
-            // Récupérer l'identifiant de l'utilisateur à partir de l'URL
-            var userId = window.location.pathname.split('/').pop(); // Récupérer le dernier segment de l'URL
+            // Récupérer l'identifiant de l'utilisateur à partir de la session
+            var userId = {{ app.session.get('iduser') }}; // Récupérer l'iduser de la session
 
             $.ajax({
-                url: '/transfer_points/' + userId, // Utiliser l'URL avec l'ID de l'utilisateur
+                url: '/transfer_points', // Utiliser l'URL sans l'ID de l'utilisateur
                 method: 'POST',
                 data: {
                     donPoints: donPoints,
@@ -327,6 +369,7 @@
         });
     });
 </script>
+
 
 
 

@@ -30,4 +30,14 @@ class DonsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function countByEtatstatutdons($etat): int
+    {
+        return $this->createQueryBuilder('d')
+            ->select('COUNT(d)')
+            ->where('d.etatstatutdons = :etat')
+            ->setParameter('etat', $etat)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

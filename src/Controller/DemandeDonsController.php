@@ -26,6 +26,8 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Form\ChoiceType;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 
 
 
@@ -46,16 +48,28 @@ class DemandeDonsController extends AbstractController
     
 
     
-    #[Route('/demander_dons/{idUser}', name: 'demander_dons', methods: ['GET', 'POST'])]
-    public function demanderDons(Request $request, EntityManagerInterface $entityManager, $idUser, PaginatorInterface $paginator): Response
+    #[Route('/demander_dons', name: 'demander_dons', methods: ['GET', 'POST'])]
+    public function demanderDons(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, PaginatorInterface $paginator, DemandedonsRepository $demandedonsRepository): Response
     {
-        // Récupérer l'utilisateur spécifié par son ID depuis la base de données
-        $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($idUser);
+        // Récupérer l'ID de l'utilisateur à partir de la session
+        $userId = $session->get('iduser');
     
-        // Si l'utilisateur n'existe pas, renvoyer une erreur
+        // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
+        if (!$userId) {
+            // Redirection vers la page de connexion
+            return $this->redirectToRoute('login'); // Remplacez 'login' par le nom de votre route de connexion
+        }
+    
+        // Récupérer l'utilisateur à partir de l'ID
+        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+    
+        // Vérifier si l'utilisateur existe
         if (!$utilisateur) {
             throw $this->createNotFoundException('Utilisateur non trouvé.');
-        }
+        } 
+    
+        $nomUtilisateur = $utilisateur->getNomuser();
+        $prenomUtilisateur = $utilisateur->getPrenomuser();
     
         $demande = new Demandedons();
         $form = $this->createForm(DemandedonsType::class, $demande);
@@ -63,7 +77,6 @@ class DemandeDonsController extends AbstractController
         // Gérer la soumission du formulaire
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // Assigner l'objet Utilisateur récupéré à la demande de don
             $demande->setIdUtilisateur($utilisateur);
             $demande->setNomuser($utilisateur->getNomuser());
             $demande->setPrenomuser($utilisateur->getPrenomuser());
@@ -73,79 +86,99 @@ class DemandeDonsController extends AbstractController
             $entityManager->flush();
     
             // Rediriger vers la même page pour éviter la soumission répétée du formulaire
-            return $this->redirectToRoute('demander_dons', ['idUser' => $idUser]);
+            return $this->redirectToRoute('demander_dons');
         }
     
-        // Paginer les résultats
-        $query = $entityManager->getRepository(Demandedons::class)->createQueryBuilder('d')
-            ->orderBy('d.datePublication', 'DESC')
-            ->getQuery();
-    
-        $demandes = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1),
-            3
-        );
-    
-        // Render the form and other data
+ $filterSort = $request->query->get('filter_sort');
+ $filter = null;
+ $sort = null;
+
+ // Analyser les paramètres de filtre et de tri
+ if ($filterSort) {
+     if ($filterSort === 'alphabetical') {
+         $sort = 'nom'; // Changer "nom" par le champ approprié dans votre entité Demandedons
+     } elseif ($filterSort === 'date') {
+         $sort = 'datePublication'; // Changer "datePublication" par le champ approprié dans votre entité Demandedons
+     } elseif ($filterSort === 'asc') {
+         $sort = 'asc'; // Changer "asc" par le tri approprié
+     } elseif ($filterSort === 'desc') {
+         $sort = 'desc'; // Changer "desc" par le tri approprié
+     }
+ }
+
+ // Récupérer les demandes de dons en fonction du filtre et du tri
+ $demandes = $demandedonsRepository->findFilteredAndSorted($filter, $sort);
+
+ // Paginer les résultats
+ $demandesPaginated = $paginator->paginate(
+     $demandes,
+     $request->query->getInt('page', 1),
+     3
+ );
+        // Rendre la vue avec les données
         return $this->render('demande_dons/demanderdons.html.twig', [
             'utilisateur' => $utilisateur,
-            'idUser' => $idUser,
             'form' => $form->createView(),
-            'demandes' => $demandes,
+            'demandes' => $demandesPaginated,
+            'nomUtilisateur' => $nomUtilisateur,
+            'prenomUtilisateur' => $prenomUtilisateur,
         ]);
     }
-    
-    
 
+    
+    
+    
 
 /**
- * @Route("/transfer_points/{idUser}", name="transfer_points", methods={"POST"})
+ * @Route("/transfer_points", name="transfer_points", methods={"POST"})
  */
-public function transferPoints(Request $request, EntityManagerInterface $entityManager, $idUser): Response
+public function transferPoints(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): JsonResponse
 {
-    // Utiliser $idUser qui est l'ID de l'utilisateur à partir de l'URL
+    // Récupérer l'ID de l'utilisateur à partir de la session
+    $userId = $session->get('iduser');
+
+    // Utiliser $userId qui est l'ID de l'utilisateur à partir de la session
     
     $donPoints = $request->request->get('donPoints');
     $idDemande = $request->request->get('idDemande');
 
     // Récupérer l'utilisateur expéditeur
-    $sender = $entityManager->getRepository(Utilisateur::class)->find($idUser);
+    $sender = $entityManager->getRepository(Utilisateur::class)->find($userId);
     if (!$sender) {
-        return new Response('Utilisateur expéditeur non trouvé', Response::HTTP_NOT_FOUND);
+        return new JsonResponse(['error' => 'Utilisateur expéditeur non trouvé'], Response::HTTP_NOT_FOUND);
     }
 
     // Récupérer la demande de don associée à l'ID
     $demande = $entityManager->getRepository(Demandedons::class)->find($idDemande);
     if (!$demande) {
-        return new Response('Demande de don non trouvée', Response::HTTP_NOT_FOUND);
+        return new JsonResponse(['error' => 'Demande de don non trouvée'], Response::HTTP_NOT_FOUND);
     }
 
     // Vérifier que les données sont valides
     if (!is_numeric($donPoints) || $donPoints <= 0) {
-        return new Response('Nombre de points invalide', Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => 'Nombre de points invalide'], Response::HTTP_BAD_REQUEST);
     }
 
     // Vérifier si l'utilisateur expéditeur a suffisamment de points
     if ($sender->getNbPoints() < $donPoints) {
-        return new Response('Points insuffisants pour effectuer le transfert', Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => 'Points insuffisants pour effectuer le transfert'], Response::HTTP_BAD_REQUEST);
     }
 
     // Mettre à jour les points de l'utilisateur expéditeur
     $sender->setNbPoints($sender->getNbPoints() - $donPoints);
     
-    // Mettre à jour les points de la demande
-    $newPoints = $demande->getNbPoints() + $donPoints;
+    // Mettre à jour les points de la demande en remplaçant les points existants par les nouveaux points
+    $newPoints = $demande->getNbPoints() + $donPoints ;
     $demande->setNbPoints($newPoints);
     
     // Enregistrer les changements dans la base de données
     $entityManager->flush();
     $this->addFlash('success', 'Les points ont été transférés avec succès.');
 
-
-    // Rediriger vers la page demander_dons après le transfert
+    // Retourner la réponse JSON avec les nouveaux points
     return new JsonResponse(['success' => true, 'newPoints' => $newPoints]);
 }
+
 
 
 

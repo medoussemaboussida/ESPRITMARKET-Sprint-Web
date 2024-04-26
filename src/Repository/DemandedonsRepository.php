@@ -46,7 +46,47 @@ public function findByEmail($email)
         ->getQuery()
         ->getResult();
 }
+public function findAllOrderedByDate($direction)
+{
+    return $this->createQueryBuilder('d')
+        ->orderBy('d.datePublication', $direction)
+        ->getQuery()
+        ->getResult();
+}
+public function findAllOrderedByPoints($sortDirection)
+    {
+        $qb = $this->createQueryBuilder('d');
 
+        // Vérifiez la direction du tri
+        if ($sortDirection === 'asc') {
+            $qb->orderBy('d.nbpoints', 'ASC');
+        } else {
+            $qb->orderBy('d.nbpoints', 'DESC');
+        }
+
+        // Exécutez la requête et retournez les résultats
+        return $qb->getQuery()->getResult();
+    }
+    public function findFilteredAndSorted($filter, $sort)
+    {
+        $queryBuilder = $this->createQueryBuilder('d');
+
+        // Ajouter les conditions de filtrage
+        if ($filter === 'alphabetical') {
+            $queryBuilder->orderBy('d.contenu', 'ASC');
+        } elseif ($filter === 'date') {
+            $queryBuilder->orderBy('d.datePublication', 'ASC');
+        }
+
+        // Ajouter les conditions de tri
+        if ($sort === 'asc') {
+            $queryBuilder->orderBy('d.nbpoints', 'ASC');
+        } elseif ($sort === 'desc') {
+            $queryBuilder->orderBy('d.nbpoints', 'DESC');
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 
 
 }

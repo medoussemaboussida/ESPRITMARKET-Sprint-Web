@@ -2,7 +2,7 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 dons_page:
-    path: /dons/{userId}
+    path: /dons
     controller: App\Controller\DonsController::index
 # config/routes.yaml
 don_delete:
@@ -17,14 +17,14 @@ edit_don:
     controller: 'App\Controller\DonsController::editDon'
 
 demander_dons:
-    path: '/demander_dons/{idUser}'
+    path: '/demander_dons'
     controller: 'App\Controller\DemandeDonsController::demanderDons'
     methods: ['GET', 'POST']
 
 
 
 transfer_points:
-    path: /transfer_points/{idUser}
+    path: /transfer_points
     controller: 'App\Controller\DemandeDonsController::transferPoints'
     methods: ['POST']
 
@@ -77,13 +77,19 @@ demander_dons_action:
     controller: App\Controller\DemandeDonsController::demanderDonsAction
     methods: [GET, POST]
 
-generate_qr_code:
-    path: '/generate-qr-code/{content}'
-    controller: 'App\Controller\QrCodeGeneratorController::generateQrCodeUri'
+
 
 afficher_dons:
     path: /afficher-dons
     controller: App\Controller\DonsController::afficherDonsFiltre
+# config/routes.yaml
 
+app_login:
+    path: /login
+    controller: App\Controller\UtilisateurController::login
+
+app_utilisateur:
+    path: /utilisateur
+    controller: App\Controller\UtilisateurController::index
 
 

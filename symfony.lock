@@ -1,7 +1,4 @@
 {
-    "arturdoruch/flash-message-bundle": {
-        "version": "1.0.1"
-    },
     "doctrine/annotations": {
         "version": "2.0",
         "recipe": {
@@ -43,6 +40,9 @@
     },
     "endroid/qr-code-bundle": {
         "version": "5.0.1"
+    },
+    "knplabs/knp-menu-bundle": {
+        "version": "v3.4.1"
     },
     "knplabs/knp-paginator-bundle": {
         "version": "v5.9.0"
