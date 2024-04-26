@@ -248,151 +248,97 @@
 <div class="latest-news mt-150 mb-150">
     <div class="container">
         <div class="row">
-		
-            {% for key, demande in demandes %}
-            <div class="col-lg-4 col-md-6">
-                <div class="single-latest-news">
-                    <a href=""><div class=""></div></a>
-                    <div class="news-text-box">
-                        <h3><a href="single-news.html">{{ demande.getContenu() }}</a></h3>
-                        <p class="blog-meta">
-                            <span class="author"><i class="fas fa-user"></i> {{ demande.getNomuser() }} {{ demande.getPrenomuser() }}</span>
-                            <span class="date"><i class="fas fa-calendar"></i>{{ demande.getDatePublication()|date('Y-m-d H:i:s') }}</span>
-                        </p>
-                        <p class="excerpt">Points gagnés: {{ demande.getNbpoints() }}</p>
-						 <p>Objectif Points : {{ demande.objectifPoints }}</p>
- <p>Delai : {{ demande.delai|date('Y-m-d H:i:s') }}</p>
-          {% if demande.delai is not null %}
-    <!-- Obtenir la date et l'heure actuelles -->
-    {% set maintenant = date() %}
-    
-    <!-- Calculer le temps restant jusqu'à la date de délai -->
-    {% set diff = demande.delai.timestamp - maintenant.timestamp %}
-    {% set jours = diff / 86400 %} {# 86400 secondes par jour #}
-    {% set heures = (diff % 86400) / 3600 %} {# 3600 secondes par heure #}
-    {% set minutes = ((diff % 86400) % 3600) / 60 %} {# 60 secondes par minute #}
-    {% set secondes = ((diff % 86400) % 3600) % 60 %}
-    
-    Temps restant : {{ jours | round(0, 'floor') }} jours {{ heures | round(0, 'floor') }} heures {{ minutes | round(0, 'floor') }} minutes {{ secondes | round(0, 'floor') }} secondes
-{% else %}
-    <p>Le délai n'est pas défini pour cette demande.</p>
-{% endif %}
-   {% if demande.objectifPoints > 0 %}
-                    {% set totalPointsDemande = demande.getNbpoints() %}
-                    {% set pourcentageProgression = (totalPointsDemande / demande.objectifPoints) * 100 %}
+ {% for key, demande in demandes %}
+    <div class="col-lg-4 col-md-6">
+        <div class="single-latest-news">
+            <!-- Afficher le code QR correspondant à la demande -->
+            {% if key < qrCodes|length %}
+                <img src="{{ qrCodes[key] }}" alt="Code QR pour les points de la demande">
+            {% endif %}
+                
+                        <a href=""><div class=""></div></a>
+                        <div class="news-text-box">
+                            <h3><a href="single-news.html">{{ demande.getContenu() }}</a></h3>
+                            <p class="blog-meta">
+                                <span class="author"><i class="fas fa-user"></i> {{ demande.getNomuser() }} {{ demande.getPrenomuser() }}</span>
+                                <span class="date"><i class="fas fa-calendar"></i>{{ demande.getDatePublication()|date('Y-m-d H:i:s') }}</span>
+                            </p>
+                            <p class="excerpt">Points gagnés: {{ demande.getNbpoints() }}</p>
+                            <p>Objectif Points : {{ demande.objectifPoints }}</p>
+                            <p>Delai : {{ demande.delai|date('Y-m-d H:i:s') }}</p>
+                            {% if demande.delai is not null %}
+                                <!-- Obtenir la date et l'heure actuelles -->
+                                {% set maintenant = date() %}
 
-                    <div class="progress progress-md portfolio-progress">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ pourcentageProgression }}%" aria-valuenow="{{ pourcentageProgression }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                <!-- Calculer le temps restant jusqu'à la date de délai -->
+                                {% set diff = demande.delai.timestamp - maintenant.timestamp %}
+                                {% set jours = diff / 86400 %} {# 86400 secondes par jour #}
+                                {% set heures = (diff % 86400) / 3600 %} {# 3600 secondes par heure #}
+                                {% set minutes = ((diff % 86400) % 3600) / 60 %} {# 60 secondes par minute #}
+                                {% set secondes = ((diff % 86400) % 3600) % 60 %}
+
+                                Temps restant : {{ jours | round(0, 'floor') }} jours {{ heures | round(0, 'floor') }} heures {{ minutes | round(0, 'floor') }} minutes {{ secondes | round(0, 'floor') }} secondes
+                            {% else %}
+                                <p>Le délai n'est pas défini pour cette demande.</p>
+                            {% endif %}
+                            {% if demande.objectifPoints > 0 %}
+                                {% set totalPointsDemande = demande.getNbpoints() %}
+                                {% set pourcentageProgression = (totalPointsDemande / demande.objectifPoints) * 100 %}
+
+                                <div class="progress progress-md portfolio-progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ pourcentageProgression }}%" aria-valuenow="{{ pourcentageProgression }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            {% else %}
+                                <p>L'objectif de points n'est pas défini pour cette demande.</p>
+                            {% endif %}
+                            <hr>
+
+                            <!-- Lien pour transférer des points -->
+                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
+
+                            <!-- Formulaire de transfert de points (masqué par défaut) -->
+                            <div class="modal fade" id="myModal{{ demande.idDemande }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h2 class="modal-title" id="myModalLabel">Transférer des points</h2>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="transferForm{{ demande.idDemande }}">
+                                                <label for="donPoints">Nombre de points à transférer :</label>
+                                                <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
+                                                <div id="errorMessage{{ demande.idDemande }}" style="color: red;"></div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                            <button type="button" id="submitForm{{ demande.idDemande }}" class="btn btn-primary">Transférer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                {% else %}
-                    <p>L'objectif de points n'est pas défini pour cette demande.</p>
-                {% endif %}
-<hr>
-
-
-                        <!-- Lien pour transférer des points -->
-<a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
-
-                        <!-- Formulaire de transfert de points (masqué par défaut) -->
-                        <!-- Formulaire de transfert de points (masqué par défaut) -->
-<div class="modal fade" id="myModal{{ demande.idDemande }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h2 class="modal-title" id="myModalLabel">Transférer des points</h2>
-            </div>
-            <div class="modal-body">
-                <form id="transferForm{{ demande.idDemande }}">
-                    <label for="donPoints">Nombre de points à transférer :</label>
-                    <input type="number" id="donPoints{{ demande.idDemande }}" name="donPoints" required><br><br>
-                    <div id="errorMessage{{ demande.idDemande }}" style="color: red;"></div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                <button type="button" id="submitForm{{ demande.idDemande }}" class="btn btn-primary">Transférer</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var myModal = new bootstrap.Modal(document.getElementById('myModal{{ demande.idDemande }}'));
-
-        $('.read-more-btn').click(function(e) {
-            e.preventDefault();
-            myModal.show();
-        });
-
-        // Gérer la soumission du formulaire de transfert de points
-        $('[id^="submitForm"]').click(function(e) {
-            e.preventDefault(); // Empêcher le comportement par défaut du formulaire
-            var idDemande = $(this).attr('id').replace('submitForm', '');
-            var donPoints = $('#donPoints' + idDemande).val();
-
-            // Récupérer l'identifiant de l'utilisateur à partir de la session
-            var userId = {{ app.session.get('iduser') }}; // Récupérer l'iduser de la session
-
-            $.ajax({
-                url: '/transfer_points', // Utiliser l'URL sans l'ID de l'utilisateur
-                method: 'POST',
-                data: {
-                    donPoints: donPoints,
-                    idDemande: idDemande
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#pointsDemande' + idDemande).text(response.newPoints);
-                        $('#myModal' + idDemande).hide(); // Masquer la fenêtre modale
-                        // Rafraîchir la page après le transfert réussi
-                        window.location.reload();
-                    } else {
-                        // Afficher le message d'erreur dans l'élément errorMessage
-                        $('#errorMessage' + idDemande).text(response);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    // Afficher le message d'erreur dans l'élément errorMessage
-                    $('#errorMessage' + idDemande).text('Erreur: ' + xhr.responseText);
-                }
-            });
-        });
-
-        // Gérer le clic sur le bouton de fermeture du modal
-        $('.close').click(function() {
-            $(this).closest('.modal').hide();
-        });
-    });
-</script>
-
-
-
-
-
-                    </div>
-					
                 </div>
-            </div>
             {% endfor %}
-			
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-center">
+                {{ knp_pagination_render(demandes, 'pagination.html.twig') }}
+            </div>
         </div>
-		{% for message in app.flashes('success') %}
-    <div class="alert alert-success">
-        {{ message }}
-    </div>
-{% endfor %}
-
-	<div class="d-flex justify-content-center">
-    {{ knp_pagination_render(demandes, 'pagination.html.twig') }}
-</div>
-
     </div>
 </div>
+<!-- jQuery -->
+
     <!-- jQuery -->
    <!-- JavaScript pour gérer les événements du modal -->
 

@@ -27,8 +27,14 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Form\ChoiceType;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Endroid\QrCode\QrCode;
 
-
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Writer\PngWriter;
 
 
 
@@ -89,32 +95,56 @@ class DemandeDonsController extends AbstractController
             return $this->redirectToRoute('demander_dons');
         }
     
- $filterSort = $request->query->get('filter_sort');
- $filter = null;
- $sort = null;
-
- // Analyser les paramètres de filtre et de tri
- if ($filterSort) {
-     if ($filterSort === 'alphabetical') {
-         $sort = 'nom'; // Changer "nom" par le champ approprié dans votre entité Demandedons
-     } elseif ($filterSort === 'date') {
-         $sort = 'datePublication'; // Changer "datePublication" par le champ approprié dans votre entité Demandedons
-     } elseif ($filterSort === 'asc') {
-         $sort = 'asc'; // Changer "asc" par le tri approprié
-     } elseif ($filterSort === 'desc') {
-         $sort = 'desc'; // Changer "desc" par le tri approprié
-     }
- }
-
- // Récupérer les demandes de dons en fonction du filtre et du tri
- $demandes = $demandedonsRepository->findFilteredAndSorted($filter, $sort);
-
- // Paginer les résultats
- $demandesPaginated = $paginator->paginate(
-     $demandes,
-     $request->query->getInt('page', 1),
-     3
- );
+        $filterSort = $request->query->get('filter_sort');
+        $filter = null;
+        $sort = null;
+    
+        // Analyser les paramètres de filtre et de tri
+        if ($filterSort) {
+            if ($filterSort === 'alphabetical') {
+                $sort = 'nom'; // Changer "nom" par le champ approprié dans votre entité Demandedons
+            } elseif ($filterSort === 'date') {
+                $sort = 'datePublication'; // Changer "datePublication" par le champ approprié dans votre entité Demandedons
+            } elseif ($filterSort === 'asc') {
+                $sort = 'asc'; // Changer "asc" par le tri approprié
+            } elseif ($filterSort === 'desc') {
+                $sort = 'desc'; // Changer "desc" par le tri approprié
+            }
+        }
+    
+        // Récupérer les demandes de dons en fonction du filtre et du tri
+        $demandes = $demandedonsRepository->findFilteredAndSorted($filter, $sort);
+    
+        // Paginer les résultats
+        $demandesPaginated = $paginator->paginate(
+            $demandes,
+            $request->query->getInt('page', 1),
+            3
+        );
+    
+        $qrCodes = [];
+        foreach ($demandesPaginated as $demande) {
+            $nbPoints = $demande->getNbpoints();
+            if ($nbPoints !== null) {
+                // Créer un nouveau code QR pour chaque demande
+                $qrCode = QrCode::create($nbPoints)
+                    ->setEncoding(new Encoding('UTF-8'))
+                    ->setSize(100)
+                    ->setMargin(10);
+        
+                // Générer l'URI de données pour le code QR
+                $qrCodeUri = (new PngWriter())->write($qrCode)->getDataUri();
+                
+                // Ajouter l'URI de données au tableau
+                $qrCodes[] = $qrCodeUri;
+            }
+        }
+$pngWriter = new PngWriter();
+$pngResult = $pngWriter->write($qrCode);
+$qrCodeUri = $pngResult->getDataUri(); // Obtenez l'URI de l'image PNG
+        
+        
+    
         // Rendre la vue avec les données
         return $this->render('demande_dons/demanderdons.html.twig', [
             'utilisateur' => $utilisateur,
@@ -122,9 +152,11 @@ class DemandeDonsController extends AbstractController
             'demandes' => $demandesPaginated,
             'nomUtilisateur' => $nomUtilisateur,
             'prenomUtilisateur' => $prenomUtilisateur,
+            'qrCodes' => $qrCodes, 
+            'qrCodeUri' => $qrCodeUri,
+
         ]);
     }
-
     
     
     
