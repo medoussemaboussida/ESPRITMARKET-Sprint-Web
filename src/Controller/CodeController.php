@@ -19,7 +19,7 @@ class CodeController extends AbstractController
 {
 
 
-/**#[Route('/ajouter-code', name: 'ajouter_code')]
+#[Route('/ajouter-code', name: 'ajouter_code')]
     public function ajouterCode(Request $request): Response
 {
     $code = new Codepromo();
@@ -46,90 +46,33 @@ class CodeController extends AbstractController
         'codes' => $codes,
 
     ]);
-}*/
+}
 
-private $paginator;
-
-    public function __construct(PaginatorInterface $paginator)
+    #[Route('/afficher-codes', name: 'afficher_codes')]
+    public function afficherCodes(Request $request, CodeRepository $codeRepository): Response
     {
-        $this->paginator = $paginator;
-    }
+        $searchQuery = $request->query->get('search_query', '');  // Rechercher par nom de code
+        $sortBy = $request->query->get('sort_by', 'datedebut');    // Champ de tri par défaut
+        $sortOrder = $request->query->get('sort_order', 'asc');    // Ordre de tri par défaut
+        $reductionAssocie = $request->query->get('reduction_associe', null);
 
-#[Route('/ajouter-code', name: 'ajouter_code')]
-    public function ajouterCode(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager): Response
-    {
-        $code = new Codepromo();
-        $form = $this->createForm(CodeType::class, $code);
-        $form->handleRequest($request);
+    
+        $criteria = [
+            'code' => $searchQuery,
+            'reductionassocie' => $reductionAssocie
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            // Enregistrez la catégorie dans la base de données
-            $entityManager->persist($code);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Code promo ajoutée avec succès.');
-
-            // Envoyer un e-mail à tous les utilisateurs
-            $userEmails = $this->getAllUserEmails($entityManager); 
-
-            foreach ($userEmails as $email) {
-                $subject = "Nouveaux Code Promo Ajouté";
-                $body = "Bonjour,\n\nUn Nouveau Code Promo a été ajouté dans notre épicerie. Le code est : " . $code->getCode() . ".\n\nCordialement,\nEsprit Market";
-            
-                $email = (new Email())
-                    ->from('mehergames29@gmail') // Adresse e-mail de l'expéditeur
-                    ->to($email) // Adresse e-mail du destinataire
-                    ->subject($subject)
-                    ->text($body);
-            
-                // Envoyer l'e-mail
-                $mailer->send($email);
-            }
-            
-
-            // Redirigez l'utilisateur après l'ajout réussi
-            return $this->redirectToRoute('afficher_codes');
-        }
-
-        // Affichez le formulaire
-        $codes = $this->getDoctrine()->getRepository(Codepromo::class)->findAll();
-     
-        return $this->render('code/ajouter.html.twig', [
-            'form' => $form->createView(),
-            'codes' => $codes,
-        ]);
-    }
-
-    private function getAllUserEmails(EntityManagerInterface $entityManager): array
-    {
-        $userRepository = $entityManager->getRepository(Utilisateur::class);
-        $users = $userRepository->findAll();
-
-        $emails = [];
-        foreach ($users as $user) {
-            $emails[] = $user->getEmailuser();
-        }
-
-        return $emails;
-    }
-
-#[Route('/afficher-codes', name: 'afficher_codes')]
-    public function afficherCodes(Request $request,PaginatorInterface $paginator): Response
-    {
-        // Récupérer toutes les codes depuis la base de données
-        $codes = $this->getDoctrine()->getRepository(Codepromo::class)->findAll();
-         // Paginer les codes promo
-        $codes = $paginator->paginate(
-        $codes, // Données à paginer (ici, votre liste de codes promo)
-        $request->query->getInt('page', 1), // Numéro de page par défaut
-        2 // Nombre d'éléments par page
-    );
-
+        ];
+    
+        // Utilisation du repository pour obtenir les codes promo filtrés et triés
+        $codes = $codeRepository->findByCriteriaAndSort($criteria, $sortBy, $sortOrder);
+    
         return $this->render('code/afficher.html.twig', [
             'codes' => $codes,
+            'sort_by' => $sortBy,
+            'sort_order' => $sortOrder,
         ]);
     }
+    
 
     #[Route('/modifier-code/{id}', name: 'modifier_code')]
     public function modifierCode(int $id, Request $request): Response
@@ -198,61 +141,9 @@ private $paginator;
         // Rediriger vers la page d'affichage des codes
         return $this->redirectToRoute('afficher_codes');
     }
-    #[Route('/afficher-codes', name: 'afficher_codes')]
-    public function rechercheCodePromo(CodeRepository $codeRepository, Request $request): Response
-    {
-        $searchQuery = $request->query->get('search_query', ''); // Récupère la valeur du champ de recherche
-    
-        $codes = $codeRepository->findBySearchQuery($searchQuery); // Recherche les codes promo
-    
-        return $this->render('code/afficher.html.twig', [
-            'codes' => $codes,
-        ]);
-    }
     
 
-#[Route('/afficher-codes', name: 'afficher_codes')]
-public function findByCriteriaTriDate(Request $request, CodeRepository $codeRepository, $sort_by = 'datedebut'): Response
-{
-    $sortOrder = $request->query->get('sort_order', 'asc');
 
-    // Vérifiez si l'ordre de tri est valide
-    $validSortOrders = ['asc', 'desc'];
-    if (!in_array($sortOrder, $validSortOrders)) {
-        throw new \InvalidArgumentException('Invalid sort order.');
-    }
-
-    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-    $codes = $codeRepository->findByCriteriaTriDate([], $sort_by, $sortOrder);
-
-    return $this->render('code/afficher.html.twig', [
-        'codes' => $codes,
-        'sort_by' => $sort_by,
-        'sort_order' => $sortOrder,
-    ]);
-}
-
-
-#[Route('/afficher-codes', name: 'afficher_codes')]
-public function findByCriteriaTriReduction(Request $request, CodeRepository $codeRepository, $sort_by = 'reductionassocie'): Response
-{
-    $sortOrder = $request->query->get('sort_order', 'asc');
-
-    // Vérifiez si l'ordre de tri est valide
-    $validSortOrders = ['asc', 'desc'];
-    if (!in_array($sortOrder, $validSortOrders)) {
-        throw new \InvalidArgumentException('Invalid sort order.');
-    }
-
-    // Utilisez la méthode findByCriteria du repository pour rechercher les offres
-    $codes = $codeRepository->findByCriteriaTriReduction([], $sort_by, $sortOrder);
-
-    return $this->render('code/afficher.html.twig', [
-        'codes' => $codes,
-        'sort_by' => $sort_by,
-        'sort_order' => $sortOrder,
-    ]);
-}
 
 
 }

@@ -424,8 +424,8 @@
                                             <thead>
                                                 <tr>
                                                     <th>Code promo</th>
-                                                    <th>Date de début</th>
-                                                    <th>Date de fin</th>
+                                                    <th><a href="{{ path('afficher_codes', {'sort_by': 'datedebut', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Date de début</a></th>
+                                                    <th><a href="{{ path('afficher_codes', {'sort_by': 'datefin', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Date de fin</a></th>
                                                     <th><a href="{{ path('afficher_codes', {'sort_by': 'reductionassocie', 'sort_order': sort_order == 'asc' ? 'desc' : 'asc'}) }}">Réduction</a></th>
                                                     <th>Action</th>
                                                 </tr>
