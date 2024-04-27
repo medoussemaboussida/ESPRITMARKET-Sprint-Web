@@ -34,6 +34,7 @@ class ProduitController extends AbstractController
         $this->paginator = $paginator;
     }
 
+    ///////////////////////pour page home de partie front
     #[Route('/produit', name: 'app_produit')]
     public function index(SessionInterface $session): Response
     {
@@ -59,8 +60,19 @@ class ProduitController extends AbstractController
 
     //ajouter et afficher
     #[Route('/produit/ajouter', name: 'app_produit_ajouter')]
-    public function ajouter(Request $request): Response
+    public function ajouter(Request $request,SessionInterface $session): Response
 {
+    $userId = $session->get('iduser');
+    // Vérifier si l'ID de l'utilisateur existe dans la session
+    // Récupérer l'utilisateur à partir de session
+    if (!$userId)
+    {
+        return $this->redirectToRoute('app_utilisateur');
+
+    }
+    else
+    {
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
     $produit = new Produit();
     $form = $this->createForm(ProduitType::class, $produit,);
     $form->handleRequest($request);
@@ -133,8 +145,10 @@ class ProduitController extends AbstractController
         'produits' => $pagination,
         'categories' => $categories,
         'pagination' => $pagination,
+        'user'=> $user,
 
     ]);
+}
 }
 
 
@@ -142,9 +156,12 @@ class ProduitController extends AbstractController
 //chercher un produit
 #[Route('/produit/search', name: 'app_produit_search')]
 
-public function searchAjax(Request $request): Response
+public function searchAjax(Request $request,SessionInterface $session): Response
 {
-    
+    $userId = $session->get('iduser');
+    // Vérifier si l'ID de l'utilisateur existe dans la session
+    // Récupérer l'utilisateur à partir de session
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
     // Rendre la vue partielle pour les résultats de la recherche
     $produit = new Produit();
     $form = $this->createForm(ProduitType::class, $produit,);
@@ -166,7 +183,7 @@ public function searchAjax(Request $request): Response
             $existingProduit->setQuantite($existingProduit->getQuantite() + 1);
         }
         else {
-        /** @var UploadedFile $image */
+       
         $image = $form->get('imageproduit')->getData();
 
         // Vérifiez si une image a été téléchargée
@@ -198,7 +215,11 @@ $searchTerm = $request->query->get('search');
 
 // Effectuer la recherche en fonction du contenu du champ de recherche
 $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeywordOrPriceOrQuantity($searchTerm);
-    
+$pagination = $this->paginator->paginate(
+    $produits,
+    $request->query->getInt('page', 1),
+    4
+);
     $categories = $this->getDoctrine()
     ->getRepository(Categorie::class)
     ->createQueryBuilder('c')
@@ -211,11 +232,14 @@ $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeyword
 
     return $this->render('produit/ajouterProduit.html.twig', [
         'form' => $form->createView(),
-        'produits' => $produits,
+        'produits' => $pagination,
         'categories' => $categories,
         'searchTerm' => $searchTerm,
+        'user'=> $user,
+        'pagination' => $pagination,
 
     ]);
+    
 }
 
 
@@ -241,10 +265,14 @@ $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeyword
 }
     $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
     $prixEnEuros = []; // Tableau pour stocker les prix convertis en euros
-
+    $prixEnDollars =[];
+    $prixEnYuan=[];
         // Conversion des prix en euros
         foreach ($produits as $produit) {
             $prixEnEuros[$produit->getIdproduit()] = $converter->convert($produit->getPrix(), 'TND', 'EUR');
+            $prixEnDollars[$produit->getIdproduit()] = $converter->convert($produit->getPrix(), 'TND', 'USD');
+            $prixEnYuan[$produit->getIdproduit()] = $converter->convert($produit->getPrix(), 'TND', 'CNY');
+
         }
     $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
     return $this->render('produit/frontProduit.html.twig', [
@@ -252,6 +280,9 @@ $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeyword
          'user'=> $user,
          'categories' => $categories,
          'prixEnEuros' => $prixEnEuros,
+         'prixEnDollars' => $prixEnDollars,
+         'prixEnYuan' => $prixEnYuan,
+
 
     ]);
     }
@@ -267,18 +298,29 @@ $produits = $this->getDoctrine()->getRepository(Produit::class)->searchByKeyword
 
 //filtrer products selon categorie choisi dans la partie front
 #[Route('/produit/frontProduit/{id}', name: 'app_categorie_front')]
-public function produitsParCategorie(Request $request,$id): Response
+public function produitsParCategorie(Request $request,$id,Converter $converter,SessionInterface $session): Response
 {
-    $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(1);
-
+    $userId = $session->get('iduser');
+     // Récupérer l'utilisateur à partir de session
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
     $produits = $this->getDoctrine()->getRepository(Produit::class)->findBy(['categorie' => ['idcategoire' => $id]]);
     $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
-
+    $prixEnEuros = []; // Tableau pour stocker les prix convertis en euros
+    $prixEnDollars =[];
+    $prixEnYuan=[];
+        // Conversion des prix en euros
+        foreach ($produits as $produit) {
+            $prixEnEuros[$produit->getIdproduit()] = $converter->convert($produit->getPrix(), 'TND', 'EUR');
+            $prixEnDollars[$produit->getIdproduit()] = $converter->convert($produit->getPrix(), 'TND', 'USD');
+            $prixEnYuan[$produit->getIdproduit()] = $converter->convert($produit->getPrix(), 'TND', 'CNY');
+        }
     return $this->render('produit/frontProduit.html.twig', [
         'produits' => $produits,
         'user'=> $user,
          'categories' => $categories,
-
+         'prixEnEuros' => $prixEnEuros,
+         'prixEnDollars' => $prixEnDollars,
+         'prixEnYuan' => $prixEnYuan,
 
     ]);
 }
@@ -338,8 +380,11 @@ public function edit(ProduitRepository $repository, $id, Request $request)
 
 //trie prix asc
 #[Route('/produit/prixAsc', name: 'app_prix_asc')]
-    public function triePrixAsc(Request $request): Response
+    public function triePrixAsc(Request $request,SessionInterface $session): Response
     {
+        $userId = $session->get('iduser');
+     // Récupérer l'utilisateur à partir de session
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
         $produit = new Produit();
         $form = $this->createForm(ProduitType::class, $produit,);
         $form->handleRequest($request);
@@ -412,15 +457,19 @@ public function edit(ProduitRepository $repository, $id, Request $request)
             'produits' => $pagination,
             'categories' => $categories,
             'pagination' => $pagination,
-    
+            'user'=> $user,
         ]);
     }
 
 
 //trie prix desc
 #[Route('/produit/prixDesc', name: 'app_prix_desc')]
-public function triePrixDesc(Request $request): Response
+public function triePrixDesc(Request $request,SessionInterface $session): Response
 {
+    $userId = $session->get('iduser');
+     // Récupérer l'utilisateur à partir de session
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
     $produit = new Produit();
     $form = $this->createForm(ProduitType::class, $produit,);
     $form->handleRequest($request);
@@ -493,14 +542,17 @@ public function triePrixDesc(Request $request): Response
         'produits' => $pagination,
         'categories' => $categories,
         'pagination' => $pagination,
-
+        'user'=> $user,
     ]);
 }
 
 //trie nomProduit desc
 #[Route('/produit/nomAsc', name: 'app_nomproduit_asc')]
-public function trieNomAsc(Request $request): Response
+public function trieNomAsc(Request $request,SessionInterface $session): Response
 {
+    $userId = $session->get('iduser');
+     // Récupérer l'utilisateur à partir de session
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
     $produit = new Produit();
     $form = $this->createForm(ProduitType::class, $produit,);
     $form->handleRequest($request);
@@ -573,15 +625,19 @@ public function trieNomAsc(Request $request): Response
         'produits' => $pagination,
         'categories' => $categories,
         'pagination' => $pagination,
-
+        'user'=> $user,
     ]);
 }
 
 
 //trie nomProduit desc
 #[Route('/produit/nomDesc', name: 'app_nomproduit_desc')]
-public function trieNomDesc(Request $request): Response
+public function trieNomDesc(Request $request,SessionInterface $session): Response
 {
+    $userId = $session->get('iduser');
+     // Récupérer l'utilisateur à partir de session
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
     $produit = new Produit();
     $form = $this->createForm(ProduitType::class, $produit,);
     $form->handleRequest($request);
@@ -654,7 +710,7 @@ public function trieNomDesc(Request $request): Response
         'produits' => $pagination,
         'categories' => $categories,
         'pagination' => $pagination,
-
+        'user'=> $user,
     ]);
 }
 

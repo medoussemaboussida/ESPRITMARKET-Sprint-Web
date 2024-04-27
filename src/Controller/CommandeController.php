@@ -81,7 +81,7 @@ class CommandeController extends AbstractController
 
 
         ///////////////////////sms//////////////////////////////////////
-        $utilisateur = $panier->getIduser();
+     /*   $utilisateur = $panier->getIduser();
         $numtel = $utilisateur->getNumtel();
         $numtel = '+216' . $numtel;
         $totalPrixFormate = number_format($totalPrix, 3, ',', ' ');
@@ -106,7 +106,7 @@ class CommandeController extends AbstractController
         $this->addFlash('error', 'Erreur lors de l\'envoi du SMS : ' . $e->getMessage());
         return $this->redirectToRoute('app_produit_front');
     }
-
+*/
 
 
         return $this->redirectToRoute('app_produit_front');
@@ -142,13 +142,18 @@ class CommandeController extends AbstractController
         if ($commandeDateFormatted === $dateActuelleFormatted)
         {
         $entityManager->remove($commande);
+        // Rediriger l'utilisateur vers une page appropriée après la suppression des commandes
+    $this->addFlash('success', 'Votre Commande est annulée avec succès.');
+    $entityManager->flush();
+
+        }
+        else
+        {
+            $this->addFlash('error', 'vous n avez pas une commande');
+            
         }
     }
 
-    $entityManager->flush();
-
-    // Rediriger l'utilisateur vers une page appropriée après la suppression des commandes
-    $this->addFlash('success', 'Votre Commande est annulée avec succès.');
     return $this->redirectToRoute('app_produit_front');
 }
     }

@@ -65,7 +65,7 @@ class CategorieController extends AbstractController
     $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
  
     //user
-    $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(1);
+    $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
 
     return $this->render('categorie/ajouterCategorie.html.twig', [
         'form' => $form->createView(),

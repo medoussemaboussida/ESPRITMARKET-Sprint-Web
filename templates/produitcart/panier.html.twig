@@ -89,6 +89,8 @@
 									<div class="header-icons">
 										<a class="shopping-cart" href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+										<a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
+
 									</div>
 								</li>
 							</ul>
@@ -114,6 +116,7 @@
 							<h3>Search For:</h3>
 							<input type="text" placeholder="Keywords">
 							<button type="submit">Search <i class="fas fa-search"></i></button>
+							
 						</div>
 					</div>
 				</div>
@@ -147,6 +150,7 @@
     <thead class="cart-table-head">
         <tr class="table-head-row">
             <th class="product-image">Produit</th>
+			<th class="product-image">Prix</th>
 			<th class="product-image">Quantite</th>
 			<th class="product-action">-/+</th>
 
@@ -156,6 +160,15 @@
     {% for produitId, produit in produitsUniques %}
         <tr class="table-body-row">
             <td class="product-image"><img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="" class="product-img" ></td>
+<td>
+    {{ totalPrix | number_format(3, '.', ' ') }} DT
+	 &nbsp;|&nbsp;
+    {{ prixEnEuros | number_format(3, '.', ' ') }} EUR
+    &nbsp;|&nbsp;
+    {{ prixEnDollars | number_format(3, '.', ' ') }} $
+    &nbsp;|&nbsp;
+    {{ prixEnYuan | number_format(3, '.', ' ') }} ¥
+</td>  
 <td class="product-quantity" id="quantite-{{ produitId }}">{{ quantite[produitId] }}</td>
             <td class="product-action">
 <a href="#" class="cart-btn remove-from-cart" data-produit="{{ produitId }}" data-panier="{{ panier.idpanier }}">-</a>
@@ -197,6 +210,14 @@ document.addEventListener("DOMContentLoaded", function() {
         const quantiteElement = document.getElementById(`quantite-${produitId}`);
         if (quantiteElement) {
             quantiteElement.textContent = data.quantite[produitId]; // Met à jour la quantité affichée
+
+	 const montantTotalElement = document.querySelector('.total-data:last-child td:last-child');
+if (montantTotalElement) {
+    montantTotalElement.textContent = data.totalPrixFormatted + ' | ' + 
+                                       data.totalPrixEnEurosFormatted + ' | ' + 
+                                       data.totalPrixEnDollarsFormatted + ' | ' + 
+                                       data.totalPrixEnYuanFormatted;
+}
         }
     }
 })       .catch(error => {
@@ -236,7 +257,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 const quantiteElement = document.getElementById(`quantite-${produitId}`);
                 if (quantiteElement) {
                     quantiteElement.textContent = data.quantite[produitId]; // Met à jour la quantité affichée
+   const montantTotalElement = document.querySelector('.total-data:last-child td:last-child');
+if (montantTotalElement) {
+    montantTotalElement.textContent = data.totalPrixFormatted + ' | ' + 
+                                       data.totalPrixEnEurosFormatted + ' | ' + 
+                                       data.totalPrixEnDollarsFormatted + ' | ' + 
+                                       data.totalPrixEnYuanFormatted;
+}
+
+	
                 }
+
+
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -270,17 +302,17 @@ document.addEventListener("DOMContentLoaded", function() {
 								</tr>
 							</thead>
 							<tbody>
-							        {% for produit in produitsDansPanier %}
-
-								<tr class="total-data">
-									<td><strong>{{ produit.idproduit.nomproduit }}</strong></td>
-									<td>{{ produit.idproduit.prix |number_format(3, '.', ' ')}} DT</td>
-								</tr>
-								        {% endfor %}
 							 <tr class="total-data">
                             <td><strong>Montant total</strong></td>
-                         <td>{{ totalPrix | number_format(3, '.', ' ') }} DT</td>
-                         </tr>
+<td>
+    {{ totalPrix | number_format(3, '.', ' ') }} DT
+	 &nbsp;|&nbsp;
+    {{ prixEnEuros | number_format(3, '.', ' ') }} EUR
+    &nbsp;|&nbsp;
+    {{ prixEnDollars | number_format(3, '.', ' ') }} $
+    &nbsp;|&nbsp;
+    {{ prixEnYuan | number_format(3, '.', ' ') }} ¥
+</td>                         </tr>
 							</tbody>
 						</table>
 						<div class="cart-buttons">

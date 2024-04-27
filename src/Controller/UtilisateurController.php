@@ -33,13 +33,25 @@ public function login(Request $request, AuthenticationUtils $authenticationUtils
 
    // Vérifier si l'utilisateur existe et si le mot de passe est correct
    if ($user && $user2) {
+    if ($user->getRole() === 'Client')
+    {
     $iduser = $user->getIduser();
        $session->set('iduser', $iduser);
        return $this->redirectToRoute('app_produit');
+
+    }
+    else
+    {
+        $iduser = $user->getIduser();
+       $session->set('iduser', $iduser);
+        return $this->redirectToRoute('app_produit_ajouter');
+
+    }
    } else {
        // Si les informations de connexion sont incorrectes, afficher un message d'erreur
        return $this->redirectToRoute('app_utilisateur');   }
 }
+
 private $logoutUrlGenerator;
 
     public function __construct(LogoutUrlGenerator $logoutUrlGenerator)
@@ -50,6 +62,6 @@ private $logoutUrlGenerator;
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
-        // Cette méthode sera vide car le logout est géré par Symfony
+        
     }
 }

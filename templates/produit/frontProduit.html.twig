@@ -90,6 +90,8 @@
 									<div class="header-icons">
 										<a class="shopping-cart" href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+										<a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
+
 									</div>
 								</li>
 							</ul>
@@ -173,7 +175,15 @@
                 </div>
                 <h3>{{ produit.nomproduit }}</h3>
                 <p class="product-price"><span>Stock :{{ produit.quantite }}</span> {{ produit.prix |number_format(3, '.', ' ')}}DT </p>
-                    <p>{{ prixEnEuros[produit.idproduit] | number_format(3, '.', ' ')}} EUR</p>
+        <p>
+    {{ prixEnEuros[produit.idproduit] | number_format(3, '.', ' ')}} EUR
+    &nbsp;|&nbsp;
+    {{ prixEnDollars[produit.idproduit] | number_format(3, '.', ' ')}} $
+    &nbsp;|&nbsp;
+    {{ prixEnYuan[produit.idproduit] | number_format(3, '.', ' ')}} ¥
+</p>
+
+
             <a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
             </div>
         </div>

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Hexaequo\CurrencyConverterBundle\Converter;
 
 class ProduitcartController extends AbstractController
 {
@@ -31,7 +32,7 @@ class ProduitcartController extends AbstractController
 
     //ajouter meme produit avec bouton +
     #[Route('/produitcart/ajouterPlus/{id}/{idp}', name: 'app_produitcart_ajouter')]
-    public function ajouterP($id,$idp, ProduitcartRepository $repository, PanierRepository $panierRepository): Response
+    public function ajouterP($id,$idp, ProduitcartRepository $repository, PanierRepository $panierRepository,Converter $converter): Response
     {
         
         $panier = $panierRepository->find($idp);
@@ -52,7 +53,15 @@ class ProduitcartController extends AbstractController
     $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
     $quantite = [];
     $produitsUniques = [];
-
+ //calcul montant facture
+ $totalPrix = 0;
+ // Parcourez chaque produit et ajoutez son prix au total
+ foreach ($produitCart as $produit) {
+     $totalPrix += $produit->getIdproduit()->getPrix(); 
+ }
+ $prixEnEuros = $converter->convert($totalPrix, 'TND', 'EUR');
+ $prixEnDollars = $converter->convert($totalPrix, 'TND', 'USD');
+ $prixEnYuan = $converter->convert($totalPrix, 'TND', 'CNY');
     // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
     foreach ($produitCart as $produit) {
     
@@ -68,8 +77,11 @@ class ProduitcartController extends AbstractController
     $response = new JsonResponse([
         'success' => true,
         'message' => 'Produit ajouté au panier avec succès',
-        'quantite' => $quantite
-
+        'quantite' => $quantite,
+        'totalPrixFormatted' => number_format($totalPrix, 3, '.', ' ') . ' DT',
+        'totalPrixEnEurosFormatted' => number_format($prixEnEuros, 3, '.', ' ') . ' EUR',
+        'totalPrixEnDollarsFormatted' => number_format($prixEnDollars, 3, '.', ' ') . ' USD',
+        'totalPrixEnYuanFormatted' => number_format($prixEnYuan, 3, '.', ' ') . ' CNY',
     ]);
 
     return $response;
@@ -79,7 +91,7 @@ class ProduitcartController extends AbstractController
  
    //supprimer un produit de votre panier avec bouton -
    #[Route('/produitcart/supprimer/{id}/{idp}', name: 'app_produitcart_supprimer')]
-   public function supprimer($id,$idp,ProduitcartRepository $repository,PanierRepository $panierRepository): Response
+   public function supprimer($id,$idp,ProduitcartRepository $repository,PanierRepository $panierRepository,Converter $converter): Response
    {
      //recherche et suppression aleatoire de produit se repete plusieurs fois
      $panier = $panierRepository->find($idp);
@@ -92,7 +104,15 @@ class ProduitcartController extends AbstractController
        $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
        $quantite = [];
        $produitsUniques = [];
-   
+    //calcul montant facture
+    $totalPrix = 0;
+    // Parcourez chaque produit et ajoutez son prix au total
+    foreach ($produitCart as $produit) {
+        $totalPrix += $produit->getIdproduit()->getPrix(); 
+    }
+    $prixEnEuros = $converter->convert($totalPrix, 'TND', 'EUR');
+$prixEnDollars = $converter->convert($totalPrix, 'TND', 'USD');
+$prixEnYuan = $converter->convert($totalPrix, 'TND', 'CNY');
        // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
        foreach ($produitCart as $produit) {
        
@@ -103,13 +123,17 @@ class ProduitcartController extends AbstractController
                $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
            }
        }
+       
        // Renvoyer une réponse JSON avec les données mises à jour
     $response = new JsonResponse([
         'success' => true,
         'message' => 'Produit supprimé au panier avec succès',
-        'quantite' => $quantite
-
-        // Vous pouvez également renvoyer d'autres données comme la nouvelle quantité, etc.
+        'quantite' => $quantite,
+        'totalPrixFormatted' => number_format($totalPrix, 3, '.', ' ') . ' DT',
+        'totalPrixEnEurosFormatted' => number_format($prixEnEuros, 3, '.', ' ') . ' EUR',
+    'totalPrixEnDollarsFormatted' => number_format($prixEnDollars, 3, '.', ' ') . ' USD',
+    'totalPrixEnYuanFormatted' => number_format($prixEnYuan, 3, '.', ' ') . ' CNY',
+    
     ]);
 
     return $response;
@@ -148,7 +172,7 @@ class ProduitcartController extends AbstractController
 
     //afficher la panier avec les produits choisis
     #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]
-    public function afficherPanier($idUser): Response
+    public function afficherPanier($idUser,Converter $converter): Response
     {
         //user connecté 
         $user = $this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(['iduser' => $idUser]);
@@ -168,6 +192,11 @@ class ProduitcartController extends AbstractController
             $totalPrix += $produit->getIdproduit()->getPrix(); 
         }
         
+
+$prixEnEuros = $converter->convert($totalPrix, 'TND', 'EUR');
+$prixEnDollars = $converter->convert($totalPrix, 'TND', 'USD');
+$prixEnYuan = $converter->convert($totalPrix, 'TND', 'CNY');
+
 
         $quantite = [];
         $produitsUniques = [];
@@ -190,7 +219,9 @@ class ProduitcartController extends AbstractController
             'totalPrix' => $totalPrix,
             'quantite' => $quantite, // Passer le tableau de quantité à la vue
             'user'=> $user,
-
+            'prixEnEuros' => $prixEnEuros,
+            'prixEnDollars' => $prixEnDollars,
+            'prixEnYuan' => $prixEnYuan,
         ]);
     }
 
