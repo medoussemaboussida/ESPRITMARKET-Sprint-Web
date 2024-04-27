@@ -38,11 +38,11 @@
             <div class="profile-desc">
               <div class="profile-pic">
                 <div class="count-indicator">
-                  <img class="img-xs rounded-circle " src="/back/assets/images/faces/face15.jpg" alt="">
                   <span class="count bg-success"></span>
                 </div>
                 <div class="profile-name">
-                  <h5 class="mb-0 font-weight-normal">Admin</h5>
+                  <h5 class="mb-0 font-weight-normal">{{ nomUtilisateur }} {{ prenomUtilisateur }}</h5>
+
                   <span></span>
                 </div>
               </div>
@@ -265,8 +265,7 @@
               <li class="nav-item dropdown">
                 <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
                   <div class="navbar-profile">
-                    <img class="img-xs rounded-circle" src="/back/assets/images/faces/face15.jpg" alt="">
-                    <p class="mb-0 d-none d-sm-block navbar-profile-name">Admin</p>
+                      <span class="username">{{ nomUtilisateur }} {{ prenomUtilisateur }}</span>
                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                   </div>
                 </a>
@@ -275,27 +274,20 @@
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-settings text-success"></i>
-                      </div>
                     </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Settings</p>
-                    </div>
+                    
                   </a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-logout text-danger"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Log out</p>
-                    </div>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <p class="p-3 mb-0 text-center">Advanced settings</p>
+<a class="dropdown-item preview-item" href="{{ path('app_logout') }}">
+    <div class="preview-thumbnail">
+        <div class="preview-icon bg-dark rounded-circle">
+            <i class="mdi mdi-logout text-danger"></i>
+        </div>
+    </div>
+    <div class="preview-item-content">
+        <span class="preview-subject mb-1">Log out</span>
+    </div>
+</a>
                 </div>
               </li>
             </ul>
@@ -324,7 +316,7 @@
                         </div>
                       </div>
                       <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
-                        <i class="icon-lg mdi mdi-codepen text-primary ml-auto"></i>
+<i class="icon-lg mdi mdi-emoticon-happy text-success ml-auto"></i>
                       </div>
                     </div>
                   </div>
@@ -341,7 +333,7 @@
                         </div>
                       </div>
                       <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
-                        <i class="icon-lg mdi mdi-wallet-travel text-danger ml-auto"></i>
+<i class="icon-lg mdi mdi-emoticon-sad text-danger ml-auto"></i>
                       </div>
                     </div>
                   </div>
@@ -351,7 +343,6 @@
             </div>
           
 
-            </div>
                     <h4 class="card-title">Liste des Dons</h4>
                     <div class="table-responsive">
                       <table class="table">
@@ -443,8 +434,11 @@
 </div>
 
 
-    <a href="{{ path('modifier_points_don', {'id': don.idDons}) }}" class="btn btn-primary btn-sm">
-    <i class="mdi mdi-pencil mdi-24px"></i>
+    {% if don.etatstatutdons != 'reçu' %}
+        <a href="{{ path('modifier_points_don', {'id': don.idDons}) }}" class="btn btn-primary btn-sm">
+            <i class="mdi mdi-pencil mdi-24px"></i>
+        </a>
+    {% endif %}
 </a>
 
 

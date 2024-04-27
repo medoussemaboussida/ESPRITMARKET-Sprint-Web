@@ -214,14 +214,46 @@ public function transferPoints(Request $request, EntityManagerInterface $entityM
 
 
 
+
+
 /**
  * @Route("/admin/demandedons", name="admin_demandedons")
  */
-public function backDemandesDons(DemandedonsRepository $demandedonsRepository, Request $request): Response
+public function backDemandesDons(DemandedonsRepository $demandedonsRepository, Request $request, SessionInterface $session): Response
 {
-    // Récupérer l'adresse e-mail saisie dans le formulaire
-    $email = $request->query->get('email');
+    // Récupérer l'ID de l'utilisateur à partir de la requête
+    $userId = $session->get('iduser');
 
+    // Si l'ID de l'utilisateur est fourni dans l'URL, récupérer l'utilisateur correspondant
+    if ($userId) {
+        // Récupérer l'utilisateur à partir de l'ID
+        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
+        // Vérifier si l'utilisateur existe
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        }
+    }
+     // Récupérer l'adresse e-mail saisie dans le formulaire
+
+    // Récupérer les 10 demandes de dons les plus récentes
+    $demandesRecentes = $demandedonsRepository->findMostRecent(10);
+
+    // Récupérer les 10 demandes de dons les plus anciennes
+    $demandesAnciennes = $demandedonsRepository->findOldest(10);
+
+
+    // Récupérer toutes les demandes de dons
+
+    // Récupérer toutes les demandes de dons
+    $demandesDons = $demandedonsRepository->findAll();
+
+    // Initialiser les compteurs
+    $demandesAtteintesCount = 0;
+    $demandesNonAtteintesCount = 0;
+    $email = $request->query->get('email');
+    $nomUtilisateur = $utilisateur->getNomuser();
+    $prenomUtilisateur = $utilisateur->getPrenomuser();
     // Si une adresse e-mail est saisie, filtrer les demandes de dons correspondantes
     if ($email) {
         $demandesDons = $demandedonsRepository->findByEmail($email);
@@ -230,11 +262,34 @@ public function backDemandesDons(DemandedonsRepository $demandedonsRepository, R
         $demandesDons = $demandedonsRepository->findAll();
     }
 
-    // Rendre la vue Twig avec la liste des demandes de dons
+    // Parcourir toutes les demandes de dons
+    foreach ($demandesDons as $demande) {
+        // Récupérer l'objectif de points de la demande
+        $objectifPoints = $demande->getObjectifPoints();
+
+        // Vérifier si la demande a atteint l'objectif
+        if ($demande->getNbPoints() >= $objectifPoints) {
+            // Incrémenter le compteur des demandes atteintes
+            $demandesAtteintesCount++;
+        } else {
+            // Incrémenter le compteur des demandes non atteintes
+            $demandesNonAtteintesCount++;
+        }
+    }
+
+    // Rendre la vue Twig avec les données
     return $this->render('demande_dons/backDemandeDons.html.twig', [
+        'demandesAtteintesCount' => $demandesAtteintesCount,
+        'demandesNonAtteintesCount' => $demandesNonAtteintesCount,
+        'nomUtilisateur' => $nomUtilisateur,
+        'prenomUtilisateur' => $prenomUtilisateur,
         'Demandedons' => $demandesDons,
+        'demandesRecentes' => $demandesRecentes,
+        'demandesAnciennes' => $demandesAnciennes,
+
     ]);
 }
+
 
 /**
      * @Route("/admin/demandedons/{id}/delete", name="admin_demandedons_delete", methods={"GET", "POST"})
@@ -367,18 +422,22 @@ public function demanderDonsAction(Request $request): Response
 
         // Récupérer l'utilisateur sélectionné
         $utilisateur = $data['utilisateur'];
+        $nomuser = $utilisateur->getNomUser();
+$prenomuser = $utilisateur->getPrenomUser();
 
         // Créer une nouvelle demande
         $demande = new Demandedons();
         $demande->setIdUtilisateur($utilisateur);
-        $demande->setNomPrenomUtilisateur($nomCompletUtilisateur); // Champ pour le nom complet de l'utilisateur
+        $demande->setNomuser($nomuser); // Définir le nom complet de l'utilisateur sur la demande
+$demande->setprenomuser($prenomuser); // Définir le nom complet de l'utilisateur sur la demande
+   
 
+        
         $demande->setContenu($data['contenu']);
         $demande->setObjectifPoints($data['objectifPoints']);
         $demande->setDelai($data['delai']);
 
         // Récupérer le prénom de l'utilisateur
-        $nomCompletUtilisateur = $utilisateur->getNomUser() . ' ' . $utilisateur->getPrenomUser();
 
     
 
@@ -393,7 +452,11 @@ public function demanderDonsAction(Request $request): Response
     return $this->render('demande_dons/ajouterdemandedons.html.twig', [
         'utilisateurs' => $utilisateurs,
         'form' => $form->createView(),
+        
     ]);
 }
+
+
+
 
 }

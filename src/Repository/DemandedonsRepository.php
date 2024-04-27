@@ -19,7 +19,7 @@ class DemandedonsRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
-            'SELECT d, u.nomUser, u.prenomUser, d.nbpoints' .
+            'SELECT d, u.nomuser, u.prenomuser, d.nbpoints' .
             'FROM App\Entity\Demandedons d ' .
             'JOIN d.idUtilisateur u'
         );
@@ -41,7 +41,7 @@ public function findByEmail($email)
 {
     return $this->createQueryBuilder('d')
         ->join('d.idUtilisateur', 'u')
-        ->andWhere('u.emailUser = :email')
+        ->andWhere('u.emailuser = :email')
         ->setParameter('email', $email)
         ->getQuery()
         ->getResult();
@@ -87,6 +87,27 @@ public function findAllOrderedByPoints($sortDirection)
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+    // DemandedonsRepository.php
+
+public function findMostRecent($limit = 10)
+{
+    return $this->createQueryBuilder('d')
+        ->orderBy('d.datePublication', 'DESC')
+        ->setMaxResults($limit)
+        ->getQuery()
+        ->getResult();
+}
+
+public function findOldest($limit = 10)
+{
+    return $this->createQueryBuilder('d')
+        ->orderBy('d.datePublication', 'ASC')
+        ->setMaxResults($limit)
+        ->getQuery()
+        ->getResult();
+}
+
 
 
 }

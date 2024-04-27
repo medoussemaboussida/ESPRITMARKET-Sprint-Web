@@ -323,6 +323,56 @@
                         </div>
                     </div>
                 </div>
+				 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('myModal{{ demande.idDemande }}'));
+
+        $('.read-more-btn').click(function(e) {
+            e.preventDefault();
+            myModal.show();
+        });
+
+        // Gérer la soumission du formulaire de transfert de points
+        $('[id^="submitForm"]').click(function(e) {
+            e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+            var idDemande = $(this).attr('id').replace('submitForm', '');
+            var donPoints = $('#donPoints' + idDemande).val();
+
+            // Récupérer l'identifiant de l'utilisateur à partir de la session
+            var userId = {{ app.session.get('iduser') }}; // Récupérer l'iduser de la session
+
+            $.ajax({
+                url: '/transfer_points', // Utiliser l'URL sans l'ID de l'utilisateur
+                method: 'POST',
+                data: {
+                    donPoints: donPoints,
+                    idDemande: idDemande
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#pointsDemande' + idDemande).text(response.newPoints);
+                        $('#myModal' + idDemande).hide(); // Masquer la fenêtre modale
+                        // Rafraîchir la page après le transfert réussi
+                        window.location.reload();
+                    } else {
+                        // Afficher le message d'erreur dans l'élément errorMessage
+                        $('#errorMessage' + idDemande).text(response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Afficher le message d'erreur dans l'élément errorMessage
+                    $('#errorMessage' + idDemande).text('Erreur: ' + xhr.responseText);
+                }
+            });
+        });
+
+        // Gérer le clic sur le bouton de fermeture du modal
+        $('.close').click(function() {
+            $(this).closest('.modal').hide();
+        });
+    });
+</script>
+
             {% endfor %}
 
             {% for message in app.flashes('success') %}
@@ -331,18 +381,20 @@
                 </div>
             {% endfor %}
 
-            <div class="d-flex justify-content-center">
+          
+        </div>
+		<div class="d-flex justify-content-center">
                 {{ knp_pagination_render(demandes, 'pagination.html.twig') }}
             </div>
-        </div>
+
     </div>
 </div>
 <!-- jQuery -->
 
     <!-- jQuery -->
    <!-- JavaScript pour gérer les événements du modal -->
-
-
+  
+  
 
 
 

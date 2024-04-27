@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
 use App\Repository\DonsRepository;
 use App\Entity\Evenement;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -250,6 +251,7 @@ public function delete(Request $request, DonsRepository $donsRepository, int $id
  */
 public function editDon(Request $request, int $id): Response
 {
+ 
     // Récupérer le don correspondant à l'identifiant
     $don = $this->getDoctrine()->getRepository(Dons::class)->find($id);
 
@@ -425,30 +427,61 @@ public function modifierPointsDon(Request $request, int $id): Response
 /**
  * @Route("/admin/dons", name="admin_dons")
  */
-public function backDons(DonsRepository $donsRepository, Request $request): Response
+public function backDons(DonsRepository $donsRepository, Request $request, SessionInterface $session): Response
 {
-    // Récupérer l'e-mail de la requête
-    $email = $request->query->get('email');
+    // Récupérer l'ID de l'utilisateur à partir de la requête
+    $userId = $session->get('iduser');
 
-    // Si un e-mail est fourni, récupérer les dons par cet e-mail
-    if ($email) {
-        $dons = $donsRepository->findDonsByEmail($email);
-    } else {
-        // Sinon, récupérer tous les dons
-        $dons = $donsRepository->findAll();
+    // Si l'ID de l'utilisateur est fourni dans l'URL, récupérer l'utilisateur correspondant
+    if ($userId) {
+        // Récupérer l'utilisateur à partir de l'ID
+        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
+        // Vérifier si l'utilisateur existe
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        }
+
+        // Récupérer l'e-mail de la requête
+        $email = $request->query->get('email');
+        $nomUtilisateur = $utilisateur->getNomuser();
+        $prenomUtilisateur = $utilisateur->getPrenomuser();
+
+        // Si un e-mail est fourni, récupérer les dons par cet e-mail
+        if ($email) {
+            $dons = $donsRepository->findDonsByEmail($email);
+        } else {
+            // Sinon, récupérer tous les dons
+            $dons = $donsRepository->findAll();
+        }
+
+        // Calculer le nombre de demandes reçues et en attente
+        $demandesRecues = $donsRepository->countByEtatstatutdons('reçu');
+        $demandesEnAttente = $donsRepository->countByEtatstatutdons('en attente');
+
+        // Rendre la vue Twig avec la liste des dons et les informations sur les demandes
+        return $this->render('dons/backDons.html.twig', [
+            'dons' => $dons,
+            'demandesRecues' => $demandesRecues,
+            'demandesEnAttente' => $demandesEnAttente,
+            'nomUtilisateur' => $nomUtilisateur,
+            'prenomUtilisateur' => $prenomUtilisateur,
+        ]);
     }
 
-    // Calculer le nombre de demandes reçues et en attente
-    $demandesRecues = $donsRepository->countByEtatstatutdons('reçu');
-    $demandesEnAttente = $donsRepository->countByEtatstatutdons('en attente');
-
-    // Rendre la vue Twig avec la liste des dons et les informations sur les demandes
-    return $this->render('dons/backDons.html.twig', [
-        'dons' => $dons,
-        'demandesRecues' => $demandesRecues,
-        'demandesEnAttente' => $demandesEnAttente,
-    ]);
 }
 
+/**
+ * @Route("/search", name="search")
+ */
+public function search(Request $request): Response
+{
+    // Récupérer le terme de recherche de la requête
+    $email = $request->query->get('email');
 
-}
+    // Effectuer la recherche dans la base de données
+    $results = $this->getDoctrine()->getRepository(Dons::class)->findDonsByEmail($email);
+
+    // Transformer les résultats en format JSON et les renvoyer
+    return $this->json($results);
+}}

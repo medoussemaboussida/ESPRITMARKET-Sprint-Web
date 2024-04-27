@@ -38,11 +38,10 @@
             <div class="profile-desc">
               <div class="profile-pic">
                 <div class="count-indicator">
-                  <img class="img-xs rounded-circle " src="/back/assets/images/faces/face15.jpg" alt="">
                   <span class="count bg-success"></span>
                 </div>
                 <div class="profile-name">
-                  <h5 class="mb-0 font-weight-normal">Admin</h5>
+                  <h5 class="mb-0 font-weight-normal">{{ nomUtilisateur }} {{ prenomUtilisateur }}</h5>
                   <span></span>
                 </div>
               </div>
@@ -243,10 +242,7 @@
                         <i class="mdi mdi-settings text-danger"></i>
                       </div>
                     </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Settings</p>
-                      <p class="text-muted ellipsis mb-0"> Update dashboard </p>
-                    </div>
+                    
                   </a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item preview-item">
@@ -267,37 +263,30 @@
               <li class="nav-item dropdown">
                 <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
                   <div class="navbar-profile">
-                    <img class="img-xs rounded-circle" src="/back/assets/images/faces/face15.jpg" alt="">
-                    <p class="mb-0 d-none d-sm-block navbar-profile-name">Admin</p>
+                      <span class="username">{{ nomUtilisateur }} {{ prenomUtilisateur }}</span>
                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                   </div>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+<div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
                   <h6 class="p-3 mb-0">Profile</h6>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-settings text-success"></i>
-                      </div>
                     </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Settings</p>
-                    </div>
+                    
                   </a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-logout text-danger"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Log out</p>
-                    </div>
-                  </a>
+                 <a class="dropdown-item preview-item" href="{{ path('app_logout') }}">
+    <div class="preview-thumbnail">
+        <div class="preview-icon bg-dark rounded-circle">
+            <i class="mdi mdi-logout text-danger"></i>
+        </div>
+    </div>
+    <div class="preview-item-content">
+        <span class="preview-subject mb-1">Log out</span>
+    </div>
+</a>
                   <div class="dropdown-divider"></div>
-                  <p class="p-3 mb-0 text-center">Advanced settings</p>
                 </div>
               </li>
             </ul>
@@ -308,13 +297,58 @@
         </nav>
         
         <!-- partial -->
+              <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">              
                    <div class="row ">
               <div class="col-12 grid-margin">
                 <div class="card">
                   <div class="card-body">
+                  <div class="row">
+              <div class="col-sm-4 grid-margin">
+                <div class="card">
+                  <div class="card-body">
+                    <h5>Nombre de demandes ayant atteint l'objectif </h5>
+                    <div class="row">
+                      <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                        <div class="d-flex d-sm-block d-md-flex align-items-center">
+                          <h2 class="mb-0"> {{ demandesAtteintesCount }}</h2>
+                        </div>
+                      </div>
+                      <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+<i class="icon-lg mdi mdi-emoticon-happy text-success ml-auto"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4 grid-margin">
+                <div class="card">
+                  <div class="card-body">
+                    <h5>Nombre de demandes n'ayant pas encore atteint l'objectif</h5>
+                    <div class="row">
+                      <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                        <div class="d-flex d-sm-block d-md-flex align-items-center">
+                          <h2 class="mb-0">{{ demandesNonAtteintesCount }}</h2>
+                        </div>
+                      </div>
+                      <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+<i class="icon-lg mdi mdi-emoticon-sad text-danger ml-auto"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+             
+            </div>
+          
+
+            </div>
+                  
                     <h4 class="card-title">Liste des Demandes de Dons</h4>
+                    
+                 
+
 <div class="text-right">
     <a class="btn btn-inverse-primary btn-fw" href="{{ path('demander_dons_action') }}">Ajouter Demande de Dons</a>
 </div>
@@ -385,12 +419,20 @@
     </tbody>
   </table>
 </div>
-
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:partials/_footer.html -->
+          
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">

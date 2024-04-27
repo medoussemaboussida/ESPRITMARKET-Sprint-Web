@@ -25,7 +25,7 @@ class DonsRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('d')
             ->join('d.idUser', 'u')
-            ->andWhere('u.emailUser = :email')
+            ->andWhere('u.emailuser = :email')
             ->setParameter('email', $email)
             ->getQuery()
             ->getResult();

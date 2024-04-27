@@ -93,3 +93,7 @@ app_utilisateur:
     controller: App\Controller\UtilisateurController::index
 
 
+search:
+    path: /search
+    controller: App\Controller\DonsController::search
+    methods: GET

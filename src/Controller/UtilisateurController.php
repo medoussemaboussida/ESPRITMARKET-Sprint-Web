@@ -22,26 +22,32 @@ class UtilisateurController extends AbstractController
     }
 
     #[Route('/login', name: 'app_login')]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils, SessionInterface $session): Response
+    public function login(Request $request, SessionInterface $session): Response
     {
         // Récupérer les informations du formulaire
         $email = $request->request->get('email');
         $password = $request->request->get('password');
 
         // Récupérer l'entité Utilisateur à partir de l'email
-        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(['emailuser' => $email]);
-        $user2 = $this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(['mdp' => $password]);
+        $user = $this->getDoctrine()->getRepository(Utilisateur::class)->findOneBy(['emailuser' => $email, 'mdp' => $password]);
 
         // Vérifier si l'utilisateur existe et si le mot de passe est correct
-        if ($user && $user2) {
+        if ($user) {
             $iduser = $user->getIduser();
             $session->set('iduser', $iduser);
-            return $this->redirectToRoute('dons_page'); // Redirection vers la page des dons
+            
+            // Rediriger en fonction du rôle de l'utilisateur
+            if ($user->getRole() === 'Admin') {
+                return $this->redirectToRoute('admin_dons'); // Redirection vers la page admin_page
+            } elseif ($user->getRole() === 'Client') {
+                return $this->redirectToRoute('dons_page'); // Redirection vers la page dons_page
+            }
         } else {
             // Si les informations de connexion sont incorrectes, afficher un message d'erreur
             return $this->redirectToRoute('app_utilisateur');
         }
     }
+
 
     #[Route('/logout', name: 'app_logout')]
     public function logout(SessionInterface $session): RedirectResponse
