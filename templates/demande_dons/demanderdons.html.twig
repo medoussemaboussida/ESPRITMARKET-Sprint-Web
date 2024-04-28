@@ -221,21 +221,7 @@
 
 
 
-<h2>Filtrer et trier</h2>
-<form action="{{ path('demander_dons') }}" method="get">
-    <select name="filter_sort">
-        <option value="">-- Sélectionnez une option --</option>
-        <optgroup label="Filtrer par ordre">
-            <option value="alphabetical">Alphabétique</option>
-            <option value="date">Date de publication</option>
-        </optgroup>
-        <optgroup label="Trier par points gagnés">
-            <option value="asc">Croissants</option>
-            <option value="desc">Décroissants</option>
-        </optgroup>
-    </select>
-    <button type="submit">Filtrer</button>
-</form>
+
 
 
 
@@ -243,6 +229,28 @@
 
 
 	<h2>Les demandes de dons</h2>
+<div class="row">
+    <div class="col-md-6">
+        <!-- Contenu principal -->
+    </div>
+    <div class="col-md-6 text-right">
+        <!-- Formulaire de filtrage -->
+        <form action="{{ path('demander_dons') }}" method="get">
+            <select name="filter_sort">
+                <option value="">-- Sélectionnez une option --</option>
+                <optgroup label="Filtrer par ordre">
+                    <option value="alphabetical">Alphabétique</option>
+                    <option value="date">Date de publication</option>
+                </optgroup>
+                <optgroup label="Trier par points gagnés">
+                    <option value="asc">Croissants</option>
+                    <option value="desc">Décroissants</option>
+                </optgroup>
+            </select>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+        </form>
+    </div>
+</div>
 
 <!-- Liste des demandes de dons -->
 <div class="latest-news mt-150 mb-150">
@@ -296,8 +304,44 @@
                             <!-- Lien pour transférer des points -->
                             <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal{{ demande.idDemande }}">Transférer des points <i class="fas fa-angle-right"></i></a>
 
+                                    <a href="#" class="btn btn-danger delete-link"
+    data-toggle="modal"
+    data-url="{{ path('supprimer_demande', {'id': demande.idDemande}) }}"
+    data-target="#confirmDeleteModal-{{ demande.idDemande }}"
+>
+    <i class="fas fa-trash"></i>
+</a>
+<div class="modal fade" id="confirmDeleteModal-{{ demande.idDemande }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer ce don ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <!-- Formulaire de suppression -->
+                <form action="{{ path('supprimer_demande', {'id': demande.idDemande}) }}" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ demande.idDemande) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
                             <!-- Formulaire de transfert de points (masqué par défaut) -->
                             <div class="modal fade" id="myModal{{ demande.idDemande }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">

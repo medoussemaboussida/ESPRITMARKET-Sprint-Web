@@ -344,6 +344,18 @@
           
 
                     <h4 class="card-title">Liste des Dons</h4>
+<div class="text-right">
+            <!-- Formulaire de filtrage par état -->
+            <form action="{{ path('admin_dons') }}" method="get">
+                <select name="etat">
+                    <option value="">-- Sélectionnez un état --</option>
+                    <option value="reçu">Reçu</option>
+                    <option value="en attente">En attente</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Filtrer par état</button>
+            </form>
+        </div>
+
                     <div class="table-responsive">
                       <table class="table">
                         <thead>
@@ -378,6 +390,7 @@
                                 <td>{{ don.idUser.prenomUser }}</td>
                                 <td>{{ don.idUser.emailUser }}</td>
                                 <td>{{ don.nbpoints }}</td>
+                                
                                 <td>{{ don.dateAjout|date('Y-m-d H:i:s') }}</td>
                                 <td>
 <form action="{{ path('update_etat_dons', { 'id': don.idDons }) }}" method="post">

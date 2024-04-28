@@ -108,6 +108,25 @@ public function findOldest($limit = 10)
         ->getResult();
 }
 
+public function findFilteredAndSort($filter, $sort)
+{
+    $queryBuilder = $this->createQueryBuilder('d');
+
+ if ($filter === 'date') {
+        $queryBuilder->orderBy('d.datePublication', 'ASC');
+    }
+
+    // Ajouter les conditions de tri
+    if ($sort === 'asc') {
+        $queryBuilder->orderBy('d.nbpoints', 'ASC');
+    } elseif ($sort === 'desc') {
+        $queryBuilder->orderBy('d.nbpoints', 'DESC');
+    }
+
+    return $queryBuilder->getQuery()->getResult();
+}
+
+
 
 
 }

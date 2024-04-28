@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Dons;
+
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,5 +40,16 @@ class DonsRepository extends ServiceEntityRepository
             ->setParameter('etat', $etat)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    
+
+    public function findByEtatstatutdons($etat)
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.etatstatutdons = :etat')
+            ->setParameter('etat', $etat)
+            ->getQuery()
+            ->getResult();
     }
 }

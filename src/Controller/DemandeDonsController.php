@@ -86,6 +86,8 @@ class DemandeDonsController extends AbstractController
             $demande->setIdUtilisateur($utilisateur);
             $demande->setNomuser($utilisateur->getNomuser());
             $demande->setPrenomuser($utilisateur->getPrenomuser());
+            $demande->setNbpoints(0);
+
     
             // Persistez la demande dans la base de données
             $entityManager->persist($demande);
@@ -277,6 +279,8 @@ public function backDemandesDons(DemandedonsRepository $demandedonsRepository, R
         }
     }
 
+    
+
     // Rendre la vue Twig avec les données
     return $this->render('demande_dons/backDemandeDons.html.twig', [
         'demandesAtteintesCount' => $demandesAtteintesCount,
@@ -436,6 +440,8 @@ $demande->setprenomuser($prenomuser); // Définir le nom complet de l'utilisateu
         $demande->setContenu($data['contenu']);
         $demande->setObjectifPoints($data['objectifPoints']);
         $demande->setDelai($data['delai']);
+        $demande->setNbpoints(0);
+
 
         // Récupérer le prénom de l'utilisateur
 
@@ -455,6 +461,28 @@ $demande->setprenomuser($prenomuser); // Définir le nom complet de l'utilisateu
         
     ]);
 }
+
+#[Route('/demande/{id}/supprimer', name: 'supprimer_demande')]
+public function SupprimerDemande (Request $request, DemandedonsRepository $demandedonsRepository, $id): Response
+
+
+    {
+        $demande = $demandedonsRepository->find($id);
+
+        // Récupérer la demande de don à supprimer
+        if (!$demande) {
+            throw $this->createNotFoundException('La demande de don n\'existe pas.');
+        }
+
+        // Supprimer la demande de don de la base de données
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($demande);
+        $entityManager->flush();
+
+        // Rediriger vers la page des demandes de dons après la suppression
+        return $this->redirectToRoute('demander_dons');
+    }
+
 
 
 

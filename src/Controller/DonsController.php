@@ -64,6 +64,9 @@ class DonsController extends AbstractController
             if (!$utilisateur) {
                 throw $this->createNotFoundException('Utilisateur non trouvé.');
             }
+
+  
+
              // Récupérer le nom et le prénom de l'utilisateur connecté
 $nomUtilisateur = $utilisateur->getNomuser();
 $prenomUtilisateur = $utilisateur->getPrenomuser();
@@ -155,6 +158,7 @@ $prenomUtilisateur = $utilisateur->getPrenomuser();
             'maximumPoints' => $maximumPoints, // Passer le maximum de points à la vue Twig
             'nomUtilisateur'=>$nomUtilisateur,
             'prenomUtilisateur'=>$prenomUtilisateur,
+
 
         ]);
     }
@@ -441,7 +445,8 @@ public function backDons(DonsRepository $donsRepository, Request $request, Sessi
         if (!$utilisateur) {
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         }
-
+        // Récupérer l'utilisateur ayant effectué le plus de dons
+    
         // Récupérer l'e-mail de la requête
         $email = $request->query->get('email');
         $nomUtilisateur = $utilisateur->getNomuser();
@@ -455,6 +460,16 @@ public function backDons(DonsRepository $donsRepository, Request $request, Sessi
             $dons = $donsRepository->findAll();
         }
 
+      // Récupérer l'état sélectionné dans le formulaire de filtrage
+      $etat = $request->query->get('etat');
+
+      // Récupérer les dons en fonction de l'état sélectionné
+      if ($etat) {
+          $dons = $donsRepository->findBy(['etatstatutdons' => $etat]);
+      } else {
+          // Si aucun état n'est sélectionné, récupérer tous les dons
+          $dons = $donsRepository->findAll();
+      }
         // Calculer le nombre de demandes reçues et en attente
         $demandesRecues = $donsRepository->countByEtatstatutdons('reçu');
         $demandesEnAttente = $donsRepository->countByEtatstatutdons('en attente');
@@ -466,6 +481,7 @@ public function backDons(DonsRepository $donsRepository, Request $request, Sessi
             'demandesEnAttente' => $demandesEnAttente,
             'nomUtilisateur' => $nomUtilisateur,
             'prenomUtilisateur' => $prenomUtilisateur,
+
         ]);
     }
 
