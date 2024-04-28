@@ -18,7 +18,33 @@
     <!-- inject:css -->
     <!-- endinject -->
     <!-- Layout styles -->
+        <style>
+        .notification-icon {
+            position: relative; /* Required to position the badge */
+            display: inline-block; /* Allow the badge to be inline with the icon */
+            cursor: pointer; /* Change the cursor to a pointer to indicate clickability */
+            padding: 10px; /* Add some padding around the icon */
+        }
+
+        .badge {
+            position: absolute; /* To place it relative to the icon */
+            top: -5px; /* Adjust this to move the badge above the icon */
+            right: -10px; /* Adjust to move the badge to the right position */
+            background-color: red; /* Red to highlight */
+            color: white; /* White text for contrast */
+            padding: 3px 7px; /* Padding for the badge */
+            border-radius: 50%; /* Rounded edges for the badge */
+            font-size: 12px; /* Smaller text */
+        }
+
+        .notification-bell {
+            font-size: 24px; /* Increase the size of the bell icon */
+        }
+    </style>
     <link rel="stylesheet" href="assets/css/style.css">
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- jQuery -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> <!-- Bootstrap -->
     <!-- End layout styles -->
     <link rel="shortcut icon" href="assets/images/favicon.png" />
   </head>
@@ -286,6 +312,7 @@
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
                   <h6 class="p-3 mb-0">Notifications</h6>
                   <div class="dropdown-divider"></div>
+                  {% for notification in notifications %}
                   <a class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-dark rounded-circle">
@@ -293,34 +320,17 @@
                       </div>
                     </div>
                     <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Event today</p>
-                      <p class="text-muted ellipsis mb-0"> Just a reminder that you have an event today </p>
+                      <p class="preview-subject mb-1"> {{ notification.message }} </p>
+                      {% else %}
+                      <li>No new notifications.</li> <!-- Display a fallback message if no notifications are found -->
+                  {% endfor %}
                     </div>
                   </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-settings text-danger"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Settings</p>
-                      <p class="text-muted ellipsis mb-0"> Update dashboard </p>
-                    </div>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-link-variant text-warning"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Launch Admin</p>
-                      <p class="text-muted ellipsis mb-0"> New admin wow! </p>
-                    </div>
-                  </a>
+ 
+
+
+                 
+                  
                   <div class="dropdown-divider"></div>
                   <p class="p-3 mb-0 text-center">See all notifications</p>
                 </div>
@@ -367,45 +377,7 @@
             </button>
           </div>
         </nav>
-
-        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.0/main.min.js" integrity="sha256-DBxkGZLxKsLKhz054qUpBqtotG00r9AELGpSigJujLg=" crossorigin="anonymous"></script>
-       
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-        <!-- Modal pour afficher le calendrier -->
-        <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="calendarModalLabel">Calendrier des offres</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="calendrier"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
         
-       
-        <!-- Utilisez la variable JavaScript pour spécifier l'URL -->
-        <script>
-          $(document).ready(function() {
-              $('#calendarModal').on('shown.bs.modal', function () {
-                  // Chargez le calendrier dans le modal
-                  $('#calendrier').fullCalendar({
-                      // Configurations du calendrier ici...
-                      events: {
-                          url: afficherCalendrierUrl, // Utilisation de la variable JavaScript
-                          method: 'GET'
-                      }
-                  });
-              });
-          });
-        </script>
-
             
            <!-- partial -->
 <div class="main-panel">
@@ -427,6 +399,8 @@
                         <div class="col-md-6">
                             <h4 class="card-title">Liste des Offres</h4>
                         </div>
+                      
+     
                         <!-- afficherOffre.html.twig -->
                         <div class="col-md-6 text-right">
                           <a href="{{ path('export_offres') }}" class="btn btn-secondary">Exporter les Offres en PDF</a>

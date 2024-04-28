@@ -1,0 +1,6 @@
+mercure:
+  hubs:
+    default:
+      url: 'https://your-mercure-server.example/hub'
+      jwt:
+        secret: 'your-mercure-jwt-secret'  # Remplacez par votre secret JWT

@@ -102,7 +102,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- end header -->
+	
 
 	<!-- search area -->
 	<div class="search-area">
@@ -140,7 +140,27 @@
 	<!-- products -->
 	<div class="product-section mt-150 mb-150">
 		<div class="container">
+    <link rel="stylesheet" href="/front/assets/css/all.min.css">
+    <script src="/front/assets/js/jquery-1.11.3.min.js"></script>
+	<div class="notification-section">
+  <!-- Notification Bell Icon -->
+    <div class="notification-icon" id="notification-icon">
+        <i class="fas fa-bell"></i>
+        <span class="badge" id="notification-count">notification</span> <!-- Example count -->
+    </div>
 
+    <!-- Dropdown for Notifications -->
+    <div class="notification-dropdown" id="notification-dropdown">
+        <ul>
+        {% for notification in notifications %}
+            <li>
+                {{ notification.message }} <!-- Display the notification message -->
+            </li>
+        {% else %}
+            <li>No new notifications.</li> <!-- Display a fallback message if no notifications are found -->
+        {% endfor %}
+        </ul>
+    </div>
 			<div class="row">
                 <div class="col-md-12">
                     <div class="product-filters">
@@ -165,12 +185,90 @@
 {% endfor %}
 		<div  id="product-lists" class="row product-lists">
 			{% for produit in produits %}
+			
 			<div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-box text-center">
 				<div class="single-product-item">
 					<div class="product-image">
 						<img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="">
 					</div>
 					<h3>{{ produit.nomproduit }}</h3>
+					                       <div class="product-rating">
+                            {% if produit.rating is defined %}
+                            {% for i in range(1, 5) %}
+                                <!-- Render filled stars for the current rating -->
+                                <i class="{% if i <= produit.rating %}fas fa-star{% else %}far fa-star{% endif %}"></i>
+                            {% endfor %}
+                            {% else %}
+                                <p>No ratings available</p>
+                            {% endif %}
+                        </div>
+						<div class="product-interactions">
+    <!-- Like and Dislike buttons with JavaScript events -->
+    <button class="like-btn" id="like-btn-{{ produit.idproduit }}" onclick="likeProduct({{ produit.idproduit }})">
+        <i class="fas fa-thumbs-up"></i> Like
+    </button>
+    <button class="dislike-btn" id="dislike-btn-{{ produit.idproduit }}" onclick="dislikeProduct({{ produit.idproduit }})">
+        <i class="fas fa-thumbs-down"></i> Dislike
+    </button>
+</div>
+
+<script>
+// Function to handle "like" action for a product
+function likeProduct(productId) {
+    // Send POST request to the backend endpoint for liking the product
+    fetch(`/produit/like/${productId}`, {
+        method: 'POST'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If the request was successful, update the UI or show a message
+            document.getElementById(`like-btn-${productId}`).classList.add('active');
+            alert('Product liked successfully');
+        } else {
+            // If there was an error, handle it
+            alert('Error liking product');
+        }
+    })
+    .catch(error => {
+        // Handle network errors
+        console.error('Error:', error);
+        alert('An error occurred while liking the product.');
+    });
+}
+
+// Function to handle "dislike" action for a product
+function dislikeProduct(productId) {
+    // Send POST request to the backend endpoint for disliking the product
+    fetch(`/produit/dislike/${productId}`, {
+        method: 'POST'
+    })
+    .then(response => {
+        if (response.ok) {
+            // If the request was successful, update the UI or show a message
+            document.getElementById(`dislike-btn-${productId}`).classList.add('active');
+            alert('Product disliked successfully');
+        } else {
+            // If there was an error, handle it
+            alert('Error disliking product');
+        }
+    })
+    .catch(error => {
+        // Handle network errors
+        console.error('Error:', error);
+        alert('An error occurred while disliking the product.');
+    });
+}
+</script>
+
+	    <a href="#" class="notification-icon" id="notification-icon" data-toggle="dropdown">
+        <i class="fas fa-bell"></i>
+        <span id="notification-count" class="badge">0</span> <!-- Default to 0 -->
+    </a>
+
+    <!-- Dropdown for notifications -->
+    <div class="dropdown-menu" aria-labelledby="notification-icon" id="notification-dropdown">
+        <!-- This is where the unread notifications will be displayed -->
+    </div>
 					<p class="product-price"><span>Stock: {{ produit.quantite }}</span> {{ produit.prix | number_format(3, '.', ' ') }} DT</p>
 					{% if produit.offre is null %}
 						{# Si le produit n'a pas d'offre #}
@@ -339,6 +437,27 @@
 	<script src="/front/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="/front/assets/js/main.js"></script>
+  <script>
+        // JavaScript to toggle the visibility of the notification dropdown
+        document.getElementById('notification-icon').addEventListener('click', function () {
+            const dropdown = document.getElementById('notification-dropdown');
+            if (dropdown.style.display === 'none' || !dropdown.style.display) {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
 
+        // Optional: Close the dropdown if clicked outside
+        document.addEventListener('click', function (event) {
+            const isClickInside = document.getElementById('notification-icon').contains(event.target);
+            if (!isClickInside) {
+                document.getElementById('notification-dropdown').style.display = 'none';
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- jQuery -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> <!-- Bootstrap -->
 </body>
 </html>

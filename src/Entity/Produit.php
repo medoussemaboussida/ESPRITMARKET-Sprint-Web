@@ -36,6 +36,11 @@ class Produit
     private $quantite;
 
     /**
+     * @ORM\Column(name="rating", type="float", nullable=true)
+     */
+    private $rating=0;
+
+    /**
      * @var float
      *
      * @ORM\Column(name="prix", type="float", precision=10, scale=0, nullable=false)
@@ -90,6 +95,18 @@ class Produit
     public function setNomproduit(string $nomproduit): static
     {
         $this->nomproduit = $nomproduit;
+
+        return $this;
+    }
+
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): static
+    {
+        $this->rating = $rating;
 
         return $this;
     }

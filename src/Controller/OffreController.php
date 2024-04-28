@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Offre;
+use App\Entity\Notification;
 use App\Form\OffreType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,6 +26,8 @@ use App\Service\PDFExporterService;
 use SebastianBergmann\Environment\Console;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
+use App\Entity\Utilisateur;
+use Doctrine\ORM\EntityManagerInterface;
 
 class OffreController extends AbstractController
 {
@@ -89,67 +93,67 @@ public function afficherOffresCalendrier(): Response
 
 
 #[Route('/ajouter-offre', name: 'ajouter_offre')]
-public function ajouterOffre(Request $request,FlashBagInterface $flashBag): Response
+public function ajouterOffre(Request $request, EntityManagerInterface $em, FlashBagInterface $flashBag): Response
 {
     $offre = new Offre();
     $form = $this->createForm(OffreType::class, $offre);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer les produits sélectionnés
-        $produits = $form->get('produits')->getData();
-
-        // Associer chaque produit à l'offre
-        foreach ($produits as $produit) {
-            if ($produit->getOffre() !== null) {
-                // Si le produit est déjà associé à une autre offre, ajoutez un flash message
-                $flashBag->add('error', 'Parmi les produits sélectionnés, il existe un produit déjà affecté à une autre offre.');
-                
-                // Redirigez l'utilisateur vers la page d'ajout d'offre pour lui permettre de corriger
-                return $this->redirectToRoute('ajouter_offre');
-            }
-        }
+        // Handle uploaded image if needed
         /** @var UploadedFile $image */
         $image = $form->get('imageoffre')->getData();
-
-        // Vérifiez si une image a été téléchargée
         if ($image) {
-            // Générez un nom de fichier unique
-            $nomFichier = md5(uniqid()).'.'.$image->guessExtension();
-
-            // Déplacez le fichier vers le répertoire public/images
-            $image->move(
-                $this->getParameter('images_directory'), // Le chemin vers votre répertoire Images dans le dossier public
-                $nomFichier
-            );
-
-            // Définir le nom du fichier de l'image de catégorie dans l'entité
-            $offre->setImageoffre($nomFichier);
+            $fileName = md5(uniqid()) . '.' . $image->guessExtension();
+            $image->move($this->getParameter('images_directory'), $fileName);
+            $offre->setImageoffre($fileName);
         }
 
-        // Enregistrez la catégorie dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($offre);
-        $entityManager->flush();
+        // Persist the new offer
+        $em->persist($offre);
+        $em->flush();
 
+        // Create a new notification when a new offer is created
+        $notification = new Notification();
+        $notification->setMessage("A new offer has been created: " . $offre->getNomoffre());
+        $notification->setCreatedAt(new \DateTime());
+        $notification->setIsRead(false); // Default to unread
+
+        $em->persist($notification);
+        $em->flush();
+
+        // Add a flash message for successful offer creation
         $this->addFlash('success', 'Offre ajoutée avec succès.');
 
-        // Redirigez l'utilisateur après l'ajout réussi
+        // Redirect after successful creation
         return $this->redirectToRoute('afficher_offres');
     }
 
-    // Récupérer tous les produits depuis la base de données
-    $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
-
-    // Affichage du formulaire
     return $this->render('offre/ajouter.html.twig', [
         'form' => $form->createView(),
-        'produits' => $produits, // Passer les produits au modèle Twig
     ]);
 }
+
 #[Route('/afficher-offres', name: 'afficher_offres')]
-public function afficherOffres(Request $request, OffreRepository $offreRepository): Response
+public function afficherOffres(Request $request, OffreRepository $offreRepository, SessionInterface $session): Response
 {
+        // // Récupérer l'ID de l'utilisateur à partir de la session
+        // $userId = $session->get('iduser');
+    
+        // // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
+        // if (!$userId) {
+        //     // Redirection vers la page de connexion
+        //     return $this->redirectToRoute('app_login'); // Remplacez 'login' par le nom de votre route de connexion
+        // }
+    
+        // Récupérer l'utilisateur à partir de l'ID
+        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find(1);
+        $notifications = $this->getDoctrine()->getRepository(Notification::class)->findAll();
+    
+        // Vérifier si l'utilisateur existe
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        } 
     // Récupération des critères de filtrage
     $searchQuery = $request->query->get('search_query');
     $sortBy = $request->query->get('sort_by', 'datedebut'); // Défaut tri par date de début
@@ -176,7 +180,9 @@ public function afficherOffres(Request $request, OffreRepository $offreRepositor
 
     return $this->render('offre/afficher.html.twig', [
         'offres' => $offres,
-        'sort_order' => $sortOrder
+        'sort_order' => $sortOrder,
+        'notifications' => $notifications,
+        
     ]);
 }
 
@@ -322,5 +328,21 @@ public function modifier(Request $request, int $id): Response {
 
         return $response; // Retourner la réponse
     }
-
+    
+    public function envoyerNotification(Offre $offre, PublisherInterface $publisher): void {
+        // Créez le message de notification
+        $data = [
+            'title' => 'Nouvelle Offre!',
+            'message' => "Une nouvelle offre a été ajoutée: {$offre->getNomoffre()}",
+            'details' => "Description: {$offre->getDescriptionoffre()}",
+        ];
+    
+        // Envoyer l'update à Mercure
+        $update = new Update(
+            '/notifications',  // Le sujet (endpoint) Mercure
+            json_encode($data)  // Les données à envoyer
+        );
+    
+        $publisher($update);
+    }
 }
