@@ -40,7 +40,7 @@ class UtilisateurController extends AbstractController
             if ($user->getRole() === 'Admin') {
                 return $this->redirectToRoute('afficher_offres'); // Redirection vers la page admin_page
             } elseif ($user->getRole() === 'Client') {
-                return $this->redirectToRoute('afficher_offres'); // Redirection vers la page dons_page
+                return $this->redirectToRoute('app_produit_front'); // Redirection vers la page dons_page
             }
         } else {
             // Si les informations de connexion sont incorrectes, afficher un message d'erreur

@@ -14,6 +14,7 @@ use App\Repository\PanierRepository;
 use App\Form\CodePromoType;
 use App\Entity\Codepromo;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ProduitcartController extends AbstractController
 {
@@ -67,8 +68,24 @@ class ProduitcartController extends AbstractController
   //ajouter un produit a votre panier
   #[Route('/produitcart/ajouter/{idProduit}/{idUser}', name: 'app_produit_cart')]
  
-  public function ajouter(Request $request, $idProduit, $idUser): Response
+  public function ajouter(Request $request, $idProduit, $idUser,SessionInterface $session): Response
   {
+    // Récupérer l'ID de l'utilisateur à partir de la session
+    $userId = $session->get('iduser');
+    
+    // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
+    if (!$userId) {
+        // Redirection vers la page de connexion
+        return $this->redirectToRoute('app_login'); // Remplacez 'login' par le nom de votre route de connexion
+    }
+
+    // Récupérer l'utilisateur à partir de l'ID
+    $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
+    // Vérifier si l'utilisateur existe
+    if (!$utilisateur) {
+        throw $this->createNotFoundException('Utilisateur non trouvé.');
+    } 
      //chercher le panier de user passé en parametre
       $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
       //chercher le produit passe en parametre
@@ -94,9 +111,25 @@ class ProduitcartController extends AbstractController
  
      //afficher la panier avec les produits choisis
      #[Route('/produitcart/afficher-panier/{idUser}', name: 'afficher_produit_panier')]
-     public function afficherPanier($idUser, Request $request): Response
+     public function afficherPanier($idUser, Request $request,SessionInterface $session): Response
      {
 
+    // Récupérer l'ID de l'utilisateur à partir de la session
+    $userId = $session->get('iduser');
+    
+    // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
+    if (!$userId) {
+        // Redirection vers la page de connexion
+        return $this->redirectToRoute('app_login'); // Remplacez 'login' par le nom de votre route de connexion
+    }
+
+    // Récupérer l'utilisateur à partir de l'ID
+    $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
+    // Vérifier si l'utilisateur existe
+    if (!$utilisateur) {
+        throw $this->createNotFoundException('Utilisateur non trouvé.');
+    } 
          //user : 7atita hakeka bech najem navigi 
          $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
  
@@ -176,53 +209,5 @@ class ProduitcartController extends AbstractController
  
          ]);
      }
-
-/*afficher la panier avec les produits choisis
-#[Route('/produitcart/afficher-panier-with-code/{idUser}', name: 'afficher_produit_panier_with_code')]
-public function afficherPanierCode($idUser): Response
-{
-    //user : 7atita hakeka bech najem navigi 
-    $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
-
-    // Récupérer le panier de l'utilisateur spécifié en parametre 
-    $panier = $this->getDoctrine()->getRepository(Panier::class)->findOneBy(['iduser' => $idUser]);
-    $produitCartRepository = $this->getDoctrine()->getRepository(Produitcart::class);
-    $produitsDansPanier = $produitCartRepository->findBy(['idpanier' => $panier]);
-
-    //selectionner produitcart selon panier specifique
-    $produitCart = $this->getDoctrine()->getRepository(Produitcart::class)->findBy(['idpanier' => $panier]);
-
-    //calcul montant facture
-    $totalPrix = 0;
-    // Parcourez chaque produit et ajoutez son prix au total
-    foreach ($produitCart as $produit) {
-        $totalPrix += $produit->getIdproduit()->getPrix(); 
-    }
-    
-
-    $quantite = [];
-    $produitsUniques = [];
-
-    // Parcourir chaque produit dans le produitcart et si un produit se repete plusieurs fois , on stocke dans variable quantite , et affiche ce produit une seule fois dans le tableau
-    foreach ($produitCart as $produit) {
-    
-        if (array_key_exists($produit->getIdproduit()->getIdproduit(), $quantite)) {
-            $quantite[$produit->getIdproduit()->getIdproduit()]++;
-        } else {
-            $quantite[$produit->getIdproduit()->getIdproduit()] = 1;
-            $produitsUniques[$produit->getIdproduit()->getIdproduit()] = $produit->getIdproduit();
-        }
-    }
-
-    return $this->render('produitcart/panierCode.html.twig', [
-        'produitsUniques' => $produitsUniques,
-        'produitsDansPanier' => $produitsDansPanier,
-        'panier' => $panier,
-        'totalPrix' => $totalPrix,
-        'quantite' => $quantite, // Passer le tableau de quantité à la vue
-        'user'=> $user,
-
-    ]);
-}*/
 
 }

@@ -14,6 +14,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\MailerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Entity\Notification;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 
 class CodeController extends AbstractController
 {
@@ -33,6 +36,15 @@ class CodeController extends AbstractController
         $entityManager->persist($code);
         $entityManager->flush();
 
+         // Create a new notification when a new offer is created
+         $notification = new Notification();
+         $notification->setMessage("A new code promo has been created: " . $code->getCode());
+         $notification->setCreatedAt(new \DateTime());
+         $notification->setIsRead(false); // Default to unread
+
+         $entityManager->persist($notification);
+         $entityManager->flush();
+
         $this->addFlash('success', 'Code promo ajoutée avec succès.');
 
         // Redirigez l'utilisateur après l'ajout réussi
@@ -49,8 +61,26 @@ class CodeController extends AbstractController
 }
 
     #[Route('/afficher-codes', name: 'afficher_codes')]
-    public function afficherCodes(Request $request, CodeRepository $codeRepository): Response
+    public function afficherCodes(Request $request, CodeRepository $codeRepository,SessionInterface $session): Response
     {
+        // Récupérer l'ID de l'utilisateur à partir de la session
+        $userId = $session->get('iduser');
+    
+        // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
+        if (!$userId) {
+            // Redirection vers la page de connexion
+            return $this->redirectToRoute('app_login'); // Remplacez 'login' par le nom de votre route de connexion
+        }
+    
+        // Récupérer l'utilisateur à partir de l'ID
+        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+    
+        // Vérifier si l'utilisateur existe
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        } 
+        $notifications = $this->getDoctrine()->getRepository(Notification::class)->findAll();
+
         $searchQuery = $request->query->get('search_query', '');  // Rechercher par nom de code
         $sortBy = $request->query->get('sort_by', 'datedebut');    // Champ de tri par défaut
         $sortOrder = $request->query->get('sort_order', 'asc');    // Ordre de tri par défaut
@@ -70,6 +100,8 @@ class CodeController extends AbstractController
             'codes' => $codes,
             'sort_by' => $sortBy,
             'sort_order' => $sortOrder,
+            'notifications' => $notifications,
+
         ]);
     }
     

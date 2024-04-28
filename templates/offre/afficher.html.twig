@@ -425,8 +425,7 @@
                                 <tbody>
                                   {% for offre in offres  %}
                                   <tr>
-                                        <td>{{ offre.descriptionoffre }}</td>
-                                        <td>{{ offre.nomoffre }}</td>
+                                    <td>{{ offre.descriptionoffre|length > 35 ? offre.descriptionoffre|slice(0, 35) ~ '...' : offre.descriptionoffre }}</td>                                        <td>{{ offre.nomoffre }}</td>
                                         <td>{{ offre.datedebut|date('Y-m-d') }}</td>
                                         <td>{{ offre.datefin|date('Y-m-d') }}</td>
                                         <td>{{ offre.reduction }}%</td>

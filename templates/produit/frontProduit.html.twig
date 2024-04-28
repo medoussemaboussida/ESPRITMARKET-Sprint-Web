@@ -192,78 +192,57 @@
 						<img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="">
 					</div>
 					<h3>{{ produit.nomproduit }}</h3>
-					                       <div class="product-rating">
-                            {% if produit.rating is defined %}
-                            {% for i in range(1, 5) %}
-                                <!-- Render filled stars for the current rating -->
-                                <i class="{% if i <= produit.rating %}fas fa-star{% else %}far fa-star{% endif %}"></i>
-                            {% endfor %}
-                            {% else %}
-                                <p>No ratings available</p>
-                            {% endif %}
-                        </div>
-						<div class="product-interactions">
-    <!-- Like and Dislike buttons with JavaScript events -->
-    <button class="like-btn" id="like-btn-{{ produit.idproduit }}" onclick="likeProduct({{ produit.idproduit }})">
-        <i class="fas fa-thumbs-up"></i> Like
-    </button>
-    <button class="dislike-btn" id="dislike-btn-{{ produit.idproduit }}" onclick="dislikeProduct({{ produit.idproduit }})">
-        <i class="fas fa-thumbs-down"></i> Dislike
-    </button>
-</div>
+					    
 
-<script>
-// Function to handle "like" action for a product
-function likeProduct(productId) {
-    // Send POST request to the backend endpoint for liking the product
-    fetch(`/produit/like/${productId}`, {
-        method: 'POST'
-    })
-    .then(response => {
-        if (response.ok) {
-            // If the request was successful, update the UI or show a message
-            document.getElementById(`like-btn-${productId}`).classList.add('active');
-            alert('Product liked successfully');
-        } else {
-            // If there was an error, handle it
-            alert('Error liking product');
-        }
-    })
-    .catch(error => {
-        // Handle network errors
-        console.error('Error:', error);
-        alert('An error occurred while liking the product.');
-    });
-}
+						<script>
+						// Function to handle "like" action for a product
+						function likeProduct(productId) {
+							// Send POST request to the backend endpoint for liking the product
+							fetch(`/produit/like/${productId}`, {
+								method: 'POST'
+							})
+							.then(response => {
+								if (response.ok) {
+									// If the request was successful, update the UI or show a message
+									document.getElementById(`like-btn-${productId}`).classList.add('active');
+									alert('Product liked successfully');
+								} else {
+									// If there was an error, handle it
+									alert('Error liking product');
+								}
+							})
+							.catch(error => {
+								// Handle network errors
+								console.error('Error:', error);
+								alert('An error occurred while liking the product.');
+							});
+						}
 
-// Function to handle "dislike" action for a product
-function dislikeProduct(productId) {
-    // Send POST request to the backend endpoint for disliking the product
-    fetch(`/produit/dislike/${productId}`, {
-        method: 'POST'
-    })
-    .then(response => {
-        if (response.ok) {
-            // If the request was successful, update the UI or show a message
-            document.getElementById(`dislike-btn-${productId}`).classList.add('active');
-            alert('Product disliked successfully');
-        } else {
-            // If there was an error, handle it
-            alert('Error disliking product');
-        }
-    })
-    .catch(error => {
-        // Handle network errors
-        console.error('Error:', error);
-        alert('An error occurred while disliking the product.');
-    });
-}
-</script>
+						// Function to handle "dislike" action for a product
+						function dislikeProduct(productId) {
+							// Send POST request to the backend endpoint for disliking the product
+							fetch(`/produit/dislike/${productId}`, {
+								method: 'POST'
+							})
+							.then(response => {
+								if (response.ok) {
+									// If the request was successful, update the UI or show a message
+									document.getElementById(`dislike-btn-${productId}`).classList.add('active');
+									alert('Product disliked successfully');
+								} else {
+									// If there was an error, handle it
+									alert('Error disliking product');
+								}
+							})
+							.catch(error => {
+								// Handle network errors
+								console.error('Error:', error);
+								alert('An error occurred while disliking the product.');
+							});
+						}
+						</script>
 
-	    <a href="#" class="notification-icon" id="notification-icon" data-toggle="dropdown">
-        <i class="fas fa-bell"></i>
-        <span id="notification-count" class="badge">0</span> <!-- Default to 0 -->
-    </a>
+	   
 
     <!-- Dropdown for notifications -->
     <div class="dropdown-menu" aria-labelledby="notification-icon" id="notification-dropdown">
@@ -282,7 +261,26 @@ function dislikeProduct(productId) {
 						</p>
 					{% endif %}
 
-					
+					<div class="product-rating">
+						{% if produit.rating is defined %}
+						{% for i in range(1, 5) %}
+							<!-- Render filled stars for the current rating -->
+							<i class="{% if i <= produit.rating %}fas fa-star{% else %}far fa-star{% endif %}"></i>
+						{% endfor %}
+						{% else %}
+							<p>No ratings available</p>
+						{% endif %}
+					</div>
+					<div class="product-interactions">
+					<!-- Like and Dislike buttons with JavaScript events -->
+					<button class="like-btn" id="like-btn-{{ produit.idproduit }}" onclick="likeProduct({{ produit.idproduit }})">
+						<i class="fas fa-thumbs-up"></i> Like
+					</button>
+					<button class="dislike-btn" id="dislike-btn-{{ produit.idproduit }}" onclick="dislikeProduct({{ produit.idproduit }})">
+						<i class="fas fa-thumbs-down"></i> Dislike
+					</button>
+				</div>
+				<br>
 					<a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 				</div>
 			</div>

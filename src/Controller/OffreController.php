@@ -100,6 +100,19 @@ public function ajouterOffre(Request $request, EntityManagerInterface $em, Flash
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+         // Récupérer les produits sélectionnés
+         $produits = $form->get('produits')->getData();
+
+         // Associer chaque produit à l'offre
+         foreach ($produits as $produit) {
+             if ($produit->getOffre() !== null) {
+                 // Si le produit est déjà associé à une autre offre, ajoutez un flash message
+                 $flashBag->add('error', 'Parmi les produits sélectionnés, il existe un produit déjà affecté à une autre offre.');
+                 
+                 // Redirigez l'utilisateur vers la page d'ajout d'offre pour lui permettre de corriger
+                 return $this->redirectToRoute('ajouter_offre');
+             }
+         }
         // Handle uploaded image if needed
         /** @var UploadedFile $image */
         $image = $form->get('imageoffre')->getData();
@@ -137,23 +150,24 @@ public function ajouterOffre(Request $request, EntityManagerInterface $em, Flash
 #[Route('/afficher-offres', name: 'afficher_offres')]
 public function afficherOffres(Request $request, OffreRepository $offreRepository, SessionInterface $session): Response
 {
-        // // Récupérer l'ID de l'utilisateur à partir de la session
-        // $userId = $session->get('iduser');
+         
+        // Récupérer l'ID de l'utilisateur à partir de la session
+        $userId = $session->get('iduser');
     
-        // // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
-        // if (!$userId) {
-        //     // Redirection vers la page de connexion
-        //     return $this->redirectToRoute('app_login'); // Remplacez 'login' par le nom de votre route de connexion
-        // }
+        // Si aucun ID utilisateur n'est stocké en session, rediriger vers la page de connexion
+        if (!$userId) {
+            // Redirection vers la page de connexion
+            return $this->redirectToRoute('app_login'); // Remplacez 'login' par le nom de votre route de connexion
+        }
     
         // Récupérer l'utilisateur à partir de l'ID
-        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find(1);
-        $notifications = $this->getDoctrine()->getRepository(Notification::class)->findAll();
+        $utilisateur = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
     
         // Vérifier si l'utilisateur existe
         if (!$utilisateur) {
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         } 
+        $notifications = $this->getDoctrine()->getRepository(Notification::class)->findAll();
     // Récupération des critères de filtrage
     $searchQuery = $request->query->get('search_query');
     $sortBy = $request->query->get('sort_by', 'datedebut'); // Défaut tri par date de début
