@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.3.1",
+    "jspdf": "^2.5.1"
+  }
+}

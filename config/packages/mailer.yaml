@@ -1,0 +1,6 @@
+framework:
+    mailer:
+        dsn: 'gmail+smtp://yassinedhahbi65%40gmail.com:iotjbgqfflablwsl@default'
+
+        
+

@@ -1,0 +1,18 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+app_publication:
+    path: /publication/Listpublication
+    controller: App\Controller\PublicationController::index
+
+app_login:
+    path: /login
+    controller: App\Controller\UtilisateurController::login
+
+app_utilisateur:
+    path: /utilisateur
+    controller: App\Controller\UtilisateurController::index
+
+change_language:
+    path: '/change-language/{_locale}'
+    controller: 'App\Controller\LanguageController::changeLanguage'

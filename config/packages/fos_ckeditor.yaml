@@ -1,0 +1,8 @@
+twig:
+    form_themes:
+        - '@FOSCKEditor/Form/ckeditor_widget.html.twig'
+
+fos_ck_editor:
+    input_sync: true
+    js_path: "%kernel.project_dir%/public/js/ckeditor.js"
+    default_config: default_toolbar
