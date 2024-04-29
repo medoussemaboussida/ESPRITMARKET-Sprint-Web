@@ -113,6 +113,12 @@ public function ajouterOffre(Request $request, EntityManagerInterface $em, Flash
                  return $this->redirectToRoute('ajouter_offre');
              }
          }
+         // Associer chaque produit à l'offre
+            foreach ($produits as $produit) {
+                $produit->setOffre($offre);
+                $em->persist($produit); // Persister chaque produit associé à l'offre
+            }
+
         // Handle uploaded image if needed
         /** @var UploadedFile $image */
         $image = $form->get('imageoffre')->getData();
@@ -141,9 +147,13 @@ public function ajouterOffre(Request $request, EntityManagerInterface $em, Flash
         // Redirect after successful creation
         return $this->redirectToRoute('afficher_offres');
     }
-
+    // Récupérer tous les produits depuis la base de données
+    $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
+    
     return $this->render('offre/ajouter.html.twig', [
         'form' => $form->createView(),
+        'produits' => $produits, // Passer les produits au modèle Twig
+
     ]);
 }
 
