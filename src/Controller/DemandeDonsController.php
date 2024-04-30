@@ -100,22 +100,25 @@ class DemandeDonsController extends AbstractController
         $filterSort = $request->query->get('filter_sort');
         $filter = null;
         $sort = null;
-    
+        
         // Analyser les paramètres de filtre et de tri
         if ($filterSort) {
             if ($filterSort === 'alphabetical') {
-                $sort = 'nom'; // Changer "nom" par le champ approprié dans votre entité Demandedons
+                $filter = 'alphabetical';
             } elseif ($filterSort === 'date') {
-                $sort = 'datePublication'; // Changer "datePublication" par le champ approprié dans votre entité Demandedons
+                $filter = 'date';
             } elseif ($filterSort === 'asc') {
-                $sort = 'asc'; // Changer "asc" par le tri approprié
+                $sort = 'asc';
             } elseif ($filterSort === 'desc') {
-                $sort = 'desc'; // Changer "desc" par le tri approprié
+                $sort = 'desc';
             }
         }
-    
+        
         // Récupérer les demandes de dons en fonction du filtre et du tri
         $demandes = $demandedonsRepository->findFilteredAndSorted($filter, $sort);
+        
+    
+        // Récupérer les demandes de dons en fonction du filtre et du tri
     
         // Paginer les résultats
         $demandesPaginated = $paginator->paginate(

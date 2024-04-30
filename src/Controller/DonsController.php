@@ -448,9 +448,10 @@ public function backDons(DonsRepository $donsRepository, Request $request, Sessi
         // Récupérer l'utilisateur ayant effectué le plus de dons
     
         // Récupérer l'e-mail de la requête
-        $email = $request->query->get('email');
         $nomUtilisateur = $utilisateur->getNomuser();
         $prenomUtilisateur = $utilisateur->getPrenomuser();
+        $email = $request->query->get('email');
+
 
         // Si un e-mail est fourni, récupérer les dons par cet e-mail
         if ($email) {
@@ -487,17 +488,4 @@ public function backDons(DonsRepository $donsRepository, Request $request, Sessi
 
 }
 
-/**
- * @Route("/search", name="search")
- */
-public function search(Request $request): Response
-{
-    // Récupérer le terme de recherche de la requête
-    $email = $request->query->get('email');
-
-    // Effectuer la recherche dans la base de données
-    $results = $this->getDoctrine()->getRepository(Dons::class)->findDonsByEmail($email);
-
-    // Transformer les résultats en format JSON et les renvoyer
-    return $this->json($results);
-}}
+}

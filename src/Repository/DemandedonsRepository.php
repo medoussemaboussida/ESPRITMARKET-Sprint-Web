@@ -70,23 +70,26 @@ public function findAllOrderedByPoints($sortDirection)
     public function findFilteredAndSorted($filter, $sort)
     {
         $queryBuilder = $this->createQueryBuilder('d');
-
+    
         // Ajouter les conditions de filtrage
         if ($filter === 'alphabetical') {
             $queryBuilder->orderBy('d.contenu', 'ASC');
         } elseif ($filter === 'date') {
             $queryBuilder->orderBy('d.datePublication', 'ASC');
         }
-
-        // Ajouter les conditions de tri
-        if ($sort === 'asc') {
-            $queryBuilder->orderBy('d.nbpoints', 'ASC');
-        } elseif ($sort === 'desc') {
-            $queryBuilder->orderBy('d.nbpoints', 'DESC');
+    
+        // Ajouter les conditions de tri uniquement si aucun filtre n'est appliqué
+        if (!$filter) {
+            if ($sort === 'asc') {
+                $queryBuilder->orderBy('d.nbpoints', 'ASC');
+            } elseif ($sort === 'desc') {
+                $queryBuilder->orderBy('d.nbpoints', 'DESC');
+            }
         }
-
+    
         return $queryBuilder->getQuery()->getResult();
     }
+    
 
     // DemandedonsRepository.php
 
