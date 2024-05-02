@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="/back/assets/vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/owl-carousel-2/owl.carousel.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
@@ -83,6 +85,14 @@
           <li class="nav-item nav-category">
             <span class="nav-link">Navigation</span>
           </li>
+            <li class="nav-item menu-items">
+            <a class="nav-link" href="/users">
+              <span class="menu-icon">
+                <i class="mdi mdi-speedometer"></i>
+              </span>
+              <span class="menu-title">Utilisateurs</span>
+            </a>
+          </li>
           <li class="nav-item menu-items">
             <a class="nav-link" href="/categorie/ajouter">
               <span class="menu-icon">
@@ -91,7 +101,7 @@
               <span class="menu-title">Categorie</span>
             </a>
           </li>
-          <li class="nav-item menu-items">
+          <li class="nav-item menu-items active">
             <a class="nav-link" href="/produit/ajouter">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
@@ -109,9 +119,9 @@
             </a>
           </li>
           
-          <!--dons sidebar-->
+     <!--dons sidebar-->
           <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/admin/dons">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -120,7 +130,7 @@
           </li>
 
            <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/admin/demandedons">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -130,7 +140,7 @@
 
           <!--Publication commentaire sidebar-->
            <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link"  href="../../publication/Listpublication">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -147,18 +157,17 @@
             </a>
           </li>
 
-          <!--Offre codepromo sidebar-->
+     <!--Offre codepromo sidebar-->
            <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/afficher-offres">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
               <span class="menu-title">Offre</span>
             </a>
           </li>
-
-          <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+           <li class="nav-item menu-items">
+            <a class="nav-link" href="/afficher-codes">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -167,8 +176,8 @@
           </li>
  
           <!--evenement reclamation sidebar-->
-           <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+   <li class="nav-item menu-items ">
+            <a class="nav-link" href="/evenement/back/event">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -177,7 +186,7 @@
           </li>
 
           <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/reclamation/back">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -261,8 +270,10 @@ $(document).ready(function() {
             
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
-                <a class="nav-link btn btn-success create-new-button" id="createbuttonDropdown"  href="{{ path('app_logout') }}" data-toggle="dropdown" aria-expanded="false" href="#">Logout</a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
+<a class="btn btn-danger" id="createbuttonDropdown" href="{{ path('app_logout') }}" data-toggle="dropdown" aria-expanded="false">
+    <i class="fas fa-sign-out-alt mr-2"></i> <!-- Ajoute une icône de déconnexion -->
+    Logout
+</a>                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
                   <h6 class="p-3 mb-0">Projects</h6>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item preview-item">
@@ -398,7 +409,7 @@ $(document).ready(function() {
                 <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
                   <div class="navbar-profile">
                     <img class="img-xs rounded-circle" src="/back/assets/images/faces/face15.jpg" alt="">
-                    <p class="mb-0 d-none d-sm-block navbar-profile-name">{{ user.prenomuser}}</p>
+                    <p class="mb-0 d-none d-sm-block navbar-profile-name"></p>
                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                   </div>
                   

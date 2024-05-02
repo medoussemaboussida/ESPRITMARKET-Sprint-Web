@@ -4,66 +4,37 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\EvenementRepository;
 
-/**
- * Evenement
- *
- * @ORM\Table(name="evenement")
- * @ORM\Entity
- */
+#[ORM\Table(name: "evenement")]
+#[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id_ev", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "id_ev", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")] 
     private $idEv;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="nom_ev", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "nom_ev", type: "string", length: 255, nullable: false)]
     private $nomEv;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type_ev", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "type_ev", type: "string", length: 255, nullable: false)]
     private $typeEv;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
-     */
+    #[ORM\Column(name: "date", type: "date", nullable: false)]
     private $date;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="image_ev", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "image_ev", type: "string", length: 255, nullable: false)]
     private $imageEv;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description_ev", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "description_ev", type: "string", length: 255, nullable: false)]
     private $descriptionEv;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="code_participant", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: "code_participant", type: "integer", nullable: false)]
     private $codeParticipant;
 
+    #[ORM\Column(name: "nb_points", type: "integer", nullable: true)]
+    private int $nbPoints;
     public function getIdEv(): ?int
     {
         return $this->idEv;
@@ -141,5 +112,44 @@ class Evenement
         return $this;
     }
 
+/**
+     * @return Collection<int, Dons>
+     */
+    public function getDons(): Collection
+    {
+        return $this->dons;
+    }
 
+    public function addDon(Dons $don): static
+    {
+        if (!$this->dons->contains($don)) {
+            $this->dons->add($don);
+            $don->setEvenement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDon(Dons $don): static
+    {
+        if ($this->dons->removeElement($don)) {
+            // set the owning side to null (unless already changed)
+            if ($don->getEvenement() === $this) {
+                $don->setEvenement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getNbPoints(): ?int
+    {
+        return $this->nbPoints;
+    }
+
+    public function setNbPoints(int $nbPoints): static
+    {
+        $this->nbPoints = $nbPoints;
+        return $this;
+    }
 }

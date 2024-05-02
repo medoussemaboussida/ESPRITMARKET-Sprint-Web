@@ -1,69 +1,43 @@
 <?php
 
 namespace App\Entity;
-
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Dons
- *
- * @ORM\Table(name="dons", indexes={@ORM\Index(name="idUser", columns={"idUser"}), @ORM\Index(name="idDemande", columns={"idDemande"})})
- * @ORM\Entity
- */
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
+#[ORM\Table(name: "dons")]
+#[ORM\Entity]
 class Dons
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idDons", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "idDons", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $iddons;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="nbpoints", type="integer", nullable=true, options={"default"="NULL"})
-     */
-    private $nbpoints = NULL;
+    #[ORM\Column(name: "nbpoints", type: "integer", nullable: true)]
+    #[Assert\NotBlank(message:"L'objectif de points est obligatoire.")]
+    #[Assert\PositiveOrZero(message:"L'objectif de points doit être positif ou zéro.")]
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date_ajout", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     */
-    private $dateAjout = 'current_timestamp()';
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="etatStatutDons", type="string", length=255, nullable=true, options={"default"="NULL"})
-     */
-    private $etatstatutdons = 'NULL';
+    private $nbpoints;
 
-    /**
-     * @var \Utilisateur
-     *
-     * @ORM\ManyToOne(targetEntity="Utilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idUser", referencedColumnName="idUser")
-     * })
-     */
-    private $iduser;
+    #[ORM\Column(name: "date_ajout", type: "datetime", nullable: false)]
+    private $dateAjout;
 
-    /**
-     * @var \Demandedons
-     *
-     * @ORM\ManyToOne(targetEntity="Demandedons")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idDemande", referencedColumnName="idDemande")
-     * })
-     */
-    private $iddemande;
+    #[ORM\Column(name: "etatStatutDons", type: "string", length: 255, nullable: true)]
+    private $etatstatutdons;
 
-    public function getIddons(): ?int
+    #[ORM\ManyToOne(targetEntity: "Utilisateur")]
+    #[ORM\JoinColumn(name: "idUser", referencedColumnName: "idUser")]
+    private $idUser;
+
+    #[ORM\ManyToOne(targetEntity: "Evenement")]
+    #[ORM\JoinColumn(name: "idEv", referencedColumnName: "id_ev")]
+    private $idEv;
+
+    public function getIdDons(): ?int
     {
         return $this->iddons;
     }
@@ -73,7 +47,7 @@ class Dons
         return $this->nbpoints;
     }
 
-    public function setNbpoints(?int $nbpoints): static
+    public function setNbpoints(?int $nbpoints): self
     {
         $this->nbpoints = $nbpoints;
 
@@ -85,7 +59,7 @@ class Dons
         return $this->dateAjout;
     }
 
-    public function setDateAjout(\DateTimeInterface $dateAjout): static
+    public function setDateAjout(\DateTimeInterface $dateAjout): self
     {
         $this->dateAjout = $dateAjout;
 
@@ -97,36 +71,33 @@ class Dons
         return $this->etatstatutdons;
     }
 
-    public function setEtatstatutdons(?string $etatstatutdons): static
+    public function setEtatstatutdons(?string $etatstatutdons): self
     {
         $this->etatstatutdons = $etatstatutdons;
 
         return $this;
     }
 
-    public function getIduser(): ?Utilisateur
+    public function getIdUser(): ?Utilisateur
     {
-        return $this->iduser;
+        return $this->idUser;
     }
 
-    public function setIduser(?Utilisateur $iduser): static
+    public function setIdUser(?Utilisateur $idUser): self
     {
-        $this->iduser = $iduser;
+        $this->idUser = $idUser;
 
         return $this;
     }
-
-    public function getIddemande(): ?Demandedons
+    public function getIdEv(): ?Evenement
     {
-        return $this->iddemande;
+        return $this->idEv;
     }
 
-    public function setIddemande(?Demandedons $iddemande): static
+    public function setIdEv(?Evenement $idEv): self
     {
-        $this->iddemande = $iddemande;
+        $this->idEv = $idEv;
 
         return $this;
     }
-
-
 }

@@ -45,6 +45,13 @@ class Produit
     #[ORM\JoinColumn(name: "categorie_id", referencedColumnName: "idCategorie")]
     private $categorie;
 
+    #[ORM\Column(name: "rating", type: "float", nullable: true)]
+    private $rating = 0;
+
+    #[ORM\ManyToOne(targetEntity: Offre::class, inversedBy: "produits")]
+    #[ORM\JoinColumn(name: "offre_id", referencedColumnName: "idOffre")]
+    private $offre;
+
     public function getIdproduit(): ?int
     {
         return $this->idproduit;
@@ -106,6 +113,29 @@ class Produit
     public function setCategorie(?Categorie $categorie): static
     {
         $this->categorie = $categorie;
+
+        return $this;
+    }
+    public function getRating(): ?float
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?float $rating): static
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    public function getOffre(): ?Offre
+    {
+        return $this->offre;
+    }
+
+    public function setOffre(?Offre $offre): self
+    {
+        $this->offre = $offre;
 
         return $this;
     }

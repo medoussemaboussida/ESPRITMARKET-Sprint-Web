@@ -192,10 +192,11 @@ $prixEnYuan = $converter->convert($totalPrix, 'TND', 'CNY');
             $totalPrix += $produit->getIdproduit()->getPrix(); 
         }
         
-
-$prixEnEuros = $converter->convert($totalPrix, 'TND', 'EUR');
-$prixEnDollars = $converter->convert($totalPrix, 'TND', 'USD');
-$prixEnYuan = $converter->convert($totalPrix, 'TND', 'CNY');
+        foreach ($produitCart as $produit) {
+$prixEnEuros = $converter->convert($produit->getIdproduit()->getPrix(), 'TND', 'EUR');
+$prixEnDollars = $converter->convert($produit->getIdproduit()->getPrix(), 'TND', 'USD');
+$prixEnYuan = $converter->convert($produit->getIdproduit()->getPrix(), 'TND', 'CNY');
+}
 
 
         $quantite = [];

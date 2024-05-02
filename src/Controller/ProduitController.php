@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Hexaequo\CurrencyConverterBundle\Converter;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Entity\Notification;
 
 class ProduitController extends AbstractController
 {
@@ -264,6 +265,7 @@ $pagination = $this->paginator->paginate(
         $entityManager->flush();
 }
     $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
+    $notifications = $this->getDoctrine()->getRepository(Notification::class)->findAll();
     $prixEnEuros = []; // Tableau pour stocker les prix convertis en euros
     $prixEnDollars =[];
     $prixEnYuan=[];
@@ -282,6 +284,7 @@ $pagination = $this->paginator->paginate(
          'prixEnEuros' => $prixEnEuros,
          'prixEnDollars' => $prixEnDollars,
          'prixEnYuan' => $prixEnYuan,
+         'notifications' => $notifications,
 
 
     ]);
@@ -771,5 +774,52 @@ public function generatePdf(): Response
     
             // Rediriger l'utilisateur vers une autre page
             return $this->redirectToRoute('app_produit_ajouter');    
+    }
+
+    #[Route('/produit/like/{id}', name: 'app_produit_like', methods: ['POST'])]
+    public function likeProduct($id, EntityManagerInterface $em, Request $request): Response
+    {
+        // Find the product by ID
+        $produit = $em->getRepository(Produit::class)->find($id);
+
+        if (!$produit) {
+            // If product is not found, return an error response
+            return new Response("Product not found", 404);
+        }
+
+        // Increment the product's rating (simplified example, adjust as needed)
+        $currentRating = $produit->getRating() ?? 0;
+        $produit->setRating($currentRating + 1);
+
+        // Persist and flush changes to the database
+        $em->persist($produit);
+        $em->flush();
+
+        return new Response("Product liked", 200);
+    }
+
+    // Route to handle "dislike" action for a product
+    #[Route('/produit/dislike/{id}', name: 'app_produit_dislike', methods: ['POST'])]
+    public function dislikeProduct($id, EntityManagerInterface $em, Request $request): Response
+    {
+        // Find the product by ID
+        $produit = $em->getRepository(Produit::class)->find($id);
+
+        if (!$produit) {
+            // If product is not found, return an error response
+            return new Response("Product not found", 404);
+        }
+
+        // Decrement the product's rating (simplified example, adjust as needed)
+        $currentRating = $produit->getRating() ?? 0;
+        if ($currentRating > 0) {
+            $produit->setRating($currentRating - 1);
+        }
+
+        // Persist and flush changes to the database
+        $em->persist($produit);
+        $em->flush();
+
+        return new Response("Product disliked", 200);
     }
 }

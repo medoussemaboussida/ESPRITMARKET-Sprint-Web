@@ -68,15 +68,20 @@
 						<nav class="main-menu">
 							<ul>
 								<li><a href="{{path('app_produit')}}">Home</a></li>
-								<li><a href="">Dons</a></li>
-
-								<li><a href="">Evénements</a>
+								<li class="sub-menu"><a href="#">Dons</a>
 									<ul class="sub-menu">
-										<li><a href="">Evénements</a></li>
-										<li><a href="">Réclamation</a></li>
+                                        <li><a href='/dons'>Faire un don</a></li>
+										<li><a href='/demander_dons'>Demander dons</a></li>
+										
 									</ul>
 								</li>
-								<li><a href="">Publications</a></li>
+								<li ><a href="{{ path('app_evenement_front')}}">Evénements</a>
+									<ul class="sub-menu">
+										<li><a href="{{ path('app_evenement_front')}}">Evénements</a></li>
+										<li><a href="{{ path('app_reclamation_new')}}">Réclamation</a></li>
+									</ul>
+								</li>
+								<li><a href="{{path('front_publication')}}">Publications</a></li>
 
 								<li><a href="">Offres</a></li>
 
@@ -91,7 +96,9 @@
 										<a class="shopping-cart" href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 										<a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
-
+<a href="{{ path('app_profile_user') }}" class="btn btn-primary rounded-pill py-2 px-3">
+    <i class="fas fa-user"></i> <!-- Icône utilisateur -->
+</a>
 									</div>
 								</li>
 							</ul>
@@ -123,6 +130,53 @@
 			</div>
 		</div>
 	</div>
+							<script>
+						// Function to handle "like" action for a product
+						function likeProduct(productId) {
+							// Send POST request to the backend endpoint for liking the product
+							fetch(`/produit/like/${productId}`, {
+								method: 'POST'
+							})
+							.then(response => {
+								if (response.ok) {
+									// If the request was successful, update the UI or show a message
+									document.getElementById(`like-btn-${productId}`).classList.add('active');
+									alert('Product liked successfully');
+								} else {
+									// If there was an error, handle it
+									alert('Error liking product');
+								}
+							})
+							.catch(error => {
+								// Handle network errors
+								console.error('Error:', error);
+								alert('An error occurred while liking the product.');
+							});
+						}
+
+						// Function to handle "dislike" action for a product
+						function dislikeProduct(productId) {
+							// Send POST request to the backend endpoint for disliking the product
+							fetch(`/produit/dislike/${productId}`, {
+								method: 'POST'
+							})
+							.then(response => {
+								if (response.ok) {
+									// If the request was successful, update the UI or show a message
+									document.getElementById(`dislike-btn-${productId}`).classList.add('active');
+									alert('Product disliked successfully');
+								} else {
+									// If there was an error, handle it
+									alert('Error disliking product');
+								}
+							})
+							.catch(error => {
+								// Handle network errors
+								console.error('Error:', error);
+								alert('An error occurred while disliking the product.');
+							});
+						}
+						</script>
 	<!-- end search arewa -->
 	<!-- breadcrumb-section -->
 	<div class="breadcrumb-section breadcrumb-bg">
@@ -182,8 +236,37 @@
     &nbsp;|&nbsp;
     {{ prixEnYuan[produit.idproduit] | number_format(3, '.', ' ')}} ¥
 </p>
-
-
+{% if produit.offre is null %}
+						{# Si le produit n'a pas d'offre #}
+						<p>Aucune offre disponible</p>
+					{% else %}
+						{# Si le produit a une offre #}
+						<p class="product-offre">
+							<span>Offre: {{ produit.offre.nomOffre }}</span>
+							Réduction: {{ produit.offre.reduction }}% <br>
+							Montant final: {{ (produit.prix - (produit.prix * produit.offre.reduction / 100)) | number_format(3, '.', ' ') }} DT
+						</p>
+					{% endif %}
+					<div class="product-rating">
+						{% if produit.rating is defined %}
+						{% for i in range(1, 5) %}
+							<!-- Render filled stars for the current rating -->
+							<i class="{% if i <= produit.rating %}fas fa-star{% else %}far fa-star{% endif %}"></i>
+						{% endfor %}
+						{% else %}
+							<p>No ratings available</p>
+						{% endif %}
+					</div>
+					<div class="product-interactions">
+					<!-- Like and Dislike buttons with JavaScript events -->
+					<button class="like-btn" id="like-btn-{{ produit.idproduit }}" onclick="likeProduct({{ produit.idproduit }})">
+						<i class="fas fa-thumbs-up"></i> Like
+					</button>
+					<button class="dislike-btn" id="dislike-btn-{{ produit.idproduit }}" onclick="dislikeProduct({{ produit.idproduit }})">
+						<i class="fas fa-thumbs-down"></i> Dislike
+					</button>
+				</div>
+<br>
             <a href="{{ path('app_produit_cart', {'idProduit': produit.idproduit, 'idUser': user.iduser}) }}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
             </div>
         </div>

@@ -15,6 +15,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Utilisateur;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 class CategorieController extends AbstractController
 {
     #[Route('/categorie', name: 'app_categorie')]
@@ -27,9 +29,19 @@ class CategorieController extends AbstractController
     
 
     #[Route('/categorie/ajouter', name: 'app_categorie_ajouter')]
-    public function ajouter(Request $request): Response
+    public function ajouter(Request $request,SessionInterface $session): Response
 {
+    $userId = $session->get('iduser');
+        // Vérifier si l'ID de l'utilisateur existe dans la session
+        // Récupérer l'utilisateur à partir de session
+        if (!$userId)
+        {
+            return $this->redirectToRoute('app_utilisateur');
     
+        }
+        else {
+            $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find($userId);
+
     $categorie = new Categorie();
     $form = $this->createForm(CategorieType::class, $categorie);
     $form->handleRequest($request);
@@ -64,15 +76,13 @@ class CategorieController extends AbstractController
     //affichage
     $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
  
-    //user
-    $user = $this->getDoctrine()->getRepository(Utilisateur::class)->find(2);
-
+    
     return $this->render('categorie/ajouterCategorie.html.twig', [
         'form' => $form->createView(),
         'categories' => $categories,
         'user' => $user,
 
-    ]);
+    ]);}
 }
 
 

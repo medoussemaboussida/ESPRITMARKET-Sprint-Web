@@ -67,8 +67,13 @@
 						<nav class="main-menu">
 							<ul>
 								<li  class="current-list-item"><a href="{{path('app_produit')}}">Home</a></li>
-								<li><a href="">Dons</a></li>
-
+	                           <li class="sub-menu"><a href="#">Dons</a>
+									<ul class="sub-menu">
+                                        <li><a href='/dons'>Faire un don</a></li>
+										<li><a href='/demander_dons'>Demander dons</a></li>
+										
+									</ul>
+								</li>
 								<li><a href="">Evénements</a>
 									<ul class="sub-menu">
 										<li><a href="">Evénements</a></li>
@@ -89,6 +94,9 @@
 									<div class="header-icons">
 									    <a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
 										<a class="shopping-cart" href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}"><i class="fas fa-shopping-cart"></i></a>
+										<a href="{{ path('app_profile_user') }}" class="btn btn-primary rounded-pill py-2 px-3">
+    <i class="fas fa-user"></i> <!-- Icône utilisateur -->
+</a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 									</div>
 								</li>

@@ -2,67 +2,48 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use App\Repository\OffreRepository;
 
-/**
- * Offre
- *
- * @ORM\Table(name="offre")
- * @ORM\Entity
- */
+#[ORM\Table(name: "offre")]
+#[ORM\Entity(repositoryClass: OffreRepository::class)]
 class Offre
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idOffre", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "idOffre", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $idoffre;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="descriptionOffre", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "descriptionOffre", type: "string", length: 255, nullable: false)]
     private $descriptionoffre;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="nomOffre", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "nomOffre", type: "string", length: 255, nullable: false)]
     private $nomoffre;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="dateDebut", type="date", nullable=false)
-     */
+    #[ORM\Column(name: "dateDebut", type: "date", nullable: false)]
     private $datedebut;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="dateFin", type="date", nullable=false)
-     */
+    #[ORM\Column(name: "dateFin", type: "date", nullable: false)]
     private $datefin;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="imageOffre", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "imageOffre", type: "string", length: 255, nullable: false)]
     private $imageoffre;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="reduction", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: "reduction", type: "integer", nullable: false)]
     private $reduction;
+
+    #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: "offre")]
+
+    private $produits;
+
+    public function __construct()
+    {
+        $this->produits = new ArrayCollection();
+    }
 
     public function getIdoffre(): ?int
     {
@@ -77,7 +58,6 @@ class Offre
     public function setDescriptionoffre(string $descriptionoffre): static
     {
         $this->descriptionoffre = $descriptionoffre;
-
         return $this;
     }
 
@@ -89,7 +69,6 @@ class Offre
     public function setNomoffre(string $nomoffre): static
     {
         $this->nomoffre = $nomoffre;
-
         return $this;
     }
 
@@ -101,7 +80,6 @@ class Offre
     public function setDatedebut(\DateTimeInterface $datedebut): static
     {
         $this->datedebut = $datedebut;
-
         return $this;
     }
 
@@ -113,7 +91,6 @@ class Offre
     public function setDatefin(\DateTimeInterface $datefin): static
     {
         $this->datefin = $datefin;
-
         return $this;
     }
 
@@ -125,7 +102,6 @@ class Offre
     public function setImageoffre(string $imageoffre): static
     {
         $this->imageoffre = $imageoffre;
-
         return $this;
     }
 
@@ -137,9 +113,34 @@ class Offre
     public function setReduction(int $reduction): static
     {
         $this->reduction = $reduction;
+        return $this;
+    }
+
+    /**
+ * @return \Doctrine\Common\Collections\Collection|\App\Entity\Produit[]
+     */
+    public function getProduits(): Collection
+    {
+        return $this->produits;
+    }
+
+    public function addProduit(Produit $produit): self
+    {
+        if (!$this->produits->contains($produit)) {
+            $this->produits[] = $produit;
+            $produit->setOffre($this);
+        }
 
         return $this;
     }
 
+    public function removeProduit(Produit $produit): self
+    {
+        if ($this->produits->removeElement($produit)) {
+            // Définir l'offre du produit à null
+            $produit->setOffre(null);
+        }
 
+        return $this;
+    }
 }

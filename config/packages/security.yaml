@@ -2,13 +2,13 @@ security:
     enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        Symfony\Component\Security\Core\User\UserInterface: 'bcrypt'
     # Utiliser un fournisseur de données utilisateur basé sur une entité
     providers:
         my_provider:
             entity:
                 class: App\Entity\User
-                property: email # Utilisez la propriété appropriée pour l'authentification (par exemple, email ou nom d'utilisateur)
+                property: emailuser # Utilisez la propriété appropriée pour l'authentification (par exemple, email ou nom d'utilisateur)
 
     firewalls:
         dev:

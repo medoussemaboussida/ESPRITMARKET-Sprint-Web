@@ -16,4 +16,6 @@ return [
     Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
     Endroid\QrCodeBundle\EndroidQrCodeBundle::class => ['all' => true],
     Hexaequo\CurrencyConverterBundle\CurrencyConverterBundle::class => ['all' => true],
+    Flasher\Symfony\FlasherSymfonyBundle::class => ['all' => true],
+    Trsteel\CkeditorBundle\TrsteelCkeditorBundle::class => ['all' => true],
 ];

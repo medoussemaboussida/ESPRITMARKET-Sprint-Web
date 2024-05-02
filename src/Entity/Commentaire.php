@@ -3,49 +3,35 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommentaireRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Commentaire
- *
- * @ORM\Table(name="commentaire", indexes={@ORM\Index(name="idPublication", columns={"idPublication"}), @ORM\Index(name="idUser", columns={"idUser"})})
- * @ORM\Entity
- */
+
+#[ORM\Table(name: "commentaire", indexes: [
+    new ORM\Index(name: "idUser", columns: ["idUser"]),
+    new ORM\Index(name: "idPublication", columns: ["idPublication"])
+])]
+#[ORM\Entity(repositoryClass: CommentaireRepository::class)]
 class Commentaire
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idCommentaire", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "idCommentaire", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $idcommentaire;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="descriptionCommentaire", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "descriptionCommentaire", type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Veuillez entrer un commentaire.")]
+    
     private $descriptioncommentaire;
 
-    /**
-     * @var \Utilisateur
-     *
-     * @ORM\ManyToOne(targetEntity="Utilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idUser", referencedColumnName="idUser")
-     * })
-     */
-    private $iduser;
+    
 
-    /**
-     * @var \Publication
-     *
-     * @ORM\ManyToOne(targetEntity="Publication")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idPublication", referencedColumnName="idPublication")
-     * })
-     */
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(name: "idUser", referencedColumnName: "idUser")]
+    private $iduser;
+    
+    #[ORM\ManyToOne(targetEntity: Publication::class)]
+    #[ORM\JoinColumn(name: "idPublication", referencedColumnName: "idPublication")]
     private $idpublication;
 
     public function getIdcommentaire(): ?int
@@ -58,7 +44,7 @@ class Commentaire
         return $this->descriptioncommentaire;
     }
 
-    public function setDescriptioncommentaire(string $descriptioncommentaire): static
+    public function setDescriptioncommentaire(string $descriptioncommentaire): self
     {
         $this->descriptioncommentaire = $descriptioncommentaire;
 
@@ -70,7 +56,7 @@ class Commentaire
         return $this->iduser;
     }
 
-    public function setIduser(?Utilisateur $iduser): static
+    public function setIduser(?Utilisateur $iduser): self
     {
         $this->iduser = $iduser;
 
@@ -82,7 +68,7 @@ class Commentaire
         return $this->idpublication;
     }
 
-    public function setIdpublication(?Publication $idpublication): static
+    public function setIdpublication(?Publication $idpublication): self
     {
         $this->idpublication = $idpublication;
 

@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="/back/assets/vendors/flag-icon-css/css/flag-icon.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/owl-carousel-2/owl.carousel.min.css">
     <link rel="stylesheet" href="/back/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <!-- endinject -->
@@ -84,6 +86,14 @@
           <li class="nav-item nav-category">
             <span class="nav-link">Navigation</span>
           </li>
+            <li class="nav-item menu-items">
+            <a class="nav-link" href="/users">
+              <span class="menu-icon">
+                <i class="mdi mdi-speedometer"></i>
+              </span>
+              <span class="menu-title">Utilisateurs</span>
+            </a>
+          </li>
           <li class="nav-item menu-items">
             <a class="nav-link" href="/categorie/ajouter">
               <span class="menu-icon">
@@ -101,7 +111,7 @@
             </a>
           </li>
 
-           <li class="nav-item menu-items">
+           <li class="nav-item menu-items active">
             <a class="nav-link" href="/commande/commande-back">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
@@ -110,9 +120,9 @@
             </a>
           </li>
           
-          <!--dons sidebar-->
+         <!--dons sidebar-->
           <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/admin/dons">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -121,7 +131,7 @@
           </li>
 
            <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/admin/demandedons">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -129,15 +139,16 @@
             </a>
           </li>
 
-          <!--Publication commentaire sidebar-->
+   <!--Publication commentaire sidebar-->
            <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link"  href="../../publication/Listpublication">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
               <span class="menu-title">Publication</span>
             </a>
           </li>
+
 
           <li class="nav-item menu-items">
             <a class="nav-link" href="">
@@ -148,18 +159,17 @@
             </a>
           </li>
 
-          <!--Offre codepromo sidebar-->
-           <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+<!--Offre codepromo sidebar-->
+           <li class="nav-item menu-items ">
+            <a class="nav-link" href="/afficher-offres">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
               <span class="menu-title">Offre</span>
             </a>
           </li>
-
-          <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+           <li class="nav-item menu-items">
+            <a class="nav-link" href="/afficher-codes">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -169,7 +179,7 @@
  
           <!--evenement reclamation sidebar-->
            <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/evenement/back/event">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -178,7 +188,7 @@
           </li>
 
           <li class="nav-item menu-items">
-            <a class="nav-link" href="">
+            <a class="nav-link" href="/reclamation/back">
               <span class="menu-icon">
                 <i class="mdi mdi-laptop"></i>
               </span>
@@ -234,8 +244,10 @@
             </ul>
             <ul class="navbar-nav navbar-nav-right">
               <li class="nav-item dropdown d-none d-lg-block">
-                <a class="nav-link btn btn-success create-new-button" id="createbuttonDropdown" data-toggle="dropdown" aria-expanded="false" href="#">+ Create New Project</a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
+<a class="btn btn-danger" id="createbuttonDropdown" href="{{ path('app_logout') }}" data-toggle="dropdown" aria-expanded="false">
+    <i class="fas fa-sign-out-alt mr-2"></i> <!-- Ajoute une icône de déconnexion -->
+    Logout
+</a>                   <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
                   <h6 class="p-3 mb-0">Projects</h6>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item preview-item">
@@ -477,24 +489,24 @@
     </div>
     <!-- container-scroller -->
     <!-- plugins:js -->
-    <script src="back/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="/back/assets/vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->
     <!-- Plugin js for this page -->
-    <script src="back/assets/vendors/chart.js/Chart.min.js"></script>
-    <script src="back/assets/vendors/progressbar.js/progressbar.min.js"></script>
-    <script src="back/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
-    <script src="back/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
-    <script src="back/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <script src="/back/assets/vendors/chart.js/Chart.min.js"></script>
+    <script src="/back/assets/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="/back/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="/back/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="/back/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
     <!-- End plugin js for this page -->
     <!-- inject:js -->
-    <script src="back/assets/js/off-canvas.js"></script>
-    <script src="back/assets/js/hoverable-collapse.js"></script>
-    <script src="back/assets/js/misc.js"></script>
-    <script src="back/assets/js/settings.js"></script>
-    <script src="back/assets/js/todolist.js"></script>
+    <script src="/back/assets/js/off-canvas.js"></script>
+    <script src="/back/assets/js/hoverable-collapse.js"></script>
+    <script src="/back/assets/js/misc.js"></script>
+    <script src="/back/assets/js/settings.js"></script>
+    <script src="/back/assets/js/todolist.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page -->
-    <script src="back/assets/js/dashboard.js"></script>
+    <script src="/back/assets/js/dashboard.js"></script>
     <!-- End custom js for this page -->
   </body>
 </html>

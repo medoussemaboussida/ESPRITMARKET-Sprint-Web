@@ -2,52 +2,36 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PublicationRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Publication
- *
- * @ORM\Table(name="publication")
- * @ORM\Entity
- */
+use Doctrine\DBAL\Types\Types;
+use DateTime; // Import de DateTime
+
+#[ORM\Table(name: "publication")]
+#[ORM\Entity(repositoryClass: PublicationRepository::class)]
 class Publication
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idPublication", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "idPublication", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $idpublication;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "description", type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Veuillez entrer une description.")]
     private $description;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="datePublication", type="date", nullable=false)
-     */
-    private $datepublication;
+    #[ORM\Column(name: "datePublication", type: "datetime", nullable: false)]
+    private DateTime $datePublication; // Utilisation de DateTime
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="imagePublication", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "imagePublication", type: "string", length: 255, nullable: false)]
+
     private $imagepublication;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="titrePublication", type="string", length=255, nullable=false)
-     */
+    
+    #[ORM\Column(name: "titrePublication", type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Veuillez entrer un titre de publication")]
+   
     private $titrepublication;
 
     public function getIdpublication(): ?int
@@ -60,21 +44,21 @@ class Publication
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getDatepublication(): ?\DateTimeInterface
+    public function getDatePublication(): ?\DateTimeInterface
     {
-        return $this->datepublication;
+        return $this->datePublication;
     }
 
-    public function setDatepublication(\DateTimeInterface $datepublication): static
+    public function setDatePublication(\DateTimeInterface $datePublication): self
     {
-        $this->datepublication = $datepublication;
+        $this->datePublication = $datePublication;
 
         return $this;
     }
@@ -84,7 +68,7 @@ class Publication
         return $this->imagepublication;
     }
 
-    public function setImagepublication(string $imagepublication): static
+    public function setImagepublication(string $imagepublication): self
     {
         $this->imagepublication = $imagepublication;
 
@@ -96,12 +80,14 @@ class Publication
         return $this->titrepublication;
     }
 
-    public function setTitrepublication(string $titrepublication): static
+    public function setTitrepublication(string $titrepublication): self
     {
         $this->titrepublication = $titrepublication;
 
         return $this;
     }
+
+    
 
 
 }

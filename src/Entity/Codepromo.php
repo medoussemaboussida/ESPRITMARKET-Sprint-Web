@@ -2,53 +2,61 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\CodeRepository;
 
-/**
- * Codepromo
- *
- * @ORM\Table(name="codepromo")
- * @ORM\Entity
- */
+#[ORM\Table(name: "codepromo")]
+#[ORM\Entity(repositoryClass: CodeRepository::class)]
 class Codepromo
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idCode", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(name: "idCode", type: "integer", nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private $idcode;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="reductionAssocie", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: "reductionAssocie", type: "integer", nullable: false)]
+    #[Assert\NotBlank(message: "Ce champ ne peut pas être vide")]
+    #[Assert\Range(
+        min: 1,
+        max: 100,
+        minMessage: "La valeur minimale pour ce champ est 1",
+        maxMessage: "La valeur maximale pour ce champ est 100"
+    )]
     private $reductionassocie;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: "code", type: "string", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Ce champ ne peut pas être vide")]
     private $code;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="dateDebut", type="date", nullable=false)
-     */
+    #[ORM\Column(name: "dateDebut", type: "date", nullable: false)]
+    #[Assert\NotBlank(message: "Ce champ ne peut pas être vide")]
+    #[Assert\GreaterThan(
+        value: "yesterday",
+        message: "La date de début doit être postérieure a la date actuelle."
+    )]
     private $datedebut;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="dateFin", type="date", nullable=false)
-     */
+    #[ORM\Column(name: "dateFin", type: "date", nullable: false)]
+    #[Assert\NotBlank(message: "Ce champ ne peut pas être vide")]
+    #[Assert\GreaterThan(
+        value: "today",
+        message: "La date de fin doit être postérieure a la date actuelle."
+    )]
     private $datefin;
+
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        if ($this->datedebut >= $this->datefin) {
+            $context->buildViolation('La date de début doit être avant la date de fin.')
+                ->atPath('datedebut')
+                ->addViolation();
+        }
+    }
 
     public function getIdcode(): ?int
     {
@@ -63,7 +71,6 @@ class Codepromo
     public function setReductionassocie(int $reductionassocie): static
     {
         $this->reductionassocie = $reductionassocie;
-
         return $this;
     }
 
@@ -75,7 +82,6 @@ class Codepromo
     public function setCode(string $code): static
     {
         $this->code = $code;
-
         return $this;
     }
 
@@ -87,7 +93,6 @@ class Codepromo
     public function setDatedebut(\DateTimeInterface $datedebut): static
     {
         $this->datedebut = $datedebut;
-
         return $this;
     }
 
@@ -99,9 +104,6 @@ class Codepromo
     public function setDatefin(\DateTimeInterface $datefin): static
     {
         $this->datefin = $datefin;
-
         return $this;
     }
-
-
 }

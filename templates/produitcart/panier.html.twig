@@ -67,15 +67,20 @@
 						<nav class="main-menu">
 							<ul>
 								<li><a href="{{path('app_produit')}}">Home</a></li>
-								<li><a href="">Dons</a></li>
-
-								<li><a href="">Evénements</a>
+	<li class="sub-menu"><a href="#">Dons</a>
 									<ul class="sub-menu">
-										<li><a href="">Evénements</a></li>
-										<li><a href="">Réclamation</a></li>
+                                        <li><a href='/dons'>Faire un don</a></li>
+										<li><a href='/demander_dons'>Demander dons</a></li>
+										
 									</ul>
 								</li>
-								<li><a href="">Publications</a></li>
+								<li ><a href="{{ path('app_evenement_front')}}">Evénements</a>
+									<ul class="sub-menu">
+										<li><a href="{{ path('app_evenement_front')}}">Evénements</a></li>
+										<li><a href="{{ path('app_reclamation_new')}}">Réclamation</a></li>
+									</ul>
+								</li>
+								<li><a href="{{path('front_publication')}}">Publications</a></li>
 
 								<li><a href="">Offres</a></li>
 
@@ -90,7 +95,9 @@
 										<a class="shopping-cart" href="{{ path('afficher_produit_panier', {'idUser': user.iduser}) }}"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
 										<a class="logout-icon" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i></a>
-
+<a href="{{ path('app_profile_user') }}" class="btn btn-primary rounded-pill py-2 px-3">
+    <i class="fas fa-user"></i> <!-- Icône utilisateur -->
+</a>
 									</div>
 								</li>
 							</ul>
@@ -161,7 +168,7 @@
         <tr class="table-body-row">
             <td class="product-image"><img src="{{ asset('images/' ~ produit.imageproduit) }}" alt="" class="product-img" ></td>
 <td>
-    {{ totalPrix | number_format(3, '.', ' ') }} DT
+    {{ produit.prix | number_format(3, '.', ' ') }} DT
 	 &nbsp;|&nbsp;
     {{ prixEnEuros | number_format(3, '.', ' ') }} EUR
     &nbsp;|&nbsp;
@@ -288,6 +295,20 @@ if (montantTotalElement) {
 
 
 </style>
+<script>
+		// Fonction pour afficher/cacher le bouton en fonction du champ de texte
+		function toggleApplyButton() {
+			const couponField = document.querySelector('input[name="coupon"]'); // Identifiez le champ du coupon
+			const applyButton = document.getElementById('apply_button'); // Identifiez le bouton de soumission
+
+			// Afficher le bouton si le champ de texte n'est pas vide, sinon cacher
+			if (couponField.value.trim() !== '') {
+				applyButton.classList.remove('hidden');
+			} else {
+				applyButton.classList.add('hidden');
+			}
+		}
+	</script>
 
 					</div>
 				</div>
@@ -324,12 +345,18 @@ if (montantTotalElement) {
 					<div class="coupon-section">
 						<h3>Apply Coupon</h3>
 						<div class="coupon-form-wrap">
-							<form action="index.html">
-								<p><input type="text" placeholder="Coupon"></p>
-								<p><input type="submit" value="Apply"></p>
+							<form action="{{ path('apply_coupon', {'idp':panier.idpanier}) }}" method="post">
+								<p><input type="text" placeholder="Coupon" name="coupon" oninput="toggleApplyButton()"></p>
+								<p><input type="submit" value="Apply" id="apply_button" class="hidden"></p>  <!-- Bouton caché -->
 							</form>
 						</div>
 					</div>
+					{% for message in app.flashes('success') %}
+					<div class="alert alert-success">{{ message }}</div>
+				{% endfor %}
+				{% for message in app.flashes('error') %}
+					<div class="alert alert-danger">{{ message }}</div>
+				{% endfor %}
 				</div>
 			</div>
 		</div>
